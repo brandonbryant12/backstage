@@ -5,7 +5,6 @@ import {
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { ProviderA } from './providers/providerA/provider';
 import { ProviderB } from './providers/providerB/provider';
-import { CatalogProviderProcessor } from './processor';
 import { catalogServiceRef } from '@backstage/plugin-catalog-node';
 
 export const catalogProviderModuleCatalogProviderModule = createBackendModule({
@@ -17,9 +16,8 @@ export const catalogProviderModuleCatalogProviderModule = createBackendModule({
         logger: coreServices.logger,
         scheduler: coreServices.scheduler,
         catalog: catalogProcessingExtensionPoint,
-        catalogService: catalogServiceRef,
       },
-      async init({ logger, scheduler, catalog, catalogService }) {
+      async init({ logger, scheduler, catalog }) {
         const providerA = new ProviderA(logger, scheduler.createScheduledTaskRunner({
           frequency: { minutes: 1 },
           timeout: { minutes: 10 },
@@ -31,9 +29,6 @@ export const catalogProviderModuleCatalogProviderModule = createBackendModule({
         
         catalog.addEntityProvider(providerA);
         catalog.addEntityProvider(providerB);
-        
-        const processor = new CatalogProviderProcessor(logger, catalogService);
-        catalog.addProcessor(processor);
         
         logger.info('Catalog provider module initialized with scheduled tasks');
       },

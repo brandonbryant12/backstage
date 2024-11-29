@@ -53,4 +53,5 @@ backend.add(import('@backstage/plugin-kubernetes-backend'));
 
 // backend.add(import('@internal/backstage-plugin-catalog-provider-backend-module-catalog-provider-module'));
 backend.add(import('@internal/backstage-plugin-backend-catalog-backend-module-core-provider'));
+backend.add(import('backstage-plugin-catalog-backend-backend-module-processors'));
 backend.start();
