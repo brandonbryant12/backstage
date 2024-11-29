@@ -18,9 +18,8 @@ export const catalogProviderModuleCatalogProviderModule = createBackendModule({
         scheduler: coreServices.scheduler,
         catalog: catalogProcessingExtensionPoint,
         catalogService: catalogServiceRef,
-        tokenManager: coreServices.tokenManager,
       },
-      async init({ logger, scheduler, catalog, catalogService, tokenManager }) {
+      async init({ logger, scheduler, catalog, catalogService }) {
         const providerA = new ProviderA(logger, scheduler.createScheduledTaskRunner({
           frequency: { minutes: 1 },
           timeout: { minutes: 10 },
@@ -33,7 +32,7 @@ export const catalogProviderModuleCatalogProviderModule = createBackendModule({
         catalog.addEntityProvider(providerA);
         catalog.addEntityProvider(providerB);
         
-        const processor = new CatalogProviderProcessor(logger, catalogService, tokenManager);
+        const processor = new CatalogProviderProcessor(logger, catalogService);
         catalog.addProcessor(processor);
         
         logger.info('Catalog provider module initialized with scheduled tasks');
