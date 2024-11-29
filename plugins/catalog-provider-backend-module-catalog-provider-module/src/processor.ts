@@ -39,3 +39,22 @@ export class MergeEntitiesProcessor implements CatalogProcessor {
     return entity;
   }
 }
+
+
+class CatalogFetchApi {
+  constructor(
+    private readonly logger: LoggerService,
+    private readonly auth: AuthService,
+  ) {}
+
+  async fetch(input: any, init: RequestInit | undefined): Promise<Response> {
+    const request = new Request(input as any, init);
+    const { token } = await this.auth.getPluginRequestToken({
+      onBehalfOf: await this.auth.getOwnServiceCredentials(),
+      targetPluginId: 'catalog',
+    });
+    request.headers.set('Authorization', `Bearer ${token}`);
+    this.logger.debug(`Added token to outgoing request to ${request.url}`);
+    return fetch(request);
+  }
+}
