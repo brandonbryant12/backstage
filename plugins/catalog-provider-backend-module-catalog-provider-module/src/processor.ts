@@ -31,6 +31,7 @@ export class ComponentProcessor implements CatalogProcessor {
 
   private mergeEntities(target: Entity, source: Entity): Entity {
     const merged: Entity = { ...target };
+
     // Merge metadata.annotations
     merged.metadata.annotations = {
       ...target.metadata.annotations,
@@ -43,8 +44,14 @@ export class ComponentProcessor implements CatalogProcessor {
       ...source.metadata.labels,
     };
 
+    // Merge spec fields, excluding those managed by Backstage
+    const fieldsToExclude = ['relations', 'status'];
+    for (const key of Object.keys(source.spec || {})) {
+      if (!fieldsToExclude.includes(key)) {
+        merged.spec = { ...merged.spec, [key]: source.spec[key] };
+      }
+    }
+
     return merged;
   }
 }
-
-// https://github.com/backstage/backstage/issues/23940
