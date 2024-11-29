@@ -15,12 +15,9 @@ export class MergeEntitiesProcessor implements CatalogProcessor {
     emit: CatalogProcessorEmit,
   ): Promise<Entity> {
     const entityRef = stringifyEntityRef(entity);
-    const existingEntities = await this.catalogClient.getEntities({
-      filter: { 'metadata.name': entity.metadata.name },
-    });
+    const existingEntity = await this.catalogClient.getEntityByRef(entityRef);
 
-    if (existingEntities.items.length > 0) {
-      const existingEntity = existingEntities.items[0];
+    if (existingEntity) {
       const mergedEntity = {
         ...existingEntity,
         ...entity,
@@ -37,24 +34,5 @@ export class MergeEntitiesProcessor implements CatalogProcessor {
     }
 
     return entity;
-  }
-}
-
-
-class CatalogFetchApi {
-  constructor(
-    private readonly logger: LoggerService,
-    private readonly auth: AuthService,
-  ) {}
-
-  async fetch(input: any, init: RequestInit | undefined): Promise<Response> {
-    const request = new Request(input as any, init);
-    const { token } = await this.auth.getPluginRequestToken({
-      onBehalfOf: await this.auth.getOwnServiceCredentials(),
-      targetPluginId: 'catalog',
-    });
-    request.headers.set('Authorization', `Bearer ${token}`);
-    this.logger.debug(`Added token to outgoing request to ${request.url}`);
-    return fetch(request);
   }
 }
