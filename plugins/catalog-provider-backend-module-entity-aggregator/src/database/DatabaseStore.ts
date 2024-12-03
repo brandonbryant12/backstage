@@ -145,18 +145,38 @@ export class DatabaseStore {
     }
   }
 
-  async getRecordsToEmit(batchSize: number = 100): Promise<EntityRecord[]> {
+  async getRecordsToEmit(batchSize: number = 1000): Promise<EntityRecord[]> {
     const needsEmit = this.knex.client.config.client === 'pg' ? true : 1;
-    return this.knex(TABLE_NAME)
+    
+    // First, get all entityRefs that need emission
+    const entityRefsToEmit = await this.knex(TABLE_NAME)
       .where('needsEmit', needsEmit)
-      .orderBy('priorityScore', 'desc')
+      .distinct('entityRef')
       .limit(batchSize)
-      .select()
-      .then(records => records.map(record => ({
-        ...record,
-        metadata: this.parseJsonField(record.metadata),
-        spec: this.parseJsonField(record.spec),
-      })));
+      .pluck('entityRef');
+
+    if (entityRefsToEmit.length === 0) {
+      return [];
+    }
+
+    // Then get ALL records for these entityRefs
+    const records = await this.knex(TABLE_NAME)
+      .whereIn('entityRef', entityRefsToEmit)
+      .where(builder => 
+        builder
+          .whereNull('expirationDate')
+          .orWhere('expirationDate', '>', new Date())
+      )
+      .orderBy(['entityRef', 'priorityScore'])
+      .select();
+
+    this.logger.debug(`Found ${records.length} total records for ${entityRefsToEmit.length} entities that need emission`);
+
+    return records.map(record => ({
+      ...record,
+      metadata: this.parseJsonField(record.metadata),
+      spec: this.parseJsonField(record.spec),
+    }));
   }
 
   async markEmitted(entityRefs: string[]): Promise<void> {
