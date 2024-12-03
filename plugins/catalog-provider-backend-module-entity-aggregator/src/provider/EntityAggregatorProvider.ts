@@ -11,18 +11,13 @@ import { EntityRecord } from '../types';
 import { chunk } from 'lodash';
 import { JsonObject } from '@backstage/types';
 
-// Common array fields in Backstage entities
-const MERGEABLE_ARRAYS = {
-  metadata: ['tags', 'links'],
-  spec: ['dependsOn', 'consumesApis', 'providesApis', 'ownedBy', 'type', 'targets', 'definition', 'members', 'maintainers', 'parents', 'children', 'substitutes', 'substituteFor', 'subcomponentOf'],
-};
-
 export class EntityAggregatorProvider implements EntityProvider {
   private connection?: EntityProviderConnection;
   private readonly dataSources: DataSource[];
-  private readonly batchSize = 100;
-  private updateLoopInterval = 30000; // 30 seconds
+  private readonly batchSize = 1000;
+  private updateLoopInterval = 10; // 30 seconds
   private isUpdateLoopRunning = false;
+  private readonly locationKey: string;
 
   constructor(
     private readonly name: string,
@@ -31,6 +26,7 @@ export class EntityAggregatorProvider implements EntityProvider {
     dataSources: DataSource[],
   ) {
     this.dataSources = dataSources;
+    this.locationKey = `url:${name}-provider.com`;
   }
 
   getProviderName(): string {
@@ -55,7 +51,8 @@ export class EntityAggregatorProvider implements EntityProvider {
 
   private async handleFetchedEntities(source: DataSource, entities: Entity[]): Promise<void> {
     try {
-      this.logger.debug(`Processing ${entities.length} entities from ${source.getName()}`);
+      const startTime = Date.now();
+      this.logger.info(`Starting to process ${entities.length} entities from ${source.getName()}`);
       
       const entityRecords: EntityRecord[] = entities.map(entity => ({
         dataSource: source.getName(),
@@ -66,6 +63,14 @@ export class EntityAggregatorProvider implements EntityProvider {
       }));
 
       await this.store.upsertRecords(entityRecords);
+      
+      const duration = Date.now() - startTime;
+      this.logger.info(`Processed ${entities.length} entities from ${source.getName()} in ${duration}ms`, {
+        source: source.getName(),
+        entityCount: entities.length,
+        durationMs: duration,
+        entitiesPerSecond: Math.round((entities.length / duration) * 1000)
+      });
       
     } catch (error) {
       this.logger.error(
@@ -87,7 +92,17 @@ export class EntityAggregatorProvider implements EntityProvider {
   private async runUpdateLoop(): Promise<void> {
     while (this.isUpdateLoopRunning && this.connection) {
       try {
-        await this.processUpdatedEntities();
+        const loopStartTime = Date.now();
+        const processedCount = await this.processUpdatedEntities();
+        const loopDuration = Date.now() - loopStartTime;
+
+        if (processedCount > 0) {
+          this.logger.info(`Update loop completed`, {
+            processedEntities: processedCount,
+            durationMs: loopDuration,
+            entitiesPerSecond: Math.round((processedCount / loopDuration) * 1000)
+          });
+        }
       } catch (error) {
         this.logger.error('Error in update loop', error);
       }
@@ -96,39 +111,12 @@ export class EntityAggregatorProvider implements EntityProvider {
     }
   }
 
-  private mergeArrayFields(records: EntityRecord[], section: 'metadata' | 'spec', fieldName: string): any[] {
-    // Combine arrays from all records and remove duplicates
-    const combinedArray = [...new Set(
-      records
-        .flatMap(record => record[section]?.[fieldName] || [])
-        // For objects in arrays (like links), stringify them for deduplication
-        .map(item => typeof item === 'object' ? JSON.stringify(item) : item)
-    )];
-
-    // Convert stringified objects back to objects
-    return combinedArray.map(item => {
-      try {
-        return typeof item === 'string' && item.startsWith('{') ? JSON.parse(item) : item;
-      } catch {
-        return item;
-      }
-    });
-  }
-
   private mergeRecords(records: EntityRecord[]): EntityRecord {
+    const mergeStartTime = Date.now();
+    
     // Sort by priority score (highest first)
     const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
     const highestPriorityRecord = sortedRecords[0];
-
-    // Log the starting state
-    this.logger.info('Starting merge for records:', {
-      entityRef: highestPriorityRecord.entityRef,
-      sources: sortedRecords.map(r => ({
-        source: r.dataSource,
-        priority: r.priorityScore,
-        annotations: r.metadata.annotations || {},
-      }))
-    });
 
     // Create merged record starting with highest priority record's base data
     const mergedRecord = {
@@ -137,15 +125,14 @@ export class EntityAggregatorProvider implements EntityProvider {
         ...highestPriorityRecord.metadata,
         annotations: {},
       },
-      spec: { ...highestPriorityRecord.spec },
     };
 
-    // Merge annotations (priority-based)
-    const allAnnotationKeys = new Set(
+    // For each unique annotation key
+    const allKeys = new Set(
       sortedRecords.flatMap(r => Object.keys(r.metadata.annotations || {}))
     );
 
-    allAnnotationKeys.forEach(key => {
+    allKeys.forEach(key => {
       // Find first (highest priority) record that has this annotation
       for (const record of sortedRecords) {
         if (record.metadata.annotations?.[key]) {
@@ -155,53 +142,32 @@ export class EntityAggregatorProvider implements EntityProvider {
       }
     });
 
-    // Merge array fields
-    for (const [section, fields] of Object.entries(MERGEABLE_ARRAYS)) {
-      for (const fieldName of fields) {
-        const hasField = sortedRecords.some(r => Array.isArray(r[section]?.[fieldName]));
-        if (hasField) {
-          const mergedArray = this.mergeArrayFields(sortedRecords, section as 'metadata' | 'spec', fieldName);
-          if (mergedArray.length > 0) {
-            mergedRecord[section][fieldName] = mergedArray;
-            
-            // Log the merge result for this field
-            this.logger.debug(`Merged ${section}.${fieldName}:`, {
-              entityRef: mergedRecord.entityRef,
-              field: fieldName,
-              sources: sortedRecords.map(r => ({
-                source: r.dataSource,
-                values: r[section]?.[fieldName] || []
-              })),
-              result: mergedArray
-            });
-          }
-        }
-      }
-    }
-
-    // Log the result
-    this.logger.info('Merged record result:', {
+    const mergeDuration = Date.now() - mergeStartTime;
+    this.logger.debug(`Merged ${records.length} records in ${mergeDuration}ms`, {
       entityRef: mergedRecord.entityRef,
-      dataSources: sortedRecords.map(r => r.dataSource).join(', '),
-      annotations: mergedRecord.metadata.annotations,
-      metadata: Object.keys(mergedRecord.metadata).filter(k => Array.isArray(mergedRecord.metadata[k])),
-      spec: Object.keys(mergedRecord.spec).filter(k => Array.isArray(mergedRecord.spec[k]))
+      recordCount: records.length,
+      durationMs: mergeDuration,
+      dataSources: sortedRecords.map(r => r.dataSource).join(', ')
     });
 
     return mergedRecord;
   }
 
-  private async processUpdatedEntities(): Promise<void> {
+  private async processUpdatedEntities(): Promise<number> {
     if (!this.connection) {
-      return;
+      return 0;
     }
 
+    const processStartTime = Date.now();
+    
     const entitiesToEmit = await this.store.getRecordsToEmit(this.batchSize);
     if (entitiesToEmit.length === 0) {
-      return;
+      return 0;
     }
 
-    this.logger.info(`Processing ${entitiesToEmit.length} records that need updates`);
+    let totalProcessed = 0;
+    let mergeTimeTotal = 0;
+    let emitTimeTotal = 0;
     
     const recordsByRef = new Map<string, EntityRecord[]>();
     for (const record of entitiesToEmit) {
@@ -216,12 +182,19 @@ export class EntityAggregatorProvider implements EntityProvider {
     for (const batch of batches) {
       const mutations: DeferredEntity[] = [];
       
+      const mergeStartTime = Date.now();
       for (const entityRef of batch) {
         const entityRecords = recordsByRef.get(entityRef);
         if (!entityRecords || entityRecords.length === 0) continue;
 
         const [kind] = entityRef.split(':');
         const mergedRecord = this.mergeRecords(entityRecords);
+        
+        mergedRecord.metadata.annotations = {
+          ...mergedRecord.metadata.annotations,
+          'backstage.io/managed-by-location': this.locationKey,
+          'backstage.io/managed-by-origin-location': this.locationKey,
+        };
 
         mutations.push({
           entity: {
@@ -230,10 +203,12 @@ export class EntityAggregatorProvider implements EntityProvider {
             metadata: mergedRecord.metadata,
             spec: mergedRecord.spec,
           },
-          locationKey: `${mergedRecord.dataSource}-location`,
+          locationKey: this.locationKey,
         });
       }
+      mergeTimeTotal += Date.now() - mergeStartTime;
 
+      const emitStartTime = Date.now();
       await this.connection.applyMutation({
         type: 'delta',
         added: mutations,
@@ -241,8 +216,23 @@ export class EntityAggregatorProvider implements EntityProvider {
       });
 
       await this.store.markEmitted(batch);
-      this.logger.info(`Processed batch of ${batch.length} entities`);
+      emitTimeTotal += Date.now() - emitStartTime;
+
+      totalProcessed += batch.length;
     }
+
+    const totalDuration = Date.now() - processStartTime;
+    this.logger.info(`Entity processing details:`, {
+      totalEntities: totalProcessed,
+      totalDurationMs: totalDuration,
+      mergeTimeMs: mergeTimeTotal,
+      emitTimeMs: emitTimeTotal,
+      entitiesPerSecond: Math.round((totalProcessed / totalDuration) * 1000),
+      batchSize: this.batchSize,
+      batchCount: batches.length
+    });
+
+    return totalProcessed;
   }
 
   private getEntityRef(entity: Entity): string {
