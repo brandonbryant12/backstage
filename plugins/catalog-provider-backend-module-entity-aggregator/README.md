@@ -1,142 +1,155 @@
 # Entity Aggregator Module for Backstage Catalog
 
-This backend module for Backstage provides a flexible system for aggregating entity data from multiple sources while managing priority, scheduling, and efficient updates.
+This backend module provides a sophisticated system for aggregating entity data from multiple sources into the Backstage catalog, with intelligent conflict resolution and efficient processing.
 
-## Features
+## Key Features
 
-- **Multi-Source Entity Management**: Aggregate entities from multiple data sources
-- **Priority-Based Conflict Resolution**: Handle conflicting entity definitions through configurable priority scores
-- **Efficient Change Detection**: Content-based hash tracking to only emit changed entities
-- **Batched Processing**: Efficient handling of large datasets through batched operations
-- **Configurable Refresh Schedules**: Each data source can have its own refresh schedule
-- **Delta Updates**: Efficient catalog updates using delta mutations
+- **Multi-Source Entity Management**: Aggregate entities from multiple data sources with priority-based conflict resolution
+- **Smart Conflict Resolution**: Merge entity data based on source priorities and field-level precedence
+- **Efficient Processing**: 
+  - Content-based change detection using SHA-256 hashing
+  - Batched database operations
+  - Delta-based catalog updates
+- **Flexible Scheduling**: Configure per-source refresh schedules
+- **Database Support**: Works with both PostgreSQL and SQLite
 
-## Installation
+## Understanding Data Sources
 
-```bash
-# From your Backstage root directory
-yarn add --cwd packages/backend @backstage/plugin-catalog-provider-backend-module-entity-aggregator
-```
+A data source is any system that provides entity data to Backstage. Each data source:
 
-## Configuration
-
-Add the module to your catalog plugin in `packages/backend/src/plugins/catalog.ts`:
-
+1. **Implements the DataSource abstract class**:
 ```typescript
-import { Entity } from '@backstage/catalog-model';
-import { entityAggregatorModule } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator';
-
-export default async function createPlugin(
-  env: PluginEnvironment,
-): Promise<Router> {
-  const builder = await CatalogBuilder.create(env);
-
-  // Add the entity aggregator module
-  builder.addModule(entityAggregatorModule);
-
-  const { processingEngine, router } = await builder.build();
-  await processingEngine.start();
-
-  return router;
+abstract class DataSource {
+  abstract fetchEntities(): Promise<Entity[]>;
+  // ... other methods
 }
 ```
 
-## Architecture
-
-### Core Components
-
-1. **EntityAggregatorProvider**
-   - Single provider registered with the Backstage catalog
-   - Manages the update loop for entity emission
-   - Handles delta mutations and conflict resolution
-
-2. **DatabaseStore**
-   - Manages entity record persistence
-   - Tracks content changes via hashing
-   - Handles batched operations efficiently
-
-3. **DataSource Base Class**
-   - Abstract base class for implementing data sources
-   - Handles scheduling and error management
-   - Provides lifecycle hooks for entity processing
-
-### Data Flow
-
-```mermaid
-graph TD
-    DS[DataSources] -->|Fetch| P[EntityAggregatorProvider]
-    P -->|Store| DB[DatabaseStore]
-    DB -->|Emit Changes| C[Catalog]
+2. **Has required configuration**:
+```typescript
+interface DataSourceConfig {
+  name: string;          // Unique identifier
+  priority: number;      // Higher number = higher priority
+  refreshSchedule?: string; // Optional cron schedule
+}
 ```
 
-## Creating a Custom Data Source
+3. **Can be scheduled for updates**:
+- Uses cron expressions for scheduling (e.g., "*/5 * * * *" for every 5 minutes)
+- Automatic retry mechanisms for failed fetches
+- Configurable timeout settings
 
-Implement a custom data source by extending the DataSource class:
+## Entity Processing Pipeline
+
+1. **Fetch Phase**:
+   - Data sources fetch entities either on schedule or on-demand
+   - Each entity is validated and transformed into a standardized format
+
+2. **Storage Phase**:
+   - Entities are stored with metadata in the database
+   - Content hashing detects changes
+   - Efficient batch processing (default 1000 entities per batch)
+
+3. **Merge Phase**:
+   - Entities from different sources are merged based on priority
+   - Annotation merging follows priority rules
+   - Higher priority sources override lower priority data
+
+4. **Emission Phase**:
+   - Changed entities are emitted to the catalog
+   - Delta updates minimize processing overhead
+   - Batched emissions for performance
+
+## Usage Example
+
+1. Create your data source:
 
 ```typescript
 import { DataSource, DataSourceConfig } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator';
 
-export class CustomDataSource extends DataSource {
+export class MyDataSource extends DataSource {
   async fetchEntities(): Promise<Entity[]> {
-    // Implement your entity fetching logic
+    // Your implementation to fetch entities
     return [{
       apiVersion: 'backstage.io/v1alpha1',
       kind: 'Component',
       metadata: {
-        name: 'example-component',
+        name: 'example',
         annotations: {
-          'timestamp': new Date().toISOString(),
+          'my-source/key': 'value'
         },
       },
       spec: {
         type: 'service',
-        lifecycle: 'production',
-        owner: 'team-a',
+        owner: 'team-a'
       },
     }];
   }
 }
 ```
 
-## Usage Example
-
-Configure your data sources with different priorities and schedules:
+2. Configure the module:
 
 ```typescript
-const dataSources = [
-  new CustomDataSourceA({
-    name: 'high-priority-source',
-    priority: 100,
-    refreshSchedule: '*/5 * * * *', // Every 5 minutes
-  }),
-  new CustomDataSourceB({
-    name: 'low-priority-source',
-    priority: 50,
-    refreshSchedule: '*/30 * * * *', // Every 30 minutes
-  }),
-];
+// In packages/backend/src/plugins/catalog.ts
+import { entityAggregatorModule } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator';
+
+export default async function createPlugin(env: PluginEnvironment): Promise<Router> {
+  const builder = await CatalogBuilder.create(env);
+  builder.addModule(entityAggregatorModule);
+  // ...
+}
 ```
 
-## Operational Details
+## Configuration
 
-- Batched processing of entities for efficient database operations
-- Content-based change detection using SHA-256 hashing
-- Configurable update intervals for the emission loop
-- Automatic conflict resolution based on priority scores
-- Delta mutations for efficient catalog updates
+The module supports configuration through `app-config.yaml`:
+
+```yaml
+catalog:
+  providers:
+    entityAggregator:
+      # Number of entities to process in each batch
+      batchSize: 1000
+      # Update loop interval in milliseconds
+      updateInterval: 10000
+      dataSources:
+        - name: primary-source
+          priority: 100
+          refreshSchedule: "*/5 * * * *"
+        - name: secondary-source
+          priority: 50
+          refreshSchedule: "*/30 * * * *"
+```
+
+## Database Schema
+
+The module maintains its state in a database table with the following structure:
+
+```sql
+CREATE TABLE entityRecords (
+  id TEXT PRIMARY KEY,
+  dataSource TEXT NOT NULL,
+  entityRef TEXT NOT NULL,
+  metadata JSONB NOT NULL,
+  spec JSONB NOT NULL,
+  priorityScore INTEGER NOT NULL,
+  contentHash TEXT NOT NULL,
+  needsEmit BOOLEAN NOT NULL,
+  lastTouched TIMESTAMP NOT NULL,
+  expirationDate TIMESTAMP,
+  UNIQUE(dataSource, entityRef)
+);
+```
 
 ## Error Handling
 
 The module implements comprehensive error handling:
-- Typed error reporting for data source operations
-- Automated retry mechanisms for failed operations
-- Detailed logging for debugging and monitoring
-- Transaction support for database operations
+- Failed data source refreshes are logged and retried
+- Database operations are transaction-safe
+- Entity validation before processing
+- Detailed logging for debugging
 
-## Contributing
 
-This module is part of the Backstage Community Plugins ecosystem. Contributions are welcome!
-
-## License
-
-Apache-2.0 © The Backstage Authors
+## Improvements to be made 
+- Refactor so Datasources pull method can add entities by chunk
