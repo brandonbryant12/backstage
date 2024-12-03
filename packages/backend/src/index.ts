@@ -7,7 +7,8 @@
  */
 
 import { createBackend } from '@backstage/backend-defaults';
-import { applicationProcessorModule } from '@internal/plugin-application-processor';
+// import { applicationProcessorModule } from '@internal/plugin-application-processor';
+import { entityAggregatorModule } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator'
 
 const backend = createBackend();
 
@@ -28,8 +29,8 @@ backend.add(
   import('@backstage/plugin-catalog-backend-module-scaffolder-entity-model'),
 );
 
-// Add the application processor module
-backend.add(applicationProcessorModule);
+// // Add the application processor module
+// backend.add(applicationProcessorModule);
 
 // See https://backstage.io/docs/features/software-catalog/configuration#subscribing-to-catalog-errors
 backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
@@ -52,7 +53,6 @@ backend.add(import('@backstage/plugin-search-backend-module-pg'));
 backend.add(import('@backstage/plugin-search-backend-module-catalog'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
-// kubernetes
-backend.add(import('@backstage/plugin-kubernetes-backend'));
 
+backend.add(entityAggregatorModule);
 backend.start();
