@@ -29,19 +29,17 @@ export const entityAggregatorModule = createBackendModule({
             { 
               name: 'datasource-a', 
               priority: 100,
-              refreshSchedule: '*/1 * * * *', // Every 1 minute
+              refreshSchedule: '*/20 * * * * *',
             }, 
             logger,
-            scheduler
           ),
           new DataSourceB(
             { 
               name: 'datasource-b', 
               priority: 50,
-              refreshSchedule: '*/2 * * * *', // Every 2 minutes
+              refreshSchedule: '*/40 * * * * *',
             }, 
             logger,
-            scheduler
           ),
         ];
 
@@ -50,6 +48,7 @@ export const entityAggregatorModule = createBackendModule({
           'entity-aggregator',
           store,
           logger,
+          scheduler,
           dataSources,
         );
 

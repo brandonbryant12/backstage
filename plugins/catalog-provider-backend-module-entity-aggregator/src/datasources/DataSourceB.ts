@@ -1,5 +1,7 @@
 import { Entity } from '@backstage/catalog-model';
 import { DataSource } from './DataSource';
+import { chunk } from 'lodash';
+import { LoggerService } from '@backstage/backend-plugin-api';
 
 const generateEntities = (count: number): Entity[] => {
   const timestamp = new Date().toISOString();
@@ -98,8 +100,37 @@ const generateEntities = (count: number): Entity[] => {
 };
 
 export class DataSourceB extends DataSource {
-  async fetchEntities(): Promise<Entity[]> {
-    // Generate 5 of each entity type (15 total entities)
-    return generateEntities(10);
+  constructor(
+    config: { 
+      name: string; 
+      priority: number; 
+      refreshSchedule?: string;
+    },
+    logger: LoggerService,
+  ) {
+    super({
+      ...config,
+      refreshSchedule: config.refreshSchedule || '*/40 * * * * *', // Run every 40 seconds by default
+    }, logger);
+  }
+
+  async refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void> {
+    try {
+      // Generate test entities (10 of each type)
+      const entities = generateEntities(10);
+      
+      // Process in chunks of 100 entities
+      const chunks = chunk(entities, 100);
+      
+      for (const batch of chunks) {
+        this.logger.debug(`Processing batch of ${batch.length} entities`);
+        await provide(batch);
+      }
+      
+      this.logger.info(`Successfully refreshed ${entities.length} entities`);
+    } catch (error) {
+      const message = `Failed to refresh entities for ${this.getName()}`;
+      this.logger.error(message, error);
+    }
   }
 }
