@@ -20,16 +20,17 @@ export const entityAggregatorModule = createBackendModule({
         database: coreServices.database,
       },
       async init({ catalog, logger, scheduler, database }) {
-        // Initialize the database store
         const store = await DatabaseStore.create(database, logger);
         
-        // Initialize data sources with different priorities and refresh schedules
         const dataSources = [
           new DataSourceA(
             { 
               name: 'datasource-a', 
               priority: 100,
-              refreshSchedule: '*/20 * * * * *',
+              refreshSchedule: {
+                frequency: { seconds: 20 },
+                timeout: { minutes: 10 },
+              },
             }, 
             logger,
           ),
@@ -37,13 +38,15 @@ export const entityAggregatorModule = createBackendModule({
             { 
               name: 'datasource-b', 
               priority: 50,
-              refreshSchedule: '*/40 * * * * *',
+              refreshSchedule: {
+                frequency: { seconds: 40 },
+                timeout: { minutes: 10 },
+              },
             }, 
             logger,
           ),
         ];
 
-        // Create the entity aggregator provider
         const provider = new EntityAggregatorProvider(
           'entity-aggregator',
           store,
@@ -52,9 +55,7 @@ export const entityAggregatorModule = createBackendModule({
           dataSources,
         );
 
-        // Register the provider with the catalog
         catalog.addEntityProvider(provider);
-
         logger.info('Registered entity aggregator provider with data sources A and B');
       },
     });

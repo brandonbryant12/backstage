@@ -1,10 +1,11 @@
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { Entity } from '@backstage/catalog-model';
+import { SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 
 export interface DataSourceConfig {
   name: string;
   priority: number;
-  refreshSchedule?: string;
+  refreshSchedule?: SchedulerServiceTaskScheduleDefinition;
 }
 
 export type DataSourceError = {
@@ -32,7 +33,7 @@ export abstract class DataSource {
     return this.config.priority;
   }
 
-  getSchedule(): string | undefined {
+  getSchedule(): SchedulerServiceTaskScheduleDefinition | undefined {
     return this.config.refreshSchedule;
   }
 

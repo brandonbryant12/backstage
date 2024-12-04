@@ -5,7 +5,7 @@ import {
 } from '@backstage/plugin-catalog-node';
 import { Entity, EntityMeta } from '@backstage/catalog-model';
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { SchedulerService } from '@backstage/backend-plugin-api';
+import { SchedulerService, SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 import { DataSource } from '../datasources/DataSource';
 import { DatabaseStore } from '../database/DatabaseStore';
 import { EntityRecord } from '../types';
@@ -17,7 +17,10 @@ export class EntityAggregatorProvider implements EntityProvider {
   private readonly dataSources: DataSource[];
   private readonly batchSize = 1000;
   private readonly locationKey: string;
-  private readonly emitSchedule = '*/10 * * * * *'; // Run every minute by default
+  private readonly emitSchedule: SchedulerServiceTaskScheduleDefinition = {
+    frequency: { seconds: 30 },
+    timeout: { minutes: 5 },
+  };
 
   constructor(
     private readonly name: string,
@@ -42,65 +45,33 @@ export class EntityAggregatorProvider implements EntityProvider {
     for (const source of this.dataSources) {
       const schedule = source.getSchedule();
       if (schedule) {
-        try {
-          await this.scheduler.scheduleTask({
-            id: `datasource-refresh-${source.getName()}`,
-            frequency: { cron: schedule },
-            timeout: { minutes: 10 },
-            fn: async () => {
-              await this.refreshDataSource(source);
-            },
-          });
-          this.logger.info(`Scheduled refresh for ${source.getName()} with cron: ${schedule}`);
-        } catch (error) {
-          this.logger.error(`Failed to schedule refresh for ${source.getName()}`, error);
-        }
+        const runner = this.scheduler.createScheduledTaskRunner(schedule);
+        await runner.run({
+          id: `datasource-refresh-${source.getName()}`,
+          fn: async () => {
+            await source.refresh(entities => this.provide(source, entities));
+          },
+        });
+        this.logger.info(
+          `Scheduled refresh for ${source.getName()} with schedule: ${JSON.stringify(schedule)}`,
+        );
       }
     }
 
     // Schedule the emit task
-    try {
-      await this.scheduler.scheduleTask({
-        id: `${this.name}-emit-updates`,
-        frequency: { cron: this.emitSchedule },
-        timeout: { minutes: 5 },
-        fn: async () => {
-          await this.emitUpdatedEntities();
-        },
-      });
-      this.logger.info(`Scheduled entity emission with cron: ${this.emitSchedule}`);
-    } catch (error) {
-      this.logger.error('Failed to schedule entity emission task', error);
-    }
-  }
-
-  private async refreshDataSource(source: DataSource): Promise<void> {
-    const startTime = Date.now();
-    this.logger.info(`Starting refresh for ${source.getName()}`);
-    
-    try {
-      await source.refresh(async (entities) => {
-        await this.provide(source, entities);
-      });
-      
-      const duration = Date.now() - startTime;
-      this.logger.info(`Completed refresh for ${source.getName()}`, {
-        source: source.getName(),
-        durationMs: duration,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Failed to refresh ${source.getName()}`,
-        error,
-      );
-    }
+    const emitRunner = this.scheduler.createScheduledTaskRunner(this.emitSchedule);
+    await emitRunner.run({
+      id: `${this.name}-emit-updates`,
+      fn: async () => {
+        await this.emitUpdatedEntities();
+      },
+    });
+    this.logger.info(`Scheduled entity emission with schedule: ${JSON.stringify(this.emitSchedule)}`);
   }
 
   private async provide(source: DataSource, entities: Entity[]): Promise<void> {
     try {
-      const startTime = Date.now();
       this.logger.info(`Starting to process ${entities.length} entities from ${source.getName()}`);
-      
       const entityRecords: EntityRecord[] = entities.map(entity => ({
         dataSource: source.getName(),
         entityRef: this.getEntityRef(entity),
@@ -108,30 +79,18 @@ export class EntityAggregatorProvider implements EntityProvider {
         spec: entity.spec || {} as JsonObject,
         priorityScore: source.getPriority(),
       }));
-
       await this.store.upsertRecords(entityRecords);
-      
-      const duration = Date.now() - startTime;
-      this.logger.info(`Processed ${entities.length} entities from ${source.getName()} in ${duration}ms`, {
-        source: source.getName(),
-        entityCount: entities.length,
-        durationMs: duration,
-        entitiesPerSecond: Math.round((entities.length / duration) * 1000)
-      });
+      this.logger.info(`Processed ${entities.length} entities from ${source.getName()}`);
       
     } catch (error) {
       this.logger.error(
         `Failed to process entities from ${source.getName()}`,
-        error,
+        error as JsonObject,
       );
     }
   }
 
   private mergeRecords(records: EntityRecord[]): EntityRecord {
-    try {
-      const mergeStartTime = Date.now();
-      
-      // Sort by priority score (highest first)
       const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
       const highestPriorityRecord = sortedRecords[0];
 
@@ -158,20 +117,7 @@ export class EntityAggregatorProvider implements EntityProvider {
           }
         }
       });
-
-      const mergeDuration = Date.now() - mergeStartTime;
-      this.logger.debug(`Merged ${records.length} records in ${mergeDuration}ms`, {
-        entityRef: mergedRecord.entityRef,
-        recordCount: records.length,
-        durationMs: mergeDuration,
-        dataSources: sortedRecords.map(r => r.dataSource).join(', ')
-      });
-
       return mergedRecord;
-    } catch (error) {
-      this.logger.error('Failed to merge records, returning highest priority record', error);
-      return records[0];
-    }
   }
 
   private async emitUpdatedEntities(): Promise<void> {
@@ -179,19 +125,12 @@ export class EntityAggregatorProvider implements EntityProvider {
       this.logger.warn('No connection available, skipping entity emission');
       return;
     }
-
-    const processStartTime = Date.now();
     
     try {
       const entitiesToEmit = await this.store.getRecordsToEmit(this.batchSize);
       if (entitiesToEmit.length === 0) {
         return;
       }
-
-      let totalProcessed = 0;
-      let mergeTimeTotal = 0;
-      let emitTimeTotal = 0;
-      
       const recordsByRef = new Map<string, EntityRecord[]>();
       for (const record of entitiesToEmit) {
         const existing = recordsByRef.get(record.entityRef) || [];
@@ -230,9 +169,6 @@ export class EntityAggregatorProvider implements EntityProvider {
               locationKey: this.locationKey,
             });
           }
-          mergeTimeTotal += Date.now() - mergeStartTime;
-
-          const emitStartTime = Date.now();
           await this.connection.applyMutation({
             type: 'delta',
             added: mutations,
@@ -240,26 +176,9 @@ export class EntityAggregatorProvider implements EntityProvider {
           });
 
           await this.store.markEmitted(batch);
-          emitTimeTotal += Date.now() - emitStartTime;
-
-          totalProcessed += batch.length;
         } catch (error) {
           this.logger.error(`Failed to process batch of ${batch.length} entities`, error);
-          // Continue with next batch despite error
         }
-      }
-
-      const totalDuration = Date.now() - processStartTime;
-      if (totalProcessed > 0) {
-        this.logger.info(`Entity emission completed:`, {
-          totalEntities: totalProcessed,
-          totalDurationMs: totalDuration,
-          mergeTimeMs: mergeTimeTotal,
-          emitTimeMs: emitTimeTotal,
-          entitiesPerSecond: Math.round((totalProcessed / totalDuration) * 1000),
-          batchSize: this.batchSize,
-          batchCount: batches.length
-        });
       }
     } catch (error) {
       this.logger.error('Failed to emit updated entities', error);
