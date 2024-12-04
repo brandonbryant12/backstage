@@ -6,6 +6,7 @@ export interface DataSourceConfig {
   name: string;
   priority: number;
   refreshSchedule?: SchedulerServiceTaskScheduleDefinition;
+  ttlSeconds?: number;
 }
 
 export type DataSourceError = {
@@ -35,6 +36,15 @@ export abstract class DataSource {
 
   getSchedule(): SchedulerServiceTaskScheduleDefinition | undefined {
     return this.config.refreshSchedule;
+  }
+
+  protected getExpirationDate(): Date | undefined {
+    if (!this.config.ttlSeconds) {
+      return undefined;
+    }
+    const expirationDate = new Date();
+    expirationDate.setSeconds(expirationDate.getSeconds() + this.config.ttlSeconds);
+    return expirationDate;
   }
 
   abstract refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void>;

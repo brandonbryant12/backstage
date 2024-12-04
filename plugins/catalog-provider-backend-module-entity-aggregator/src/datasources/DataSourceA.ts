@@ -1,23 +1,18 @@
 import { Entity } from '@backstage/catalog-model';
-import { DataSource } from './DataSource';
-import { chunk } from 'lodash';
+import { DataSource, DataSourceConfig } from './DataSource';
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 import { generateMockEntities } from './mockEntityFactory';
+
+interface DataSourceAConfig extends DataSourceConfig {
+  ttlSeconds?: number;
+}
 
 export class DataSourceA extends DataSource {
   constructor(
-    config: { 
-      name: string; 
-      priority: number; 
-      refreshSchedule: SchedulerServiceTaskScheduleDefinition;
-    },
+    config: DataSourceAConfig,
     logger: LoggerService,
   ) {
-    super({
-      ...config,
-      refreshSchedule: config.refreshSchedule,
-    }, logger);
+    super(config, logger);
   }
 
   async refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void> {
@@ -30,15 +25,19 @@ export class DataSourceA extends DataSource {
         apiVersion: 'v1',
       });
       
-      // Process in chunks of 100 entities
-      const chunks = chunk(entities, 100);
-      
-      for (const batch of chunks) {
-        this.logger.debug(`Processing batch of ${batch.length} entities`);
-        await provide(batch);
+      // Process all entities at once with expiration date if TTL is set
+      const expirationDate = this.getExpirationDate();
+      if (expirationDate) {
+        this.logger.debug(`Setting expiration date to ${expirationDate.toISOString()}`);
       }
       
-      this.logger.info(`Successfully refreshed ${entities.length} entities`);
+      await provide(entities);
+      
+      this.logger.info(
+        `Successfully refreshed ${entities.length} entities${
+          expirationDate ? ` with expiration date ${expirationDate.toISOString()}` : ''
+        }`
+      );
     } catch (error) {
       const message = `Failed to refresh entities for ${this.getName()}`;
       this.logger.error(message, error as Error);

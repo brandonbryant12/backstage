@@ -28,9 +28,10 @@ export const entityAggregatorModule = createBackendModule({
               name: 'datasource-a', 
               priority: 100,
               refreshSchedule: {
-                frequency: { seconds: 20 },
+                frequency: { seconds: 10 },
                 timeout: { minutes: 10 },
               },
+              ttlSeconds: 60,
             }, 
             logger,
           ),
@@ -39,7 +40,7 @@ export const entityAggregatorModule = createBackendModule({
               name: 'datasource-b', 
               priority: 50,
               refreshSchedule: {
-                frequency: { seconds: 40 },
+                frequency: { seconds: 30 },
                 timeout: { minutes: 10 },
               },
             }, 

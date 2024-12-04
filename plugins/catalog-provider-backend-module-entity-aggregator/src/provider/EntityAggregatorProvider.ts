@@ -9,7 +9,6 @@ import { SchedulerService, SchedulerServiceTaskScheduleDefinition } from '@backs
 import { DataSource } from '../datasources/DataSource';
 import { DatabaseStore } from '../database/DatabaseStore';
 import { EntityRecord } from '../types';
-import { chunk } from 'lodash';
 import { JsonObject } from '@backstage/types';
 
 export class EntityAggregatorProvider implements EntityProvider {
@@ -18,7 +17,11 @@ export class EntityAggregatorProvider implements EntityProvider {
   private readonly batchSize = 1000;
   private readonly locationKey: string;
   private readonly emitSchedule: SchedulerServiceTaskScheduleDefinition = {
-    frequency: { seconds: 30 },
+    frequency: { seconds: 10 },
+    timeout: { minutes: 5 },
+  };
+  private readonly cleanupSchedule: SchedulerServiceTaskScheduleDefinition = {
+    frequency: { seconds: 10 },
     timeout: { minutes: 5 },
   };
 
@@ -67,6 +70,23 @@ export class EntityAggregatorProvider implements EntityProvider {
       },
     });
     this.logger.info(`Scheduled entity emission with schedule: ${JSON.stringify(this.emitSchedule)}`);
+
+    // Schedule the cleanup task
+    const cleanupRunner = this.scheduler.createScheduledTaskRunner(this.cleanupSchedule);
+    await cleanupRunner.run({
+      id: `${this.name}-cleanup-expired`,
+      fn: async () => {
+        try {
+          const removedCount = await this.store.removeExpiredRecords();
+          if (removedCount > 0) {
+            this.logger.info(`Cleanup task completed: removed ${removedCount} expired records`);
+          }
+        } catch (error) {
+          this.logger.error('Failed to cleanup expired records', error as Error);
+        }
+      },
+    });
+    this.logger.info(`Scheduled expired records cleanup with schedule: ${JSON.stringify(this.cleanupSchedule)}`);
   }
 
   private async provide(source: DataSource, entities: Entity[]): Promise<void> {
@@ -78,6 +98,7 @@ export class EntityAggregatorProvider implements EntityProvider {
         metadata: entity.metadata as EntityMeta,
         spec: entity.spec || {} as JsonObject,
         priorityScore: source.getPriority(),
+        expirationDate: source instanceof DataSource ? source.getExpirationDate() : undefined,
       }));
       await this.store.upsertRecords(entityRecords);
       this.logger.info(`Processed ${entities.length} entities from ${source.getName()}`);
@@ -91,33 +112,34 @@ export class EntityAggregatorProvider implements EntityProvider {
   }
 
   private mergeRecords(records: EntityRecord[]): EntityRecord {
-      const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
-      const highestPriorityRecord = sortedRecords[0];
+    const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
+    const highestPriorityRecord = sortedRecords[0];
 
-      // Create merged record starting with highest priority record's base data
-      const mergedRecord = {
-        ...highestPriorityRecord,
-        metadata: {
-          ...highestPriorityRecord.metadata,
-          annotations: {},
-        },
-      };
+    // Create merged record starting with highest priority record's base data
+    const mergedRecord = {
+      ...highestPriorityRecord,
+      metadata: {
+        ...highestPriorityRecord.metadata,
+        annotations: {} as Record<string, string>,
+      },
+    };
 
-      // For each unique annotation key
-      const allKeys = new Set(
-        sortedRecords.flatMap(r => Object.keys(r.metadata.annotations || {}))
-      );
+    // For each unique annotation key
+    const allKeys = new Set(
+      sortedRecords.flatMap(r => Object.keys(r.metadata.annotations || {}))
+    );
 
-      allKeys.forEach(key => {
-        // Find first (highest priority) record that has this annotation
-        for (const record of sortedRecords) {
-          if (record.metadata.annotations?.[key]) {
-            mergedRecord.metadata.annotations[key] = record.metadata.annotations[key];
-            break;
-          }
+    allKeys.forEach(key => {
+      // Find first (highest priority) record that has this annotation
+      for (const record of sortedRecords) {
+        const annotations = record.metadata.annotations || {};
+        if (key in annotations) {
+          mergedRecord.metadata.annotations[key] = annotations[key];
+          break;
         }
-      });
-      return mergedRecord;
+      }
+    });
+    return mergedRecord;
   }
 
   private async emitUpdatedEntities(): Promise<void> {
@@ -127,59 +149,52 @@ export class EntityAggregatorProvider implements EntityProvider {
     }
     
     try {
-      const entitiesToEmit = await this.store.getRecordsToEmit(this.batchSize);
-      if (entitiesToEmit.length === 0) {
+      const entityGroups = await this.store.getRecordsToEmit(this.batchSize);
+      if (entityGroups.length === 0) {
         return;
       }
-      const recordsByRef = new Map<string, EntityRecord[]>();
-      for (const record of entitiesToEmit) {
-        const existing = recordsByRef.get(record.entityRef) || [];
-        existing.push(record);
-        recordsByRef.set(record.entityRef, existing);
+
+      const mutations: DeferredEntity[] = [];
+      const processedRefs: string[] = [];
+
+      for (const records of entityGroups) {
+        if (!records.length) continue;
+        
+        const entityRef = records[0].entityRef;
+        const [kind] = entityRef.split(':');
+        
+        const mergedRecord = this.mergeRecords(records);
+        
+        mergedRecord.metadata.annotations = {
+          ...mergedRecord.metadata.annotations,
+          "backstage.io/managed-by-origin-location": `entityAggregator://${mergedRecord.metadata.name}`,
+          "backstage.io/managed-by-location": `entityAggregator://${mergedRecord.metadata.name}`,
+        };
+
+        mutations.push({
+          entity: {
+            apiVersion: 'backstage.io/v1alpha1',
+            kind,
+            metadata: mergedRecord.metadata,
+            spec: mergedRecord.spec,
+          },
+          locationKey: this.locationKey,
+        });
+        
+        processedRefs.push(entityRef);
       }
 
-      const entityRefs = Array.from(recordsByRef.keys());
-      const batches = chunk(entityRefs, this.batchSize);
+      if (mutations.length > 0) {
+        await this.connection.applyMutation({
+          type: 'delta',
+          added: mutations,
+          removed: [],
+        });
 
-      for (const batch of batches) {
-        try {
-          const mutations: DeferredEntity[] = [];
-          for (const entityRef of batch) {
-            const entityRecords = recordsByRef.get(entityRef);
-            if (!entityRecords || entityRecords.length === 0) continue;
-
-            const [kind] = entityRef.split(':');
-            const mergedRecord = this.mergeRecords(entityRecords);
-            
-            mergedRecord.metadata.annotations = {
-              ...mergedRecord.metadata.annotations,
-              "backstage.io/managed-by-origin-location" : `entityAggregator://${mergedRecord.metadata.name}`,
-              "backstage.io/managed-by-location": `entityAggregator://${mergedRecord.metadata.name}`,
-            };
-
-            mutations.push({
-              entity: {
-                apiVersion: 'backstage.io/v1alpha1',
-                kind,
-                metadata: mergedRecord.metadata,
-                spec: mergedRecord.spec,
-              },
-              locationKey: this.locationKey,
-            });
-          }
-          await this.connection.applyMutation({
-            type: 'delta',
-            added: mutations,
-            removed: [],
-          });
-
-          await this.store.markEmitted(batch);
-        } catch (error) {
-          this.logger.error(`Failed to process batch of ${batch.length} entities`, error);
-        }
+        await this.store.markEmitted(processedRefs);
       }
     } catch (error) {
-      this.logger.error('Failed to emit updated entities', error);
+      this.logger.error('Failed to emit updated entities', error as Error);
     }
   }
 
@@ -187,7 +202,7 @@ export class EntityAggregatorProvider implements EntityProvider {
     try {
       return `${entity.kind}:${entity.metadata.namespace || 'default'}/${entity.metadata.name}`;
     } catch (error) {
-      this.logger.error(`Failed to generate entityRef for entity`, error);
+      this.logger.error(`Failed to generate entityRef for entity`, error as Error);
       return `unknown:default/error-${Date.now()}`;
     }
   }
