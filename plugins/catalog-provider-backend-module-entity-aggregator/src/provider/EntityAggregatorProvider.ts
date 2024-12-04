@@ -30,7 +30,7 @@ export class EntityAggregatorProvider implements EntityProvider {
     dataSources?: DataSource[],
   ) {
     this.dataSources = dataSources || [];
-    this.locationKey = `url:${name}-provider.com`;
+    this.locationKey = `entity-aggregator-provider:id`;
     this.logger.debug(`Initialized with ${this.dataSources.length} data sources`);
   }
 
@@ -144,8 +144,6 @@ export class EntityAggregatorProvider implements EntityProvider {
       for (const batch of batches) {
         try {
           const mutations: DeferredEntity[] = [];
-          
-          const mergeStartTime = Date.now();
           for (const entityRef of batch) {
             const entityRecords = recordsByRef.get(entityRef);
             if (!entityRecords || entityRecords.length === 0) continue;
@@ -155,8 +153,8 @@ export class EntityAggregatorProvider implements EntityProvider {
             
             mergedRecord.metadata.annotations = {
               ...mergedRecord.metadata.annotations,
-              'backstage.io/managed-by-location': this.locationKey,
-              'backstage.io/managed-by-origin-location': this.locationKey,
+              "backstage.io/managed-by-origin-location" : `entityAggregator://${mergedRecord.metadata.name}`,
+              "backstage.io/managed-by-location": `entityAggregator://${mergedRecord.metadata.name}`,
             };
 
             mutations.push({
