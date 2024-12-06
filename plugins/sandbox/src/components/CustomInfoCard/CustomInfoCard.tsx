@@ -168,7 +168,6 @@ export const CustomInfoCard = ({
       borderRadius: theme.shape.borderRadius,
       display: 'flex',
       flexDirection: 'column',
-      height: '100%',
       maxWidth: 790,
     }}>
       <CardHeader

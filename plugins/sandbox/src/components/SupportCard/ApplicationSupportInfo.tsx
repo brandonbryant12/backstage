@@ -3,6 +3,7 @@ import { ApplicationInfo } from './EntitySupportCard';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import { MarkdownContent } from '@backstage/core-components';
 
 interface ApplicationSupportInfoProps {
   applicationInfo: ApplicationInfo;
@@ -43,13 +44,20 @@ export const ApplicationSupportInfo = ({ applicationInfo, supportInfo }: Applica
   );
 
   return (
-    <Grid container spacing={3}>
-      <InfoCell title="APP ID" value={applicationInfo.appId} />
-      <InfoCell title="APP NAME" value={applicationInfo.appName} />
-      <ManagersCell />
-      <InfoCell title="CRITICALITY CODE" value={applicationInfo.criticalityCode} />
-      <InfoCell title="RBF RATING" value={applicationInfo.rbfGovernedRating} />
-      <InfoCell title="SECURITY TIER" value={applicationInfo.securityLevel} />
-    </Grid>
+    <>
+      {supportInfo && (
+        <Grid item xs={12}>
+          <MarkdownContent content={supportInfo} />
+        </Grid>
+      )}
+      <Grid container spacing={3}>
+        <InfoCell title="APP ID" value={applicationInfo.appId} />
+        <InfoCell title="APP NAME" value={applicationInfo.appName} />
+        <ManagersCell />
+        <InfoCell title="CRITICALITY CODE" value={applicationInfo.criticalityCode} />
+        <InfoCell title="RBF RATING" value={applicationInfo.rbfGovernedRating} />
+        <InfoCell title="SECURITY TIER" value={applicationInfo.securityLevel} />
+      </Grid>
+    </>
   );
 };
