@@ -15,6 +15,8 @@ import { Entity } from '@backstage/catalog-model';
 import { useApplicationQuery } from './hooks';
 import { useGroupQuery } from './hooks';
 import { Progress } from '@backstage/core-components';
+import Divider from '@material-ui/core/Divider';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 
 
 // From Image 1
@@ -81,8 +83,20 @@ export interface IncidentGroup {
     appOnlyApprovalGroups: string;
   }
 
+const useStyles = makeStyles((theme: Theme) => ({
+  tabs: {
+    '& .MuiTab-root': {
+      color: theme.palette.type === 'dark' ? '#fff' : theme.palette.primary.main,
+    },
+    marginBottom: theme.spacing(2),
+  },
+  tabContent: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 const GroupSupportInfo = ({ incidentGroups }: { incidentGroups: IncidentGroup[] }) => {
+  const classes = useStyles();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [selectedIncidentGroup, setSelectedIncidentGroup] = useState<IncidentGroup | undefined>();
   const { data: escalationGroupMembers, loading, error } = useEscalationGroupMembersQuery(
@@ -104,34 +118,45 @@ const GroupSupportInfo = ({ incidentGroups }: { incidentGroups: IncidentGroup[] 
     return null;
   }
 
+  // If there's only one group, don't show tabs
+  const showTabs = incidentGroups.length > 1;
+
   return (
     <>
-      <Tabs
-        value={selectedTabIndex}
-        onChange={handleTabChange}
-        indicatorColor="primary"
-        textColor="primary"
-      >
-        {incidentGroups.map((group, index) => (
-          <Tab key={group.groupId} label={group.details.name} />
-        ))}
-      </Tabs>
-      <Grid container spacing={3}>
-        <Grid item xs={4}>
-          <OnCallUser 
-            escalationGroupMember={escalationGroupMembers.length > 0 ? escalationGroupMembers[0] : undefined} 
-          />
+      {showTabs ? (
+        <Tabs
+          value={selectedTabIndex}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          className={classes.tabs}
+        >
+          {incidentGroups.map((group, index) => (
+            <Tab key={group.groupId} label={group.details.name} />
+          ))}
+        </Tabs>
+      ) : (
+        <Box mb={2} /> // Maintain consistent spacing when no tabs
+      )}
+      <Divider />
+      <div className={classes.tabContent}>
+        <Grid container spacing={3}>
+          <Grid item xs={4}>
+            <OnCallUser 
+              escalationGroupMember={escalationGroupMembers.length > 0 ? escalationGroupMembers[0] : undefined} 
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <IncidentGroupEmail escalationGroup={selectedIncidentGroup} />
+          </Grid>
+          <Grid item xs={4}>
+            <IncidentGroupMembers 
+              escalationGroup={selectedIncidentGroup} 
+              escalationGroupMembers={escalationGroupMembers} 
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
-          <IncidentGroupEmail escalationGroup={selectedIncidentGroup} />
-        </Grid>
-        <Grid item xs={4}>
-          <IncidentGroupMembers 
-            escalationGroup={selectedIncidentGroup} 
-            escalationGroupMembers={escalationGroupMembers} 
-          />
-        </Grid>
-      </Grid>
+      </div>
     </>
   );
 };
