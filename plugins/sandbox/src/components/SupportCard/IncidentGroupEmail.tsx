@@ -1,17 +1,34 @@
-import React from 'react';
-import { IncidentGroup } from './EntitySupportCard';
+import { IncidentGroup } from "../../hooks";
+import React from "react";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
-interface IncidentGroupEmailProps {
+
+export const IncidentGroupEmail = ({
+  escalationGroup,
+}: {
   escalationGroup: IncidentGroup;
-}
-
-export const IncidentGroupEmail = ({ escalationGroup }: IncidentGroupEmailProps) => {
+}) => {
   return (
-    <div>
-      <h3>Group Contact</h3>
-      <div>Email: {escalationGroup.details.email}</div>
-      <div>Manager: {escalationGroup.details.managerName}</div>
-      <div>Manager Email: {escalationGroup.details.managerEmail}</div>
-    </div>
+    <Stack spacing={2}>
+      <Box>
+        <Typography variant="subtitle2" color="text.secondary">
+          GROUP OWNER
+        </Typography>
+        <Typography variant="body1">
+          {escalationGroup.details.managerName}
+        </Typography>
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2" color="text.secondary">
+          GROUP EMAIL
+        </Typography>
+        <Typography variant="body1" color="primary">
+          {escalationGroup.details.email}
+        </Typography>
+      </Box>
+    </Stack>
   );
-}; 
+};

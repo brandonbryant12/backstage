@@ -121,44 +121,48 @@ const GroupSupportInfo = ({ incidentGroups }: { incidentGroups: IncidentGroup[] 
   // If there's only one group, don't show tabs
   const showTabs = incidentGroups.length > 1;
 
-  return (
-    <>
-      {showTabs ? (
-        <Tabs
-          value={selectedTabIndex}
-          onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-          className={classes.tabs}
-        >
-          {incidentGroups.map((group, index) => (
-            <Tab key={group.groupId} label={group.details.name} />
-          ))}
-        </Tabs>
-      ) : (
-        <Box mb={2} /> // Maintain consistent spacing when no tabs
-      )}
-      <Divider />
-      <div className={classes.tabContent}>
-        <Grid container spacing={3}>
-          <Grid item xs={4}>
-            <OnCallUser 
-              escalationGroupMember={escalationGroupMembers.length > 0 ? escalationGroupMembers[0] : undefined} 
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <IncidentGroupEmail escalationGroup={selectedIncidentGroup} />
-          </Grid>
-          <Grid item xs={4}>
-            <IncidentGroupMembers 
-              escalationGroup={selectedIncidentGroup} 
-              escalationGroupMembers={escalationGroupMembers} 
-            />
-          </Grid>
+return (
+  <Box>
+    {showTabs ? (
+      <Tabs
+        value={selectedTabIndex}
+        onChange={handleTabChange}
+        indicatorColor="primary"
+        textColor="primary"
+        className={classes.tabs}
+      >
+        {incidentGroups.map((group, index) => (
+          <Tab key={group.groupId} label={group.details.name} />
+        ))}
+      </Tabs>
+    ) : (
+      <Box mb={2} />
+    )}
+    <Divider />
+    <Box sx={{ mt: 3 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={4}>  {/* Full width on mobile, 1/3 width on medium+ screens */}
+          <OnCallUser
+            escalationGroupMember={
+              escalationGroupMembers.length > 0
+                ? escalationGroupMembers[0]
+                : undefined
+            }
+          />
         </Grid>
-      </div>
-    </>
-  );
+        <Grid item xs={12} md={4}>  {/* Full width on mobile, 1/3 width on medium+ screens */}
+          <IncidentGroupEmail escalationGroup={selectedIncidentGroup} />
+        </Grid>
+        <Grid item xs={12} md={4}>  {/* Full width on mobile, 1/3 width on medium+ screens */}
+          <IncidentGroupMembers
+            escalationGroup={selectedIncidentGroup}
+            escalationGroupMembers={escalationGroupMembers}
+          />
+        </Grid>
+      </Grid>
+    </Box>
+  </Box>
+);
 };
 
 interface SupportCardProps {
