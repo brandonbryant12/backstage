@@ -1,55 +1,55 @@
 import React from 'react';
-import { ApplicationInfo } from './SupportCard';
-import { Grid, Typography, Box } from '@material-ui/core';
-import { MarkdownContent } from '@backstage/core-components';
+import { ApplicationInfo } from './EntitySupportCard';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
 
-interface Props {
+interface ApplicationSupportInfoProps {
   applicationInfo: ApplicationInfo;
-  supportInfo?: string;
+  supportInfo: string;
 }
 
-export const ApplicationSupportInfo: React.FC<Props> = ({ applicationInfo, supportInfo }) => {
+export const ApplicationSupportInfo = ({ applicationInfo, supportInfo }: ApplicationSupportInfoProps) => {
+  const InfoCell = ({ title, value }: { title: string, value: string }) => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Box mb={1}>
+        <Typography variant="subtitle2" color="textSecondary">
+          {title}
+        </Typography>
+        <Typography variant="body1">
+          <strong>{value}</strong>
+        </Typography>
+      </Box>
+    </Grid>
+  );
+
+  const ManagersCell = () => (
+    <Grid item xs={12} sm={6} md={4}>
+      <Box mb={1}>
+        <Typography variant="subtitle2" color="textSecondary">
+          MANAGERS
+        </Typography>
+        <Typography variant="body1">
+          <strong>Development:</strong> {applicationInfo.appDevManager}
+        </Typography>
+        <Typography variant="body1">
+          <strong>IT Prod. Manager:</strong> {applicationInfo.itProductManager}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Bus. Prod. Manager:</strong> {applicationInfo.businessProductManager}
+        </Typography>
+      </Box>
+    </Grid>
+  );
+
   return (
-    <Box>
-      {supportInfo && (
-        <Box mb={2}>
-          <MarkdownContent content={supportInfo} />
-        </Box>
-      )}
-      
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">APP ID</Typography>
-          <Typography variant="body1" style={{ fontWeight: 'bold' }}>{applicationInfo.appId}</Typography>
-        </Grid>
-        
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">APP NAME</Typography>
-          <Typography variant="body1" style={{ fontWeight: 'bold' }}>{applicationInfo.appName}</Typography>
-        </Grid>
-        
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">MANAGERS</Typography>
-          <Typography>Development: {applicationInfo.appDevManager}</Typography>
-          <Typography>IT Prod. Manager: {applicationInfo.itProductManager}</Typography>
-          <Typography>Bus. Prod. Manager: {applicationInfo.businessProductManager}</Typography>
-        </Grid>
-        
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">CRITICALITY CODE</Typography>
-          <Typography>{applicationInfo.criticalityCode}</Typography>
-        </Grid>
-        
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">RBF RATING</Typography>
-          <Typography>{applicationInfo.rbfGovernedRating}</Typography>
-        </Grid>
-        
-        <Grid item xs={4}>
-          <Typography variant="subtitle2" color="textSecondary">SECURITY TIER</Typography>
-          <Typography>{applicationInfo.securityLevel}</Typography>
-        </Grid>
-      </Grid>
-    </Box>
+    <Grid container spacing={3}>
+      <InfoCell title="APP ID" value={applicationInfo.appId} />
+      <InfoCell title="APP NAME" value={applicationInfo.appName} />
+      <ManagersCell />
+      <InfoCell title="CRITICALITY CODE" value={applicationInfo.criticalityCode} />
+      <InfoCell title="RBF RATING" value={applicationInfo.rbfGovernedRating} />
+      <InfoCell title="SECURITY TIER" value={applicationInfo.securityLevel} />
+    </Grid>
   );
 };
