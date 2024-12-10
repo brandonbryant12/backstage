@@ -51,6 +51,6 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
 
-// backend.add(import('@internal/backstage-plugin-catalog-provider-backend-module-catalog-provider-module'));
-backend.add(import('@internal/backstage-plugin-backend-catalog-backend-module-core-provider'));
+
+backend.add(import('backstage-plugin-jira-backend'));
 backend.start();
