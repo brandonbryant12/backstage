@@ -37,10 +37,12 @@ export interface EntityAggregatorService {
 
 /**
  * Service reference for the entity aggregator service.
+ * A single instance of this service is shared across all plugins to provide
+ * centralized entity aggregation functionality.
  * 
  * @public
  */
 export const entityAggregatorServiceRef = createServiceRef<EntityAggregatorService>({
   id: 'catalog.entityAggregator',
-  scope: 'plugin',
+  scope: 'root',
 }); 
