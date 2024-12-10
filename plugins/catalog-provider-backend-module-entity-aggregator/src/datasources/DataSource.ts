@@ -38,7 +38,7 @@ export abstract class DataSource {
     return this.config.refreshSchedule;
   }
 
-  protected getExpirationDate(): Date | undefined {
+  public getExpirationDate(): Date | undefined {
     if (!this.config.ttlSeconds) {
       return undefined;
     }

@@ -7,6 +7,7 @@ import { DatabaseStore } from './database/DatabaseStore';
 import { DataSourceA } from './datasources/DataSourceA';
 import { DataSourceB } from './datasources/DataSourceB';
 import { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
+import { EntityAggregatorServiceImpl } from './service/EntityAggregatorServiceImpl';
 
 export const entityAggregatorModule = createBackendModule({
   pluginId: 'catalog',
@@ -22,6 +23,14 @@ export const entityAggregatorModule = createBackendModule({
       async init({ catalog, logger, scheduler, database }) {
         const store = await DatabaseStore.create(database, logger);
         
+        // Create service instance
+        const service = new EntityAggregatorServiceImpl(
+          'entity-aggregator',
+          store,
+          logger,
+          scheduler,
+        );
+
         const dataSources = [
           new DataSourceA(
             { 
@@ -48,12 +57,18 @@ export const entityAggregatorModule = createBackendModule({
           ),
         ];
 
+        // Add data sources to service
+        for (const source of dataSources) {
+          service.addDataSource(source);
+        }
+        await service.start();
+
+        // Initialize the provider with the service
         const provider = new EntityAggregatorProvider(
           'entity-aggregator',
-          store,
+          service,
           logger,
           scheduler,
-          dataSources,
         );
 
         catalog.addEntityProvider(provider);

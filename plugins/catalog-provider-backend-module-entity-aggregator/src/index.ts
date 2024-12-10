@@ -4,5 +4,8 @@ export { DataSource } from './datasources/DataSource';
 export { DataSourceA } from './datasources/DataSourceA';
 export { DataSourceB } from './datasources/DataSourceB';
 export { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
+export { entityAggregatorServiceRef } from './service/EntityAggregatorService';
+export type { EntityAggregatorService } from './service/EntityAggregatorService';
+export { entityAggregatorServiceFactory } from './service/EntityAggregatorServiceFactory';
 export type { DataSourceConfig } from './datasources/DataSource';
 export type { EntityRecord } from './types';
