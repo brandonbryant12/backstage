@@ -4,10 +4,10 @@ import {
 } from '@backstage/backend-plugin-api';
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
-import { entityAggregatorServiceRef } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator';
+import { entityAggregatorService } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator';
 
 export const catalogModuleProvider = createBackendModule({
-  pluginId: 'catalog',
+  pluginId: 'catalog-aggregator',
   moduleId: 'provider',
   register(env) {
     env.registerInit({
@@ -15,7 +15,7 @@ export const catalogModuleProvider = createBackendModule({
         catalog: catalogProcessingExtensionPoint,
         logger: coreServices.logger,
         scheduler: coreServices.scheduler,
-        aggregator: entityAggregatorServiceRef,
+        // aggregator: entityAggregatorService,
       },
       async init({ catalog, logger, scheduler, aggregator }) {
         // Initialize the provider

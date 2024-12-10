@@ -9,15 +9,11 @@
 import { createBackend } from '@backstage/backend-defaults';
 // import { applicationProcessorModule } from '@internal/plugin-application-processor';
 import { entityAggregatorModule } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator'
+import catalogModuleProvider from 'backstage-plugin-catalog-backend-module-provider';
 
 const backend = createBackend();
 
 backend.add(import('@backstage/plugin-app-backend'));
-backend.add(import('@backstage/plugin-proxy-backend'));
-backend.add(import('@backstage/plugin-scaffolder-backend'));
-backend.add(import('@backstage/plugin-techdocs-backend'));
-
-// auth plugin
 backend.add(import('@backstage/plugin-auth-backend'));
 // See https://backstage.io/docs/backend-system/building-backends/migrating#the-auth-plugin
 backend.add(import('@backstage/plugin-auth-backend-module-guest-provider'));
@@ -42,18 +38,7 @@ backend.add(
   import('@backstage/plugin-permission-backend-module-allow-all-policy'),
 );
 
-// search plugin
-backend.add(import('@backstage/plugin-search-backend'));
-
-// search engine
-// See https://backstage.io/docs/features/search/search-engines
-backend.add(import('@backstage/plugin-search-backend-module-pg'));
-
-// search collators
-backend.add(import('@backstage/plugin-search-backend-module-catalog'));
-backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
-
 
 backend.add(entityAggregatorModule);
-backend.add(import('backstage-plugin-catalog-backend-module-provider'));
+// backend.add(catalogModuleProvider);
 backend.start();

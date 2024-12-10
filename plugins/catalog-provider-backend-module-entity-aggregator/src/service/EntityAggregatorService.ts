@@ -34,15 +34,3 @@ export interface EntityAggregatorService {
    */
   getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]>;
 }
-
-/**
- * Service reference for the entity aggregator service.
- * A single instance of this service is shared across all plugins to provide
- * centralized entity aggregation functionality.
- * 
- * @public
- */
-export const entityAggregatorServiceRef = createServiceRef<EntityAggregatorService>({
-  id: 'catalog.entityAggregator',
-  scope: 'root',
-}); 

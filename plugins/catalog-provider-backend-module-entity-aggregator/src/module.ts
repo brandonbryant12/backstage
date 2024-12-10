@@ -8,8 +8,8 @@ import { DataSourceB } from './datasources/DataSourceB';
 import { EntityAggregatorServiceImpl } from './service/EntityAggregatorServiceImpl';
 
 export const entityAggregatorModule = createBackendModule({
-  pluginId: 'catalog',
-  moduleId: 'entity-aggregator',
+  pluginId: 'catalog-aggregator',
+  moduleId: 'entity-manager',
   register(env) {
     env.registerInit({
       deps: {
@@ -18,6 +18,7 @@ export const entityAggregatorModule = createBackendModule({
         database: coreServices.database,
       },
       async init({ logger, scheduler, database }) {
+        logger.info('INIT entity-manager')
         const store = await DatabaseStore.create(database, logger);
         
         // Create service instance
