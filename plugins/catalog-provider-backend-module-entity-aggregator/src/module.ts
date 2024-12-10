@@ -2,11 +2,9 @@ import {
   coreServices,
   createBackendModule,
 } from '@backstage/backend-plugin-api';
-import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { DatabaseStore } from './database/DatabaseStore';
 import { DataSourceA } from './datasources/DataSourceA';
 import { DataSourceB } from './datasources/DataSourceB';
-import { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
 import { EntityAggregatorServiceImpl } from './service/EntityAggregatorServiceImpl';
 
 export const entityAggregatorModule = createBackendModule({
@@ -15,12 +13,11 @@ export const entityAggregatorModule = createBackendModule({
   register(env) {
     env.registerInit({
       deps: {
-        catalog: catalogProcessingExtensionPoint,
         logger: coreServices.logger,
         scheduler: coreServices.scheduler,
         database: coreServices.database,
       },
-      async init({ catalog, logger, scheduler, database }) {
+      async init({ logger, scheduler, database }) {
         const store = await DatabaseStore.create(database, logger);
         
         // Create service instance
@@ -62,16 +59,6 @@ export const entityAggregatorModule = createBackendModule({
           service.addDataSource(source);
         }
         await service.start();
-
-        // Initialize the provider with the service
-        const provider = new EntityAggregatorProvider(
-          'entity-aggregator',
-          service,
-          logger,
-          scheduler,
-        );
-
-        catalog.addEntityProvider(provider);
         logger.info('Registered entity aggregator provider with data sources A and B');
       },
     });

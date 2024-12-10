@@ -55,4 +55,5 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
 
 backend.add(entityAggregatorModule);
+backend.add(import('backstage-plugin-catalog-backend-module-provider'));
 backend.start();
