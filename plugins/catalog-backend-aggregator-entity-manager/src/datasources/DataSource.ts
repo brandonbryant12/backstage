@@ -1,6 +1,5 @@
-import { LoggerService } from '@backstage/backend-plugin-api';
+import { LoggerService, SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 import { Entity } from '@backstage/catalog-model';
-import { SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 
 export interface DataSourceConfig {
   name: string;

@@ -1,9 +1,8 @@
 import { Knex } from 'knex';
-import { LoggerService } from '@backstage/backend-plugin-api';
-import { DatabaseService } from '@backstage/backend-plugin-api';
-import { createHash } from 'crypto';
+import { LoggerService, DatabaseService } from '@backstage/backend-plugin-api';
+import { JsonObject } from '@backstage/types';
 import { EntityRecord } from '../types';
-import { randomUUID } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 
 const TABLE_NAME = 'entityRecords';
 
@@ -246,7 +245,7 @@ export class DatabaseStore {
       
       return result;
     } catch (error) {
-      this.logger.error('Failed to remove expired records', error);
+      this.logger.error('Failed to remove expired records', error as Error);
       throw error;
     }
   }

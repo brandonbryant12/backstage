@@ -1,4 +1,4 @@
-# backstage-plugin-@internal/plugin-catalog-backend-module-aggregator-entity-provider
+# backstage-plugin-@core/plugin-catalog-backend-module-aggregator-entity-provider
 
 The provider backend module for the catalog plugin.
 

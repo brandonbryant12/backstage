@@ -10,8 +10,8 @@ import { createBackend } from '@backstage/backend-defaults';
 
 const backend = createBackend();
 
-backend.add(import("@internal/plugin-catalog-backend-module-aggregator-entity-manager"));
-backend.add(import('@internal/plugin-catalog-backend-module-aggregator-entity-provider'));
+backend.add(import("@core/plugin-catalog-backend-module-aggregator-entity-manager"));
+backend.add(import('@core/plugin-catalog-backend-module-aggregator-entity-provider'));
 
 
 backend.add(import('@backstage/plugin-app-backend'));

@@ -1,4 +1,8 @@
-import { createServiceFactory, createServiceRef, coreServices } from '@backstage/backend-plugin-api';
+import { 
+  createServiceFactory, 
+  createServiceRef, 
+  coreServices 
+} from '@backstage/backend-plugin-api';
 import { type EntityAggregatorService } from './EntityAggregatorService';
 import { EntityAggregatorServiceImpl } from './EntityAggregatorServiceImpl';
 import { DatabaseStore } from '../database/DatabaseStore';

@@ -1,5 +1,4 @@
-import { LoggerService } from '@backstage/backend-plugin-api';
-import { SchedulerService } from '@backstage/backend-plugin-api';
+import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { DataSource } from '../datasources/DataSource';
 import { DatabaseStore } from '../database/DatabaseStore';

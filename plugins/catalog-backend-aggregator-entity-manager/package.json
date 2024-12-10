@@ -1,5 +1,5 @@
 {
-  "name": "@internal/plugin-catalog-backend-module-aggregator-entity-manager",
+  "name": "@core/plugin-catalog-backend-module-aggregator-entity-manager",
   "version": "0.1.0",
   "main": "src/index.ts",
   "types": "src/index.ts",

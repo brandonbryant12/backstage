@@ -3,12 +3,11 @@ import {
   EntityProviderConnection,
   DeferredEntity,
 } from '@backstage/plugin-catalog-node';
-import { LoggerService } from '@backstage/backend-plugin-api';
-import { SchedulerService } from '@backstage/backend-plugin-api';
+import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
 import { 
   EntityAggregatorService, 
   EntityRecord 
-} from '@internal/plugin-catalog-backend-module-aggregator-entity-manager';
+} from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
 
 export class EntityAggregatorProvider implements EntityProvider {
   private connection?: EntityProviderConnection;

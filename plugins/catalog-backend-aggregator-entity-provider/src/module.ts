@@ -4,7 +4,7 @@ import {
 } from '@backstage/backend-plugin-api';
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
-import { entityAggregatorService } from '@internal/plugin-catalog-backend-module-aggregator-entity-manager';
+import { entityAggregatorService } from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
 
 export const catalogModuleProvider = createBackendModule({
   pluginId: 'catalog',

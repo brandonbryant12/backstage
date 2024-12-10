@@ -5587,6 +5587,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@core/plugin-catalog-backend-module-aggregator-entity-manager@npm:^0.1.0, @core/plugin-catalog-backend-module-aggregator-entity-manager@workspace:^, @core/plugin-catalog-backend-module-aggregator-entity-manager@workspace:plugins/catalog-backend-aggregator-entity-manager":
+  version: 0.0.0-use.local
+  resolution: "@core/plugin-catalog-backend-module-aggregator-entity-manager@workspace:plugins/catalog-backend-aggregator-entity-manager"
+  dependencies:
+    "@backstage/backend-common": "npm:^0.25.0"
+    "@backstage/backend-plugin-api": "npm:^1.0.2"
+    "@backstage/catalog-client": "npm:^1.8.0"
+    "@backstage/catalog-model": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.29.2"
+    "@backstage/config": "npm:^1.3.0"
+    "@backstage/plugin-catalog-node": "npm:^1.13.0"
+    "@backstage/plugin-permission-common": "npm:^0.7.12"
+    "@backstage/types": "npm:^1.1.1"
+    "@types/supertest": "npm:^2.0.12"
+    knex: "npm:^2.4.2"
+    lodash: "npm:^4.17.21"
+    msw: "npm:^1.0.0"
+    node-fetch: "npm:^2.6.7"
+    supertest: "npm:^6.2.4"
+    winston: "npm:^3.2.1"
+  languageName: unknown
+  linkType: soft
+
+"@core/plugin-catalog-backend-module-aggregator-entity-provider@workspace:^, @core/plugin-catalog-backend-module-aggregator-entity-provider@workspace:plugins/catalog-backend-aggregator-entity-provider":
+  version: 0.0.0-use.local
+  resolution: "@core/plugin-catalog-backend-module-aggregator-entity-provider@workspace:plugins/catalog-backend-aggregator-entity-provider"
+  dependencies:
+    "@backstage/backend-plugin-api": "npm:^1.0.2"
+    "@backstage/backend-test-utils": "npm:^1.1.0"
+    "@backstage/catalog-model": "npm:^1.7.0"
+    "@backstage/cli": "npm:^0.29.2"
+    "@backstage/plugin-catalog-node": "npm:^1.13.0"
+    "@backstage/types": "npm:^1.1.1"
+    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "npm:^0.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -6817,43 +6854,6 @@ __metadata:
   checksum: 10c0/80520eabbfc2d32fe195a93557cef50dfe8c8905de447f022675aaf66abc33ae54098f5ea78548d925aa671cd4ab7c7daa5ad704fe42358c9b5e7db60f80696c
   languageName: node
   linkType: hard
-
-"@internal/plugin-catalog-backend-module-aggregator-entity-manager@npm:^0.1.0, @internal/plugin-catalog-backend-module-aggregator-entity-manager@workspace:^, @internal/plugin-catalog-backend-module-aggregator-entity-manager@workspace:plugins/catalog-aggregator-entity-manager":
-  version: 0.0.0-use.local
-  resolution: "@internal/plugin-catalog-backend-module-aggregator-entity-manager@workspace:plugins/catalog-aggregator-entity-manager"
-  dependencies:
-    "@backstage/backend-common": "npm:^0.25.0"
-    "@backstage/backend-plugin-api": "npm:^1.0.2"
-    "@backstage/catalog-client": "npm:^1.8.0"
-    "@backstage/catalog-model": "npm:^1.7.0"
-    "@backstage/cli": "npm:^0.29.2"
-    "@backstage/config": "npm:^1.3.0"
-    "@backstage/plugin-catalog-node": "npm:^1.13.0"
-    "@backstage/plugin-permission-common": "npm:^0.7.12"
-    "@backstage/types": "npm:^1.1.1"
-    "@types/supertest": "npm:^2.0.12"
-    knex: "npm:^2.4.2"
-    lodash: "npm:^4.17.21"
-    msw: "npm:^1.0.0"
-    node-fetch: "npm:^2.6.7"
-    supertest: "npm:^6.2.4"
-    winston: "npm:^3.2.1"
-  languageName: unknown
-  linkType: soft
-
-"@internal/plugin-catalog-backend-module-aggregator-entity-provider@workspace:^, @internal/plugin-catalog-backend-module-aggregator-entity-provider@workspace:plugins/catalog-aggregator-entity-provider":
-  version: 0.0.0-use.local
-  resolution: "@internal/plugin-catalog-backend-module-aggregator-entity-provider@workspace:plugins/catalog-aggregator-entity-provider"
-  dependencies:
-    "@backstage/backend-plugin-api": "npm:^1.0.2"
-    "@backstage/backend-test-utils": "npm:^1.1.0"
-    "@backstage/catalog-model": "npm:^1.7.0"
-    "@backstage/cli": "npm:^0.29.2"
-    "@backstage/plugin-catalog-node": "npm:^1.13.0"
-    "@backstage/types": "npm:^1.1.1"
-    "@internal/plugin-catalog-backend-module-aggregator-entity-manager": "npm:^0.1.0"
-  languageName: unknown
-  linkType: soft
 
 "@ioredis/commands@npm:^1.1.1":
   version: 1.2.0
@@ -14313,8 +14313,8 @@ __metadata:
     "@backstage/plugin-search-backend-module-techdocs": "npm:^0.3.2"
     "@backstage/plugin-search-backend-node": "npm:^1.3.5"
     "@backstage/plugin-techdocs-backend": "npm:^1.11.2"
-    "@internal/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^"
-    "@internal/plugin-catalog-backend-module-aggregator-entity-provider": "workspace:^"
+    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^"
+    "@core/plugin-catalog-backend-module-aggregator-entity-provider": "workspace:^"
     app: "link:../app"
     better-sqlite3: "npm:^9.0.0"
     node-gyp: "npm:^10.0.0"

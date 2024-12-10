@@ -13,7 +13,7 @@ export function generateMockEntities(count: number, options: MockEntityOptions):
 
   return Array.from({ length: count }, (_, i) => {
     const id = `${i}`;
-    return [
+    const entities: Entity[] = [
       // Component
       {
         apiVersion: 'backstage.io/v1alpha1',
@@ -23,8 +23,8 @@ export function generateMockEntities(count: number, options: MockEntityOptions):
           namespace: 'default',
           description: `Service ${id} description from Source ${source === 'DataSourceA' ? 'A' : 'B'}`,
           labels: source === 'DataSourceA' 
-            ? { tier, criticality: 'high' }
-            : { tier, region: 'eu-west' },
+            ? { tier: tier, criticality: 'high' } as Record<string, string>
+            : { tier: tier, region: 'eu-west' } as Record<string, string>,
           tags: [
             'typescript',
             tier === 'frontend' ? 'react' : 'fastify',
@@ -77,7 +77,6 @@ export function generateMockEntities(count: number, options: MockEntityOptions):
           name: `api-${id}`,
           namespace: 'default',
           description: `API ${id} from Source ${source === 'DataSourceA' ? 'A' : 'B'}`,
-          tags: ['rest', apiVersion, source === 'DataSourceB' ? 'secured' : undefined].filter(Boolean),
           annotations: {
             ...(source === 'DataSourceA' ? {
               'backstage.io/techdocs-ref': 'dir:.',
@@ -146,5 +145,6 @@ export function generateMockEntities(count: number, options: MockEntityOptions):
         }
       }])
     ];
+    return entities;
   }).flat();
 } 
