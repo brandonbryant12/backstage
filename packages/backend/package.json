@@ -42,6 +42,7 @@
     "@backstage/plugin-techdocs-backend": "^1.11.2",
     "@internal/plugin-application-processor": "^0.1.0",
     "app": "link:../app",
+    "backstage-plugin-catalog-aggregator-entity-provider": "workspace:^",
     "better-sqlite3": "^9.0.0",
     "node-gyp": "^10.0.0",
     "pg": "^8.11.3"

@@ -9,6 +9,7 @@
 import { createBackend } from '@backstage/backend-defaults';
 // import { applicationProcessorModule } from '@internal/plugin-application-processor';
 import { entityAggregatorModule } from '@backstage/plugin-catalog-provider-backend-module-entity-aggregator'
+import { catalogModuleProvider } from 'backstage-plugin-catalog-aggregator-entity-provider';
 
 const backend = createBackend();
 
@@ -55,4 +56,5 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
 
 backend.add(entityAggregatorModule);
+backend.add(catalogModuleProvider);
 backend.start();

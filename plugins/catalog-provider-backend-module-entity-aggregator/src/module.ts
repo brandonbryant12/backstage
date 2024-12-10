@@ -3,10 +3,9 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
-import { DatabaseStore } from './database/DatabaseStore';
 import { DataSourceA } from './datasources/DataSourceA';
 import { DataSourceB } from './datasources/DataSourceB';
-import { EntityAggregatorProvider } from './provider/EntityAggregatorProvider';
+import { entityAggregatorService } from './service/EntityAggregatorServiceRef';
 
 export const entityAggregatorModule = createBackendModule({
   pluginId: 'catalog',
@@ -18,10 +17,9 @@ export const entityAggregatorModule = createBackendModule({
         logger: coreServices.logger,
         scheduler: coreServices.scheduler,
         database: coreServices.database,
+        entityAggregator: entityAggregatorService,
       },
-      async init({ catalog, logger, scheduler, database }) {
-        const store = await DatabaseStore.create(database, logger);
-        
+      async init({ logger, entityAggregator }) {
         const dataSources = [
           new DataSourceA(
             { 
@@ -48,16 +46,13 @@ export const entityAggregatorModule = createBackendModule({
           ),
         ];
 
-        const provider = new EntityAggregatorProvider(
-          'entity-aggregator',
-          store,
-          logger,
-          scheduler,
-          dataSources,
-        );
+        for (const source of dataSources) {
+          entityAggregator.addDataSource(source);
+        }
 
-        catalog.addEntityProvider(provider);
-        logger.info('Registered entity aggregator provider with data sources A and B');
+        entityAggregator.start();
+
+        logger.info('Entity aggregator started');
       },
     });
   },
