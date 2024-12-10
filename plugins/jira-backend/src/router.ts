@@ -39,7 +39,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     res.json({ status: 'ok' });
   });
 
-  router.post('/api/v1/tickets', async (req, res) => {
+  router.post('/tickets', async (req, res) => {
     const result = createTicketSchema.safeParse(req.body);
     if (!result.success) {
       throw new InputError(`Invalid request body: ${result.error}`);
@@ -56,7 +56,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     }
   });
 
-  router.get('/api/v1/tickets/:ticketId', async (req, res) => {
+  router.get('/tickets/:ticketId', async (req, res) => {
     const { ticketId } = req.params;
     const details = await jiraService.getTicketDetails(ticketId);
     
@@ -67,7 +67,7 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     res.json(details);
   });
 
-  router.post('/api/v1/projects/details', async (req, res) => {
+  router.post('/projects/details', async (req, res) => {
     const { projectKey, component, label, statusesNames } = req.body;
 
     if (!projectKey) {

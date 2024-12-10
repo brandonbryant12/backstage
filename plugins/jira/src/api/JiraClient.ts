@@ -40,7 +40,7 @@ export class JiraClient implements JiraApi {
     reporter?: string;
     jiraComponent?: string;
   }) {
-    const response = await this.fetch<{ id: string; key: string; self: string }>('/api/v1/tickets', {
+    const response = await this.fetch<{ id: string; key: string; self: string }>('/tickets', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export class JiraClient implements JiraApi {
   }
 
   async getTicketDetails(ticketId: string): Promise<JiraTicketDetails> {
-    return this.fetch(`/api/v1/tickets/${ticketId}`);
+    return this.fetch(`/tickets/${ticketId}`);
   }
 
   async getProjectDetails(
@@ -69,7 +69,7 @@ export class JiraClient implements JiraApi {
     label?: string,
     statusesNames?: string[],
   ): Promise<JiraProjectDetails> {
-    return this.fetch('/api/v1/projects/details', {
+    return this.fetch('/projects/details', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
