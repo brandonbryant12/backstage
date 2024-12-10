@@ -1,1 +1,0 @@
-export { applicationProcessorModule } from './module';

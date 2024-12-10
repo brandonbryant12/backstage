@@ -1,5 +1,5 @@
 {
-  "name": "backstage-plugin-catalog-aggregator-entity-provider",
+  "name": "@internal/plugin-catalog-backend-module-aggregator-entity-provider",
   "description": "The provider backend module for the catalog plugin.",
   "version": "0.1.0",
   "main": "src/index.ts",
@@ -27,8 +27,8 @@
     "@backstage/backend-plugin-api": "^1.0.2",
     "@backstage/catalog-model": "^1.7.0",
     "@backstage/plugin-catalog-node": "^1.13.0",
-    "@backstage/plugin-catalog-provider-backend-module-entity-aggregator": "^0.1.0",
-    "@backstage/types": "^1.1.1"
+    "@backstage/types": "^1.1.1",
+    "@internal/plugin-catalog-backend-module-aggregator-entity-manager": "^0.1.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.1.0",
