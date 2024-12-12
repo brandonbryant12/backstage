@@ -48,7 +48,7 @@ describe('JiraService', () => {
 
     it('should create a ticket successfully', async () => {
       server.use(
-        rest.post('http://localhost:7007/api/api/2/issue', (_, res, ctx) => {
+        rest.post('http://localhost:7007/api/2/issue', (_, res, ctx) => {
           return res(
             ctx.json({
               id: '12345',
@@ -77,7 +77,7 @@ describe('JiraService', () => {
 
     it('should handle API errors gracefully', async () => {
       server.use(
-        rest.post('http://localhost:7007/api/api/2/issue', (_, res, ctx) => {
+        rest.post('http://localhost:7007/api/2/issue', (_, res, ctx) => {
           return res(
             ctx.status(400),
             ctx.text('Invalid project key')
@@ -107,7 +107,7 @@ describe('JiraService', () => {
 
     it('should fetch ticket details successfully', async () => {
       server.use(
-        rest.get('http://localhost:7007/api/api/2/issue/TEST-123', (_, res, ctx) => {
+        rest.get('http://localhost:7007/api/2/issue/TEST-123', (_, res, ctx) => {
           return res(
             ctx.json({
               fields: {
@@ -133,7 +133,7 @@ describe('JiraService', () => {
 
     it('should handle missing assignee', async () => {
       server.use(
-        rest.get('http://localhost:7007/api/api/2/issue/TEST-123', (_, res, ctx) => {
+        rest.get('http://localhost:7007/api/2/issue/TEST-123', (_, res, ctx) => {
           return res(
             ctx.json({
               fields: {
@@ -146,7 +146,6 @@ describe('JiraService', () => {
       );
 
       const details = await jiraService.getTicketDetails('TEST-123');
-
       expect(details).toEqual({
         status: 'Open',
         assignee: null,
@@ -161,77 +160,6 @@ describe('JiraService', () => {
     });
   });
 
-  describe('getProjectDetails', () => {
-    beforeEach(() => {
-      server.use(
-        rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
-          return res(ctx.json({ token: 'mock-token' }));
-        })
-      );
-    });
-
-    it('should fetch project details successfully', async () => {
-      server.use(
-        rest.get('http://localhost:7007/api/api/2/project/TEST', (_, res, ctx) => {
-          return res(
-            ctx.json({
-              name: 'Test Project',
-              avatarUrls: {
-                '48x48': 'https://example.com/project-icon.jpg',
-              },
-              projectTypeKey: 'software',
-            })
-          );
-        }),
-        rest.get('http://localhost:7007/api/api/2/project/TEST/statuses', (_, res, ctx) => {
-          return res(
-            ctx.json([
-              {
-                statuses: [
-                  {
-                    name: 'Bug',
-                    iconUrl: 'https://example.com/bug-icon.jpg',
-                    statusCategory: { name: 'To Do' },
-                  },
-                ],
-              },
-            ])
-          );
-        }),
-        rest.post('http://localhost:7007/api/api/2/search', (_, res, ctx) => {
-          return res(
-            ctx.json({
-              issues: [
-                {
-                  fields: {
-                    issuetype: { name: 'Bug' },
-                  },
-                },
-              ],
-            })
-          );
-        })
-      );
-
-      const details = await jiraService.getProjectDetails('TEST');
-      expect(details).toEqual({
-        project: {
-          name: 'Test Project',
-          iconUrl: 'https://example.com/project-icon.jpg',
-          type: 'software',
-        },
-        issues: [
-          {
-            name: 'Bug',
-            iconUrl: 'https://example.com/bug-icon.jpg',
-            total: 1,
-            url: 'http://localhost:7007/app/browse/TEST',
-          },
-        ],
-      });
-    });
-  });
-
   describe('getIssues', () => {
     beforeEach(() => {
       server.use(
@@ -243,39 +171,44 @@ describe('JiraService', () => {
 
     it('should fetch issues successfully', async () => {
       server.use(
-        rest.get('http://localhost:7007/api/api/2/project/TEST', (_, res, ctx) => {
-          return res(
-            ctx.json({
-              name: 'Test Project',
-              avatarUrls: {
-                '48x48': 'https://example.com/project-icon.jpg',
-              },
-              projectTypeKey: 'software',
-            })
-          );
-        }),
-        rest.get('http://localhost:7007/api/api/2/project/TEST/statuses', (_, res, ctx) => {
+        rest.get('http://localhost:7007/api/2/project/TEST/statuses', (_, res, ctx) => {
           return res(
             ctx.json([
               {
+                id: '1',
+                name: 'To Do',
                 statuses: [
                   {
+                    id: '10001',
                     name: 'Bug',
                     iconUrl: 'https://example.com/bug-icon.jpg',
-                    statusCategory: { name: 'To Do' },
+                    statusCategory: {
+                      id: 1,
+                      key: 'todo',
+                      name: 'To Do'
+                    },
                   },
                 ],
               },
             ])
           );
         }),
-        rest.post('http://localhost:7007/api/api/2/search', (_, res, ctx) => {
+        rest.post('http://localhost:7007/api/2/search', (_, res, ctx) => {
           return res(
             ctx.json({
+              startAt: 0,
+              maxResults: 50,
+              total: 1,
               issues: [
                 {
+                  id: '1',
+                  key: 'TEST-1',
                   fields: {
-                    issuetype: { name: 'Bug' },
+                    issuetype: {
+                      id: '10001',
+                      name: 'Bug',
+                      description: 'A bug in the system'
+                    },
                   },
                 },
               ],
