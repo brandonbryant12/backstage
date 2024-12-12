@@ -1,5 +1,5 @@
 import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
-import { JiraApi, JiraTicketDetails, JiraProjectDetails } from './JiraApi';
+import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssueCounter } from './JiraApi';
 import { ResponseError } from '@backstage/errors';
 
 export class JiraClient implements JiraApi {
@@ -22,14 +22,15 @@ export class JiraClient implements JiraApi {
     const baseUrl = await this.getBaseUrl();
     const url = `${baseUrl}${input}`;
 
-      const response = await this.fetchApi.fetch(url, init);
-      if (!response.ok) {
-        throw await ResponseError.fromResponse(response);
-      }
-      return await response.json();
-
+    const response = await this.fetchApi.fetch(url, init);
+    if (!response.ok) {
+      const errorText = await response.text();
+      const error = await ResponseError.fromResponse(response);
+      error.message = `Request failed with ${response.status} ${response.statusText}: ${errorText}`;
+      throw error;
+    }
+    return await response.json();
   }
- 
 
   async createTicket(options: {
     projectKey: string;
@@ -39,8 +40,8 @@ export class JiraClient implements JiraApi {
     feedbackType: string;
     reporter?: string;
     jiraComponent?: string;
-  }) {
-    const response = await this.fetch<{ id: string; key: string; self: string }>('/tickets', {
+  }): Promise<JiraCreateIssueResponse> {
+    return this.fetch('/tickets', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,21 +56,24 @@ export class JiraClient implements JiraApi {
         component: options.jiraComponent,
       }),
     });
-
-    return response;
   }
 
   async getTicketDetails(ticketId: string): Promise<JiraTicketDetails> {
-    return this.fetch(`/tickets/${ticketId}`);
+    return this.fetch(`/tickets/${ticketId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
-  async getProjectDetails(
+  async getIssues(
     projectKey: string,
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraProjectDetails> {
-    return this.fetch('/projects/details', {
+  ): Promise<JiraIssueCounter[]> {
+    return this.fetch('/issues', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

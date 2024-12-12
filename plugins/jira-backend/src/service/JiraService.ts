@@ -1,4 +1,4 @@
-import { createServiceFactory, createServiceRef, LoggerService, coreServices } from '@backstage/backend-plugin-api';
+import { createServiceFactory, createServiceRef, LoggerService, coreServices, CacheService } from '@backstage/backend-plugin-api';
 import { Config } from '@backstage/config';
 import { 
   AbstractJiraAPIService, 
@@ -11,6 +11,11 @@ import {
   searchResponseSchema,
 } from './types';
 
+interface TokenResponse {
+  token: string;
+  expires_in: number;
+}
+
 export class JiraService implements AbstractJiraAPIService {
   private readonly oauthUrl: string;
   private readonly apiUrl: string;
@@ -19,6 +24,7 @@ export class JiraService implements AbstractJiraAPIService {
   constructor(
     private readonly logger: LoggerService,
     private readonly config: Config,
+    private readonly cache: CacheService,
   ) {
     const baseUrl = process.env.BACKEND_BASEURL || '';
     this.oauthUrl = `${baseUrl}/oauth`;
@@ -26,7 +32,7 @@ export class JiraService implements AbstractJiraAPIService {
     this.appUrl = `${baseUrl}/app`;
   }
 
-  private async generateToken(): Promise<string> {
+  private async generateToken(): Promise<TokenResponse> {
     const clientId = this.config.getString('feedback.jira.clientId');
     const clientSecret = this.config.getString('feedback.jira.clientSecret');
     const response = await fetch(this.oauthUrl, {
@@ -40,8 +46,25 @@ export class JiraService implements AbstractJiraAPIService {
         client_secret: clientSecret,
       }),
     });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Token request failed with status ${response.status}: ${errorText}`);
+    }
     const data = await response.json();
-    return data.token as string;
+    const { token, expires_in } = data;
+    return { token, expires_in };
+  }
+
+  private async getAuthToken(): Promise<string> {
+    const cacheKey = 'jira-backend-auth-token';
+    const cachedToken = await this.cache.get(cacheKey);
+    if (cachedToken) {
+      return cachedToken as string;
+    }
+
+    const { token, expires_in } = await this.generateToken();
+    await this.cache.set(cacheKey, token, { ttl: expires_in - 60 });
+    return token;
   }
 
   private async makeAuthenticatedRequest(options: {
@@ -51,7 +74,7 @@ export class JiraService implements AbstractJiraAPIService {
   }) {
     try {
       const jiraServicePat = this.config.getOptionalString('feedback.jira.jiraServicePat');
-      const token = await this.generateToken();
+      const token = await this.getAuthToken();
       const headers = {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -199,9 +222,10 @@ export const jiraServiceRef = createServiceRef<AbstractJiraAPIService>({
     deps: {
       logger: coreServices.logger,
       config: coreServices.rootConfig,
+      cache: coreServices.cache,
     },
-    factory({ logger, config }) {
-      return new JiraService(logger, config);
+    factory({ logger, config, cache }) {
+      return new JiraService(logger, config, cache);
     }
   })
 });

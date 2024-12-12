@@ -13,6 +13,12 @@ export interface JiraIssueCounter {
   url: string;
 }
 
+export interface JiraCreateIssueResponse {
+  id: string;
+  key: string;
+  self: string;
+}
+
 export interface JiraApi {
   /**
    * Creates a new Jira ticket
@@ -27,11 +33,7 @@ export interface JiraApi {
     feedbackType: string;
     reporter?: string;
     jiraComponent?: string;
-  }): Promise<{
-    id: string;
-    key: string;
-    self: string;
-  }>;
+  }): Promise<JiraCreateIssueResponse>;
 
   /**
    * Retrieves details for a specific Jira ticket

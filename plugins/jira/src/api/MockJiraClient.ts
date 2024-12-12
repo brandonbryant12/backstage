@@ -1,22 +1,14 @@
-import { JiraApi, JiraTicketDetails, JiraProjectDetails, JiraIssueCounter } from './JiraApi';
+import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssueCounter } from './JiraApi';
 
 export class MockJiraClient implements JiraApi {
   private mockTickets: Map<string, JiraTicketDetails> = new Map();
-  private mockProjects: Map<string, JiraProjectDetails> = new Map();
   private ticketCounter: number = 0;
-
-  // Helper methods for testing
   setMockTicket(ticketId: string, details: JiraTicketDetails) {
     this.mockTickets.set(ticketId, details);
   }
 
-  setMockProject(projectKey: string, details: JiraProjectDetails) {
-    this.mockProjects.set(projectKey, details);
-  }
-
   clearMocks() {
     this.mockTickets.clear();
-    this.mockProjects.clear();
     this.ticketCounter = 0;
   }
 
@@ -28,7 +20,7 @@ export class MockJiraClient implements JiraApi {
     feedbackType: string;
     reporter?: string;
     jiraComponent?: string;
-  }) {
+  }): Promise<JiraCreateIssueResponse> {
     this.ticketCounter += 1;
     const ticketId = `MOCK-${this.ticketCounter}`;
 
@@ -61,28 +53,27 @@ export class MockJiraClient implements JiraApi {
     label?: string,
     statusesNames?: string[],
   ): Promise<JiraIssueCounter[]> {
-    const project = this.mockProjects.get(projectKey);
-    if (!project) {
-      return [
-        {
-          name: 'Bug',
-          iconUrl: 'https://example.com/bug-icon.png',
-          total: 1,
-          url: `https://example.com/browse/${projectKey}`,
-        },
-      ];
-    }
-
-    let issues = [...project.issues];
-    if (component || label || statusesNames) {
-      const total = Math.max(1, Math.floor(Math.random() * 5));
-      issues = issues.map(issue => ({
-        ...issue,
-        total,
+    const mockIssues: JiraIssueCounter[] = [
+      {
+        name: 'Bug',
+        iconUrl: 'https://example.com/bug-icon.png',
+        total: 1,
         url: `https://example.com/browse/${projectKey}`,
+      },
+      {
+        name: 'Task',
+        iconUrl: 'https://example.com/task-icon.png',
+        total: 2,
+        url: `https://example.com/browse/${projectKey}`,
+      },
+    ];
+    if (component || label || statusesNames) {
+      return mockIssues.map(issue => ({
+        ...issue,
+        total: Math.max(1, Math.floor(Math.random() * 5)),
       }));
     }
 
-    return issues;
+    return mockIssues;
   }
 } 

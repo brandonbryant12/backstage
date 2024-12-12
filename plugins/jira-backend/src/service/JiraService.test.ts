@@ -18,6 +18,7 @@ describe('JiraService', () => {
   });
 
   let jiraService: JiraService;
+  let cacheMock: ReturnType<typeof mockServices.cache.mock>;
 
   beforeAll(() => {
     server.listen();
@@ -34,14 +35,73 @@ describe('JiraService', () => {
 
   beforeEach(() => {
     process.env.BACKEND_BASEURL = 'http://localhost:7007';
-    jiraService = new JiraService(mockServices.logger.mock(), mockConfig);
+    cacheMock = mockServices.cache.mock();
+    jiraService = new JiraService(mockServices.logger.mock(), mockConfig, cacheMock);
+  });
+
+  describe('Token Caching', () => {
+    beforeEach(() => {
+      server.use(
+        rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
+          return res(ctx.json({ token: 'mock-token', expires_in: 3600 }));
+        }),
+        rest.post('http://localhost:7007/api/2/issue', (_, res, ctx) => {
+          return res(
+            ctx.json({
+              id: '12345',
+              key: 'TEST-123',
+              self: 'http://jira.example.com/rest/api/2/issue/12345',
+            })
+          );
+        }),
+        rest.get('http://localhost:7007/api/2/issue/TEST-123', (_, res, ctx) => {
+          return res(
+            ctx.json({
+              fields: {
+                status: { name: 'Open' },
+                assignee: null,
+              },
+            })
+          );
+        })
+      );
+    });
+
+    it('retrieves a token and caches it if not present in cache', async () => {
+      cacheMock.get.mockResolvedValueOnce(undefined);
+
+      await jiraService.createJiraTicket({
+        projectKey: 'TEST',
+        summary: 'Test Issue',
+        description: 'Test Description',
+        reporter: 'test-user',
+        tag: 'test-tag',
+        feedbackType: 'BUG',
+      });
+
+      expect(cacheMock.get).toHaveBeenCalledWith('jira-backend-auth-token');
+      expect(cacheMock.set).toHaveBeenCalledWith(
+        'jira-backend-auth-token',
+        'mock-token',
+        { ttl: 3540 }
+      );
+    });
+
+    it('uses a cached token if available', async () => {
+      cacheMock.get.mockResolvedValueOnce('cached-token');
+
+      await jiraService.getTicketDetails('TEST-123');
+
+      expect(cacheMock.get).toHaveBeenCalledWith('jira-backend-auth-token');
+      expect(cacheMock.set).not.toHaveBeenCalled();
+    });
   });
 
   describe('createJiraTicket', () => {
     beforeEach(() => {
       server.use(
         rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
-          return res(ctx.json({ token: 'mock-token' }));
+          return res(ctx.json({ token: 'mock-token', expires_in: 3600 }));
         })
       );
     });
@@ -100,7 +160,7 @@ describe('JiraService', () => {
     beforeEach(() => {
       server.use(
         rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
-          return res(ctx.json({ token: 'mock-token' }));
+          return res(ctx.json({ token: 'mock-token', expires_in: 3600 }));
         })
       );
     });
@@ -164,7 +224,7 @@ describe('JiraService', () => {
     beforeEach(() => {
       server.use(
         rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
-          return res(ctx.json({ token: 'mock-token' }));
+          return res(ctx.json({ token: 'mock-token', expires_in: 3600 }));
         })
       );
     });
@@ -228,4 +288,4 @@ describe('JiraService', () => {
       ]);
     });
   });
-}); 
+});
