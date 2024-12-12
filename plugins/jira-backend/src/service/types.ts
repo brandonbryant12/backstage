@@ -17,44 +17,22 @@ export interface JiraTicketDetails {
   avatarUrl: string | null;
 }
 
-export interface JiraProjectDetails {
-  project: {
-    name: string;
-    iconUrl: string;
-    type: string;
-  };
-  issues: Array<{
-    name: string;
-    iconUrl: string;
-    total: number;
-  }>;
-  ticketIds: string[];
-  tickets: Array<{
-    key: string;
-    summary: string;
-    assignee: {
-      displayName: string | null;
-      avatarUrl: string | null;
-    };
-    status: string;
-    priority: {
-      name: string;
-      iconUrl: string;
-    };
-    created: string;
-    updated: string;
-  }>;
+export interface JiraIssueCounter {
+  name: string;
+  iconUrl: string;
+  total: number;
+  url: string;
 }
 
 export interface AbstractJiraAPIService {
   createJiraTicket(options: JiraTicketOptions): Promise<any>;
   getTicketDetails(ticketId: string): Promise<JiraTicketDetails | undefined>;
-  getProjectDetails(
+  getIssues(
     projectKey: string,
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraProjectDetails>;
+  ): Promise<JiraIssueCounter[]>;
 }
 
 export interface JiraServiceOptions {

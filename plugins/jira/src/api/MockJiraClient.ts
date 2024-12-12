@@ -1,4 +1,4 @@
-import { JiraApi, JiraTicketDetails, JiraProjectDetails } from './JiraApi';
+import { JiraApi, JiraTicketDetails, JiraProjectDetails, JiraIssueCounter } from './JiraApi';
 
 export class MockJiraClient implements JiraApi {
   private mockTickets: Map<string, JiraTicketDetails> = new Map();
@@ -55,65 +55,34 @@ export class MockJiraClient implements JiraApi {
     return ticket;
   }
 
-  async getProjectDetails(
+  async getIssues(
     projectKey: string,
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraProjectDetails> {
+  ): Promise<JiraIssueCounter[]> {
     const project = this.mockProjects.get(projectKey);
     if (!project) {
-      return {
-        project: {
-          name: `Mock Project ${projectKey}`,
-          iconUrl: 'https://example.com/project-icon.png',
-          type: 'software',
+      return [
+        {
+          name: 'Bug',
+          iconUrl: 'https://example.com/bug-icon.png',
+          total: 1,
+          url: `https://example.com/browse/${projectKey}`,
         },
-        issues: [
-          {
-            name: 'Bug',
-            iconUrl: 'https://example.com/bug-icon.png',
-            total: 1,
-          },
-        ],
-        ticketIds: ['MOCK-1'],
-        tickets: [
-          {
-            key: 'MOCK-1',
-            summary: 'Mock Issue',
-            assignee: {
-              displayName: 'Mock User',
-              avatarUrl: 'https://example.com/avatar.png',
-            },
-            status: 'Open',
-            priority: {
-              name: 'Medium',
-              iconUrl: 'https://example.com/priority-icon.png',
-            },
-            created: new Date().toISOString(),
-            updated: new Date().toISOString(),
-          },
-        ],
-      };
+      ];
     }
 
-    // Apply filters if provided
-    const filteredProject = { ...project };
+    let issues = [...project.issues];
     if (component || label || statusesNames) {
-      filteredProject.tickets = project.tickets.filter(ticket => {
-        const matchesComponent = !component || ticket.key.includes(component);
-        const matchesLabel = !label || ticket.key.includes(label);
-        const matchesStatus = !statusesNames?.length || statusesNames.includes(ticket.status);
-        return matchesComponent && matchesLabel && matchesStatus;
-      });
-      
-      filteredProject.ticketIds = filteredProject.tickets.map(t => t.key);
-      filteredProject.issues = filteredProject.issues.map(issue => ({
+      const total = Math.max(1, Math.floor(Math.random() * 5));
+      issues = issues.map(issue => ({
         ...issue,
-        total: filteredProject.tickets.length,
+        total,
+        url: `https://example.com/browse/${projectKey}`,
       }));
     }
 
-    return filteredProject;
+    return issues;
   }
 } 

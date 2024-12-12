@@ -106,26 +106,20 @@ export class JiraService implements AbstractJiraAPIService {
     return this.appUrl;
   }
 
-  async getProjectDetails(
+  async getIssues(
     projectKey: string,
     component?: string,
     label?: string,
     statusesNames: string[] = [],
-  ): Promise<JiraProjectDetails> {
+  ): Promise<JiraIssueCounter[]> {
     try {
-      // Get project details
-      const projectResponse = await this.makeAuthenticatedRequest({
-        method: 'get',
-        endpoint: `api/2/project/${projectKey}`,
-      });
+      const [issueTypesResponse] = await Promise.all([
+        this.makeAuthenticatedRequest({
+          method: 'get',
+          endpoint: `api/2/project/${projectKey}/statuses`,
+        }),
+      ]);
 
-      // Get issue types for the project
-      const issueTypesResponse = await this.makeAuthenticatedRequest({
-        method: 'get',
-        endpoint: `api/2/project/${projectKey}/statuses`,
-      });
-
-      // Build JQL query
       const jqlParts = [
         `project = "${projectKey}"`,
         'statuscategory not in ("Done")',
@@ -143,28 +137,17 @@ export class JiraService implements AbstractJiraAPIService {
 
       const jql = jqlParts.join(' AND ');
 
-      // Get issues
       const issuesResponse = await this.makeAuthenticatedRequest({
         method: 'post',
         endpoint: 'api/2/search',
         data: {
           jql,
           maxResults: -1,
-          fields: [
-            'key',
-            'summary',
-            'assignee',
-            'status',
-            'priority',
-            'created',
-            'updated',
-            'issuetype',
-          ],
+          fields: ['issuetype'],
         },
       });
 
-      // Process issue types
-      const issueCounters = issueTypesResponse
+      return issueTypesResponse
         .flatMap((status: any) => status.statuses)
         .filter((status: any) => status.statusCategory?.name !== 'Done')
         .reduce((acc: JiraIssueCounter[], issueType: any) => {
@@ -176,38 +159,13 @@ export class JiraService implements AbstractJiraAPIService {
               total: issuesResponse.issues.filter(
                 (issue: any) => issue.fields.issuetype.name === issueType.name,
               ).length,
+              url: `${this.getAppUrl()}/browse/${projectKey}`,
             });
           }
           return acc;
         }, []);
-
-      // Process tickets
-      const tickets = issuesResponse.issues.map((issue: any) => ({
-        key: issue.key,
-        summary: issue.fields.summary,
-        assignee: {
-          displayName: issue.fields.assignee?.displayName || null,
-          avatarUrl: issue.fields.assignee?.avatarUrls?.['48x48'] || null,
-        },
-        status: issue.fields.status.name,
-        priority: issue.fields.priority,
-        created: issue.fields.created,
-        updated: issue.fields.updated,
-      }));
-
-      return {
-        project: {
-          name: projectResponse.name,
-          iconUrl: projectResponse.avatarUrls['48x48'],
-          type: projectResponse.projectTypeKey,
-          url: this.getAppUrl(),
-        },
-        issues: issueCounters,
-        ticketIds: tickets.map(t => t.key),
-        tickets,
-      };
     } catch (error: any) {
-      this.logger.error(`Failed to get project details: ${error.message}`);
+      this.logger.error(`Failed to get issues: ${error.message}`);
       throw error;
     }
   }

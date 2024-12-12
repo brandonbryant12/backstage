@@ -180,7 +180,6 @@ describe('JiraService', () => {
                 '48x48': 'https://example.com/project-icon.jpg',
               },
               projectTypeKey: 'software',
-              self: 'https://example.com/jira/project/TEST',
             })
           );
         }),
@@ -204,19 +203,7 @@ describe('JiraService', () => {
             ctx.json({
               issues: [
                 {
-                  key: 'TEST-1',
                   fields: {
-                    summary: 'Test Issue',
-                    assignee: {
-                      displayName: 'John Doe',
-                      avatarUrls: {
-                        '48x48': 'https://example.com/avatar.jpg',
-                      },
-                    },
-                    status: { name: 'In Progress' },
-                    priority: { name: 'High', iconUrl: 'https://example.com/high.jpg' },
-                    created: '2024-01-01T00:00:00.000Z',
-                    updated: '2024-01-02T00:00:00.000Z',
                     issuetype: { name: 'Bug' },
                   },
                 },
@@ -232,31 +219,80 @@ describe('JiraService', () => {
           name: 'Test Project',
           iconUrl: 'https://example.com/project-icon.jpg',
           type: 'software',
-          url: 'http://localhost:7007/app',
         },
         issues: [
           {
             name: 'Bug',
             iconUrl: 'https://example.com/bug-icon.jpg',
             total: 1,
-          },
-        ],
-        ticketIds: ['TEST-1'],
-        tickets: [
-          {
-            key: 'TEST-1',
-            summary: 'Test Issue',
-            assignee: {
-              displayName: 'John Doe',
-              avatarUrl: 'https://example.com/avatar.jpg',
-            },
-            status: 'In Progress',
-            priority: { name: 'High', iconUrl: 'https://example.com/high.jpg' },
-            created: '2024-01-01T00:00:00.000Z',
-            updated: '2024-01-02T00:00:00.000Z',
+            url: 'http://localhost:7007/app/browse/TEST',
           },
         ],
       });
+    });
+  });
+
+  describe('getIssues', () => {
+    beforeEach(() => {
+      server.use(
+        rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
+          return res(ctx.json({ token: 'mock-token' }));
+        })
+      );
+    });
+
+    it('should fetch issues successfully', async () => {
+      server.use(
+        rest.get('http://localhost:7007/api/api/2/project/TEST', (_, res, ctx) => {
+          return res(
+            ctx.json({
+              name: 'Test Project',
+              avatarUrls: {
+                '48x48': 'https://example.com/project-icon.jpg',
+              },
+              projectTypeKey: 'software',
+            })
+          );
+        }),
+        rest.get('http://localhost:7007/api/api/2/project/TEST/statuses', (_, res, ctx) => {
+          return res(
+            ctx.json([
+              {
+                statuses: [
+                  {
+                    name: 'Bug',
+                    iconUrl: 'https://example.com/bug-icon.jpg',
+                    statusCategory: { name: 'To Do' },
+                  },
+                ],
+              },
+            ])
+          );
+        }),
+        rest.post('http://localhost:7007/api/api/2/search', (_, res, ctx) => {
+          return res(
+            ctx.json({
+              issues: [
+                {
+                  fields: {
+                    issuetype: { name: 'Bug' },
+                  },
+                },
+              ],
+            })
+          );
+        })
+      );
+
+      const issues = await jiraService.getIssues('TEST');
+      expect(issues).toEqual([
+        {
+          name: 'Bug',
+          iconUrl: 'https://example.com/bug-icon.jpg',
+          total: 1,
+          url: 'http://localhost:7007/app/browse/TEST',
+        },
+      ]);
     });
   });
 }); 

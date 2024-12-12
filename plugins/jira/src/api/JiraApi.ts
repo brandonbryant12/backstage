@@ -6,33 +6,11 @@ export interface JiraTicketDetails {
   avatarUrl: string | null;
 }
 
-export interface JiraProjectDetails {
-  project: {
-    name: string;
-    iconUrl: string;
-    type: string;
-  };
-  issues: Array<{
-    name: string;
-    iconUrl: string;
-    total: number;
-  }>;
-  ticketIds: string[];
-  tickets: Array<{
-    key: string;
-    summary: string;
-    assignee: {
-      displayName: string | null;
-      avatarUrl: string | null;
-    };
-    status: string;
-    priority: {
-      name: string;
-      iconUrl: string;
-    };
-    created: string;
-    updated: string;
-  }>;
+export interface JiraIssueCounter {
+  name: string;
+  iconUrl: string;
+  total: number;
+  url: string;
 }
 
 export interface JiraApi {
@@ -63,19 +41,19 @@ export interface JiraApi {
   getTicketDetails(ticketId: string): Promise<JiraTicketDetails>;
 
   /**
-   * Retrieves project details including issues and tickets
+   * Retrieves issues for a project
    * @param projectKey - The key of the project to retrieve
    * @param component - Optional component filter
    * @param label - Optional label filter
    * @param statusesNames - Optional status names filter
-   * @throws {Error} If the project details retrieval fails
+   * @throws {Error} If the issues retrieval fails
    */
-  getProjectDetails(
+  getIssues(
     projectKey: string,
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraProjectDetails>;
+  ): Promise<JiraIssueCounter[]>;
 }
 
 export const jiraApiRef = createApiRef<JiraApi>({
