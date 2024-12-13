@@ -58,17 +58,18 @@ export class MockJiraClient implements JiraApi {
       issues: [
         {
           name: 'Bug',
-          iconUrl: 'https://example.com/bug-icon.png',
+          iconUrl: 'https://product-integrations-cdn.atl-paas.net/jira-issuetype/bug.png',
           total: 1,
           url: `https://example.com/browse/${projectKey}`,
         },
         {
           name: 'Task',
-          iconUrl: 'https://example.com/task-icon.png',
+          iconUrl: 'https://product-integrations-cdn.atl-paas.net/jira-issuetype/task.png',
           total: 2,
           url: `https://example.com/browse/${projectKey}`,
         },
       ],
     };
   }
+  
 }
