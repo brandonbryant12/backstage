@@ -3,19 +3,9 @@ import express from 'express';
 import Router from 'express-promise-router';
 import { z } from 'zod';
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { AbstractJiraAPIService } from './service/types';
+import { AbstractJiraAPIService, createTicketSchema } from './service/types';
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { Config } from '@backstage/config';
-
-const createTicketSchema = z.object({
-  projectKey: z.string(),
-  summary: z.string(),
-  description: z.string(),
-  tag: z.string(),
-  feedbackType: z.enum(['BUG', 'TASK']),
-  reporter: z.string().optional(),
-  jiraComponent: z.string().optional(),
-});
 
 export interface RouterOptions {
   logger: LoggerService;
@@ -41,15 +31,22 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
   router.post('/tickets', async (req, res) => {
     const result = createTicketSchema.safeParse(req.body);
     if (!result.success) {
-      throw new InputError(`Invalid request body: ${result.error}`);
+      throw new InputError(
+        'Invalid request body',
+        { cause: result.error.errors }
+      );
     }
 
     try {
       const ticket = await jiraService.createJiraTicket(result.data);
       res.status(201).json(ticket);
     } catch (error) {
-      if (error instanceof Error) {
-        logger.error('Failed to create Jira ticket', error);
+      logger.error('Failed to create Jira ticket', error);
+      if (error instanceof z.ZodError) {
+        throw new InputError(
+          'Invalid request body',
+          { cause: error.errors }
+        );
       }
       throw error;
     }
@@ -66,21 +63,21 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     res.json(details);
   });
 
-  router.get('/issues', async (req, res) => {
+  router.post('/issues', async (req, res) => {
     const { projectKey, component, label, statusesNames } = req.body;
 
     if (!projectKey) {
       throw new InputError('Project key is required');
     }
 
-    const details = await jiraService.getIssues(
+    const issues = await jiraService.getIssues(
       projectKey,
       component,
       label,
       statusesNames,
     );
     
-    res.json(details);
+    res.json(issues);
   });
 
   return router;

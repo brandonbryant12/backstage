@@ -95,3 +95,15 @@ export interface JiraServiceOptions {
   logger: LoggerService;
   config: Config;
 }
+
+export const createTicketSchema = z.object({
+  projectKey: z.string(),
+  summary: z.string(),
+  description: z.string(),
+  tag: z.string(),
+  feedbackType: z.enum(['BUG', 'TASK']),
+  reporter: z.string().optional(),
+  jiraComponent: z.string().optional(),
+});
+
+export type CreateTicketRequest = z.infer<typeof createTicketSchema>;
