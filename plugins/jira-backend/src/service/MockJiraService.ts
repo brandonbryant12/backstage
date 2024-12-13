@@ -1,5 +1,5 @@
 import { LoggerService } from '@backstage/backend-plugin-api';
-import { AbstractJiraAPIService, JiraTicketDetails } from './types';
+import { AbstractJiraAPIService, JiraTicketDetails, JiraIssues } from './types';
 
 export class MockJiraService implements AbstractJiraAPIService {
   private mockTickets: Map<string, JiraTicketDetails> = new Map();
@@ -35,7 +35,32 @@ export class MockJiraService implements AbstractJiraAPIService {
     };
   }
 
+  async getIssues(
+    projectKey: string,
+    component?: string,
+    label?: string,
+    statusesNames: string[] = [],
+  ): Promise<JiraIssues> {
+    return {
+      projectUrl: `https://mock-jira.com/browse/${projectKey}`,
+      issues: [
+        {
+          name: 'Bug',
+          iconUrl: 'https://example.com/bug-icon.png',
+          total: 1,
+          url: `https://example.com/browse/${projectKey}`,
+        },
+        {
+          name: 'Task',
+          iconUrl: 'https://example.com/task-icon.png',
+          total: 2,
+          url: `https://example.com/browse/${projectKey}`,
+        },
+      ],
+    };
+  }
+
   getAppUrl(): string {
     return 'https://mock-jira.com';
   }
-} 
+}

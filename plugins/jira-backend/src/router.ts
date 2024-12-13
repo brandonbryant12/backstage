@@ -29,7 +29,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   router.use(express.json());
 
-  // @ts-ignore
   router.use(MiddlewareFactory.create({
     config,
     logger
@@ -67,14 +66,14 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     res.json(details);
   });
 
-  router.post('/projects/details', async (req, res) => {
+  router.get('/issues', async (req, res) => {
     const { projectKey, component, label, statusesNames } = req.body;
 
     if (!projectKey) {
       throw new InputError('Project key is required');
     }
 
-    const details = await jiraService.getProjectDetails(
+    const details = await jiraService.getIssues(
       projectKey,
       component,
       label,

@@ -1,5 +1,5 @@
 import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
-import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssueCounter } from './JiraApi';
+import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssues } from './JiraApi';
 import { ResponseError } from '@backstage/errors';
 
 export class JiraClient implements JiraApi {
@@ -72,7 +72,7 @@ export class JiraClient implements JiraApi {
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraIssueCounter[]> {
+  ): Promise<JiraIssues> {
     return this.fetch('/issues', {
       method: 'POST',
       headers: {
@@ -86,4 +86,4 @@ export class JiraClient implements JiraApi {
       }),
     });
   }
-} 
+}

@@ -4,11 +4,11 @@ import {
   AbstractJiraAPIService, 
   JiraTicketDetails, 
   JiraTicketOptions, 
-  JiraIssueCounter,
   JiraCreateIssueResponse,
   createIssueResponseSchema,
   projectStatusesResponseSchema,
   searchResponseSchema,
+  JiraIssues,
 } from './types';
 
 interface TokenResponse {
@@ -167,7 +167,7 @@ export class JiraService implements AbstractJiraAPIService {
     component?: string,
     label?: string,
     statusesNames: string[] = [],
-  ): Promise<JiraIssueCounter[]> {
+  ): Promise<JiraIssues> {
     try {
       const jqlParts = [
         `project = "${projectKey}"`,
@@ -189,23 +189,30 @@ export class JiraService implements AbstractJiraAPIService {
         this.searchIssues(jqlParts.join(' AND ')),
       ]);
 
-      return statuses
+      const projectUrl = `${this.getAppUrl()}/browse/${projectKey}`;
+      const filteredStatuses = statuses
         .flatMap(status => status.statuses)
-        .filter(status => status.statusCategory?.name !== 'Done')
-        .reduce((acc: JiraIssueCounter[], issueType) => {
-          const existing = acc.find(counter => counter.name === issueType.name);
-          if (!existing) {
-            acc.push({
-              name: issueType.name,
-              iconUrl: issueType.iconUrl || '',
-              total: issues.issues.filter(
-                issue => issue.fields.issuetype.name === issueType.name,
-              ).length,
-              url: `${this.getAppUrl()}/browse/${projectKey}`,
-            });
-          }
-          return acc;
-        }, []);
+        .filter(status => status.statusCategory?.name !== 'Done');
+
+      const issueSummaries = filteredStatuses.reduce((acc: { name: string; iconUrl: string; total: number; url: string; }[], issueType) => {
+        const existing = acc.find(counter => counter.name === issueType.name);
+        if (!existing) {
+          acc.push({
+            name: issueType.name,
+            iconUrl: issueType.iconUrl || '',
+            total: issues.issues.filter(
+              issue => issue.fields.issuetype.name === issueType.name,
+            ).length,
+            url: projectUrl,
+          });
+        }
+        return acc;
+      }, []);
+
+      return {
+        projectUrl,
+        issues: issueSummaries,
+      };
     } catch (error: any) {
       this.logger.error(`Failed to get issues: ${error.message}`);
       throw error;

@@ -1,4 +1,4 @@
-import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssueCounter } from './JiraApi';
+import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssues } from './JiraApi';
 
 export class MockJiraClient implements JiraApi {
   private mockTickets: Map<string, JiraTicketDetails> = new Map();
@@ -52,28 +52,23 @@ export class MockJiraClient implements JiraApi {
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraIssueCounter[]> {
-    const mockIssues: JiraIssueCounter[] = [
-      {
-        name: 'Bug',
-        iconUrl: 'https://example.com/bug-icon.png',
-        total: 1,
-        url: `https://example.com/browse/${projectKey}`,
-      },
-      {
-        name: 'Task',
-        iconUrl: 'https://example.com/task-icon.png',
-        total: 2,
-        url: `https://example.com/browse/${projectKey}`,
-      },
-    ];
-    if (component || label || statusesNames) {
-      return mockIssues.map(issue => ({
-        ...issue,
-        total: Math.max(1, Math.floor(Math.random() * 5)),
-      }));
-    }
-
-    return mockIssues;
+  ): Promise<JiraIssues> {
+    return {
+      projectUrl: `https://example.com/browse/${projectKey}`,
+      issues: [
+        {
+          name: 'Bug',
+          iconUrl: 'https://example.com/bug-icon.png',
+          total: 1,
+          url: `https://example.com/browse/${projectKey}`,
+        },
+        {
+          name: 'Task',
+          iconUrl: 'https://example.com/task-icon.png',
+          total: 2,
+          url: `https://example.com/browse/${projectKey}`,
+        },
+      ],
+    };
   }
-} 
+}

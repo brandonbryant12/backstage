@@ -278,14 +278,17 @@ describe('JiraService', () => {
       );
 
       const issues = await jiraService.getIssues('TEST');
-      expect(issues).toEqual([
-        {
-          name: 'Bug',
-          iconUrl: 'https://example.com/bug-icon.jpg',
-          total: 1,
-          url: 'http://localhost:7007/app/browse/TEST',
-        },
-      ]);
+      expect(issues).toEqual({
+        projectUrl: 'http://localhost:7007/app/browse/TEST',
+        issues: [
+          {
+            name: 'Bug',
+            iconUrl: 'https://example.com/bug-icon.jpg',
+            total: 1,
+            url: 'http://localhost:7007/app/browse/TEST',
+          },
+        ],
+      });
     });
   });
 });

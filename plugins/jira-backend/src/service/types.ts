@@ -68,11 +68,16 @@ export interface JiraTicketDetails {
   avatarUrl: string | null;
 }
 
-export interface JiraIssueCounter {
+export interface JiraIssue {
   name: string;
   iconUrl: string;
   total: number;
   url: string;
+}
+
+export interface JiraIssues {
+  projectUrl: string;
+  issues: JiraIssue[];
 }
 
 export interface AbstractJiraAPIService {
@@ -83,7 +88,7 @@ export interface AbstractJiraAPIService {
     component?: string,
     label?: string,
     statusesNames?: string[],
-  ): Promise<JiraIssueCounter[]>;
+  ): Promise<JiraIssues>;
 }
 
 export interface JiraServiceOptions {
