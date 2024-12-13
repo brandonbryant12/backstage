@@ -19,11 +19,6 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   router.use(express.json());
 
-  router.use(MiddlewareFactory.create({
-    config,
-    logger
-  }).error());
-
   router.get('/health', (_, res) => {
     res.json({ status: 'ok' });
   });
@@ -79,6 +74,11 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
     
     res.json(issues);
   });
+
+  router.use(MiddlewareFactory.create({
+    config,
+    logger
+  }).error());
 
   return router;
 }
