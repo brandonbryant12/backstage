@@ -1,8 +1,12 @@
 import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssues } from './JiraApi';
+import { isJiraAvailable } from '../constants';
 
 export class MockJiraClient implements JiraApi {
   private mockTickets: Map<string, JiraTicketDetails> = new Map();
   private ticketCounter: number = 0;
+
+  static isJiraAvailable = isJiraAvailable;
+
   setMockTicket(ticketId: string, details: JiraTicketDetails) {
     this.mockTickets.set(ticketId, details);
   }
@@ -71,5 +75,4 @@ export class MockJiraClient implements JiraApi {
       ],
     };
   }
-  
 }

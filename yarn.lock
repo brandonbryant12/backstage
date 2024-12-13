@@ -14335,6 +14335,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "backstage-plugin-jira@workspace:plugins/jira"
   dependencies:
+    "@backstage/catalog-model": "npm:^1.7.1"
     "@backstage/cli": "npm:^0.29.0"
     "@backstage/core-app-api": "npm:^1.15.2"
     "@backstage/core-components": "npm:^0.16.1"

@@ -1,6 +1,7 @@
 import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
 import { JiraApi, JiraTicketDetails, JiraCreateIssueResponse, JiraIssues } from './JiraApi';
 import { ResponseError } from '@backstage/errors';
+import { isJiraAvailable } from '../constants';
 
 export class JiraClient implements JiraApi {
   private readonly discoveryApi: DiscoveryApi;
@@ -13,6 +14,8 @@ export class JiraClient implements JiraApi {
     this.discoveryApi = options.discoveryApi;
     this.fetchApi = options.fetchApi;
   }
+
+  static isJiraAvailable = isJiraAvailable;
 
   private async getBaseUrl() {
     return await this.discoveryApi.getBaseUrl('jira');
