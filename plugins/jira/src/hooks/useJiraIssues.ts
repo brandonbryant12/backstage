@@ -16,42 +16,30 @@ export function useJiraIssues(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
-  useEffect(() => {
-    let mounted = true;
+useEffect(() => {
+  async function fetchIssues() {
+    if (!projectKey) return;
 
-    async function fetchIssues() {
-      if (!projectKey) return;
+    setLoading(true);
+    setError(undefined);
 
-      setLoading(true);
-      setError(undefined);
-
-      try {
-        const result = await jiraApi.getIssues(
-          projectKey,
-          options?.component,
-          options?.label,
-          options?.statusesNames,
-        );
-        if (mounted) {
-          setIssues(result);
-        }
-      } catch (e) {
-        if (mounted) {
-          setError(e as Error);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
+    try {
+      const result = await jiraApi.getIssues(
+        projectKey,
+        options?.component,
+        options?.label,
+        options?.statusesNames,
+      );
+      setIssues(result);
+    } catch (e) {
+      setError(e as Error);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchIssues();
-
-    return () => {
-      mounted = false;
-    };
-  }, [jiraApi, projectKey, options?.component, options?.label, options?.statusesNames]);
+  fetchIssues();
+}, [jiraApi, projectKey, options?.component, options?.label, options?.statusesNames]);
 
   return { issues, loading, error };
 } 
