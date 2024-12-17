@@ -18,8 +18,14 @@ export const entityAggregatorModule = createBackendModule({
         scheduler: coreServices.scheduler,
         database: coreServices.database,
         entityAggregator: entityAggregatorService,
+        config: coreServices.rootConfig,
       },
-      async init({ logger, entityAggregator }) {
+      async init({ logger, entityAggregator, config }) {
+        const isEnabled = config.getOptionalBoolean('entityAggregator.enabled') || false;
+        if(!isEnabled) {
+          logger.info("Entity Aggregator Disabled")
+          return;
+        }
         const dataSources = [
           new DataSourceA(
             { 
