@@ -20,7 +20,7 @@ export interface EntityAggregatorService {
 
   /**
    * Gets merged records that are ready to be emitted to the catalog.
-   * Previously returned EntityRecord[][], now returns a flat array of merged EntityRecords.
+   * Returns a flat array of merged EntityRecords.
    */
   getRecordsToEmit(batchSize: number): Promise<EntityRecord[]>;
 
@@ -33,4 +33,10 @@ export interface EntityAggregatorService {
    * Gets all records for a specific entity reference
    */
   getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]>;
+
+  /**
+   * Gets raw entities and the merged entity for a given entityRef.
+   * Returns { rawEntities: [{ dataSource: string, entity: object }[]], entity: object }.
+   */
+  getRawEntitiesAndMerged(entityRef: string): Promise<{ rawEntities: { dataSource: string; entity: object }[], entity: object }>;
 }

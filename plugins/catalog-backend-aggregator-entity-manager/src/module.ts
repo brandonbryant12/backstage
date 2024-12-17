@@ -19,35 +19,37 @@ export const entityAggregatorModule = createBackendModule({
         database: coreServices.database,
         entityAggregator: entityAggregatorService,
         config: coreServices.rootConfig,
+        // Removed httpRouter dependency from here since we won't mount route here
       },
       async init({ logger, entityAggregator, config }) {
         const isEnabled = config.getOptionalBoolean('entityAggregator.enabled') || false;
         if(!isEnabled) {
-          logger.info("Entity Aggregator Disabled")
+          logger.info("Entity Aggregator Disabled");
           return;
         }
+
         const dataSources = [
           new DataSourceA(
-            { 
-              name: 'datasource-a', 
+            {
+              name: 'datasource-a',
               priority: 100,
               refreshSchedule: {
                 frequency: { seconds: 10 },
                 timeout: { minutes: 10 },
               },
               ttlSeconds: 60,
-            }, 
+            },
             logger,
           ),
           new DataSourceB(
-            { 
-              name: 'datasource-b', 
+            {
+              name: 'datasource-b',
               priority: 50,
               refreshSchedule: {
                 frequency: { seconds: 30 },
                 timeout: { minutes: 10 },
               },
-            }, 
+            },
             logger,
           ),
         ];

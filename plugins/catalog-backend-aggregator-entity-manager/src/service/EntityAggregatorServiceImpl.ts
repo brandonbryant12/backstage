@@ -135,4 +135,35 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
   async getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]> {
     return this.store.getRecordsByEntityRef(entityRef);
   }
+
+  async getRawEntitiesAndMerged(entityRef: string): Promise<{ rawEntities: { dataSource: string; entity: object }[], entity: object }> {
+    const records = await this.getRecordsByEntityRef(entityRef);
+    // If no records, return empty arrays
+    if (!records || records.length === 0) {
+      return { rawEntities: [], entity: {} };
+    }
+
+    const merged = this.mergeRecords(records);
+
+    const rawEntities = records.map(r => {
+      return {
+        dataSource: r.dataSource,
+        entity: {
+          apiVersion: 'backstage.io/v1alpha1',
+          kind: r.entityRef.split(':')[0],
+          metadata: r.metadata,
+          spec: r.spec,
+        },
+      };
+    });
+
+    const mergedEntity = {
+      apiVersion: 'backstage.io/v1alpha1',
+      kind: merged.entityRef.split(':')[0],
+      metadata: merged.metadata,
+      spec: merged.spec,
+    };
+
+    return { rawEntities, entity: mergedEntity };
+  }
 }
