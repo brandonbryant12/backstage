@@ -1,20 +1,19 @@
 import { Knex } from 'knex';
 import { LoggerService, DatabaseService } from '@backstage/backend-plugin-api';
-import { JsonObject } from '@backstage/types';
 import { EntityRecord } from '../types';
 import { createHash, randomUUID } from 'crypto';
 
 const TABLE_NAME = 'entityRecords';
 
-export class DatabaseStore {
+export class RawEntitiesStore {
   private constructor(
     private readonly knex: Knex,
     private readonly logger: LoggerService,
   ) {}
 
-  static async create(db: DatabaseService, logger: LoggerService): Promise<DatabaseStore> {
+  static async create(db: DatabaseService, logger: LoggerService): Promise<RawEntitiesStore> {
     const knex = await db.getClient();
-    const store = new DatabaseStore(knex as unknown as Knex, logger);
+    const store = new RawEntitiesStore(knex as unknown as Knex, logger);
     await store.setupSchema();
     return store;
   }
@@ -22,7 +21,6 @@ export class DatabaseStore {
   private async setupSchema(): Promise<void> {
     if (!(await this.knex.schema.hasTable(TABLE_NAME))) {
       await this.knex.schema.createTable(TABLE_NAME, table => {
-        // For both PostgreSQL and SQLite
         table.string('id').primary().notNullable();
         table.string('dataSource').notNullable();
         table.string('entityRef', 255).notNullable();
@@ -36,20 +34,20 @@ export class DatabaseStore {
           table.json('spec').notNullable();
         }
 
-        // Timestamps
-        table.timestamp('lastTouched').notNullable().defaultTo(this.knex.fn.now());
+        // Removed lastTouched field
+
         table.timestamp('expirationDate');
         
         // Other fields
         table.integer('priorityScore').notNullable();
         table.string('contentHash').notNullable();
-        table.boolean('needsEmit').notNullable().defaultTo(false);
+        table.boolean('updated').notNullable().defaultTo(false);
         
         // Indexes and constraints
         table.unique(['dataSource', 'entityRef']);
         table.index('entityRef');
         table.index(['dataSource', 'expirationDate']);
-        table.index('needsEmit');
+        table.index('updated');
         table.index('contentHash');
       });
 
@@ -92,7 +90,7 @@ export class DatabaseStore {
                 priorityScore: record.priorityScore,
                 expirationDate: record.expirationDate,
                 contentHash: this.computeHash(record),
-                needsEmit: trx.raw(`
+                updated: trx.raw(`
                   CASE 
                     WHEN EXISTS (
                       SELECT 1 FROM "${TABLE_NAME}" 
@@ -120,7 +118,7 @@ export class DatabaseStore {
                 priorityScore: record.priorityScore,
                 expirationDate: record.expirationDate,
                 contentHash: this.computeHash(record),
-                needsEmit: 1
+                updated: 1
               }))
             )
             .onConflict(['dataSource', 'entityRef'])
@@ -136,11 +134,11 @@ export class DatabaseStore {
   }
 
   async getRecordsToEmit(batchSize: number = 1000): Promise<EntityRecord[][]> {
-    const needsEmit = this.knex.client.config.client === 'pg' ? true : 1;
+    const updatedFlag = this.knex.client.config.client === 'pg' ? true : 1;
     
     // Get entityRefs that need emission
     const entityRefsToEmit = await this.knex(TABLE_NAME)
-      .where('needsEmit', needsEmit)
+      .where('updated', updatedFlag)
       .distinct('entityRef')
       .limit(batchSize)
       .pluck('entityRef');
@@ -149,7 +147,7 @@ export class DatabaseStore {
       return [];
     }
 
-    // Get all valid records for these entityRefs in a single query
+    // Get all valid records for these entityRefs
     const records = await this.knex(TABLE_NAME)
       .whereIn('entityRef', entityRefsToEmit)
       .where(builder => 
@@ -184,11 +182,11 @@ export class DatabaseStore {
   async markEmitted(entityRefs: string[]): Promise<void> {
     if (entityRefs.length === 0) return;
     
-    const needsEmit = this.knex.client.config.client === 'pg' ? false : 0;
+    const updatedFlag = this.knex.client.config.client === 'pg' ? false : 0;
     
     await this.knex(TABLE_NAME)
       .whereIn('entityRef', entityRefs)
-      .update({ needsEmit });
+      .update({ updated: updatedFlag });
     
     this.logger.debug(`Marked ${entityRefs.length} entity refs as emitted`);
   }

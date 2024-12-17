@@ -11,5 +11,5 @@ export interface EntityRecord {
   priorityScore: number;
   expirationDate?: Date;
   contentHash?: string;
-  needsEmit?: boolean;
+  updated?: boolean;
 }

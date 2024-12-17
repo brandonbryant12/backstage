@@ -1,7 +1,7 @@
 import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { DataSource } from '../datasources/DataSource';
-import { DatabaseStore } from '../database/DatabaseStore';
+import { RawEntitiesStore } from '../database/RawEntitiesStore';
 import { EntityRecord } from '../types';
 import { JsonObject } from '@backstage/types';
 import { EntityAggregatorService } from './EntityAggregatorService';
@@ -16,7 +16,7 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
 
   constructor(
     private readonly name: string,
-    private readonly store: DatabaseStore,
+    private readonly store: RawEntitiesStore,
     private readonly logger: LoggerService,
     private readonly scheduler: SchedulerService,
   ) {
@@ -104,4 +104,4 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
   async getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]> {
     return this.store.getRecordsByEntityRef(entityRef);
   }
-} 
+}

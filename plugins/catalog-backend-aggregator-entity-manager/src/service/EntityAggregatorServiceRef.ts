@@ -5,7 +5,7 @@ import {
 } from '@backstage/backend-plugin-api';
 import { type EntityAggregatorService } from './EntityAggregatorService';
 import { EntityAggregatorServiceImpl } from './EntityAggregatorServiceImpl';
-import { DatabaseStore } from '../database/DatabaseStore';
+import { RawEntitiesStore } from '../database/RawEntitiesStore';
 
 export const entityAggregatorService = createServiceRef<EntityAggregatorService>({
   id: 'entity-aggregator.service',
@@ -18,7 +18,7 @@ export const entityAggregatorService = createServiceRef<EntityAggregatorService>
       database: coreServices.database,
     },
     async factory({ logger, scheduler, database }) {
-      const store = await DatabaseStore.create(database, logger);
+      const store = await RawEntitiesStore.create(database, logger);
       return new EntityAggregatorServiceImpl(
         'entity-aggregator',
         store,
