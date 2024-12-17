@@ -6,7 +6,6 @@ import {
 import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
 import { 
   EntityAggregatorService, 
-  EntityRecord 
 } from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
 
 export class EntityAggregatorProvider implements EntityProvider {
@@ -45,34 +44,6 @@ export class EntityAggregatorProvider implements EntityProvider {
     this.logger.info(`Scheduled entity emission with schedule: ${JSON.stringify(this.emitSchedule)}`);
   }
 
-  private mergeRecords(records: EntityRecord[]): EntityRecord {
-    const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
-    const highestPriorityRecord = sortedRecords[0];
-
-    const mergedRecord = {
-      ...highestPriorityRecord,
-      metadata: {
-        ...highestPriorityRecord.metadata,
-        annotations: {} as Record<string, string>,
-      },
-    };
-
-    const allKeys = new Set(
-      sortedRecords.flatMap(r => Object.keys(r.metadata.annotations || {}))
-    );
-
-    allKeys.forEach(key => {
-      for (const record of sortedRecords) {
-        const annotations = record.metadata.annotations || {};
-        if (key in annotations) {
-          mergedRecord.metadata.annotations[key] = annotations[key];
-          break;
-        }
-      }
-    });
-    return mergedRecord;
-  }
-
   private async emitUpdatedEntities(): Promise<void> {
     if (!this.connection) {
       this.logger.warn('No connection available, skipping entity emission');
@@ -80,39 +51,35 @@ export class EntityAggregatorProvider implements EntityProvider {
     }
 
     try {
-      const entityGroups = await this.service.getRecordsToEmit(this.batchSize);
-      this.logger.info(`Retrieved ${entityGroups.length} entity groups to process`);
+      const mergedRecords = await this.service.getRecordsToEmit(this.batchSize);
+      this.logger.info(`Retrieved ${mergedRecords.length} merged entity records to process`);
       
-      if (entityGroups.length === 0) {
-        this.logger.debug('No entity groups to emit');
+      if (mergedRecords.length === 0) {
+        this.logger.debug('No entities to emit');
         return;
       }
 
       const mutations: DeferredEntity[] = [];
       const processedRefs: string[] = [];
 
-      let totalRecordsProcessed = 0;
-      for (const records of entityGroups) {
-        if (!records.length) continue;
-        totalRecordsProcessed += records.length;
+      const totalRecordsProcessed = mergedRecords.length;
 
-        const entityRef = records[0].entityRef;
+      for (const record of mergedRecords) {
+        const entityRef = record.entityRef;
         const [kind] = entityRef.split(':');
 
-        const mergedRecord = this.mergeRecords(records);
-
-        mergedRecord.metadata.annotations = {
-          ...mergedRecord.metadata.annotations,
-          "backstage.io/managed-by-origin-location": `entityAggregator://${mergedRecord.metadata.name}`,
-          "backstage.io/managed-by-location": `entityAggregator://${mergedRecord.metadata.name}`,
+        record.metadata.annotations = {
+          ...record.metadata.annotations,
+          "backstage.io/managed-by-origin-location": `entityAggregator://${record.metadata.name}`,
+          "backstage.io/managed-by-location": `entityAggregator://${record.metadata.name}`,
         };
 
         mutations.push({
           entity: {
             apiVersion: 'backstage.io/v1alpha1',
             kind,
-            metadata: mergedRecord.metadata,
-            spec: mergedRecord.spec,
+            metadata: record.metadata,
+            spec: record.spec,
           },
           locationKey: this.locationKey,
         });

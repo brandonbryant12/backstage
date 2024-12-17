@@ -19,9 +19,10 @@ export interface EntityAggregatorService {
   start(): Promise<void>;
 
   /**
-   * Gets records that need to be emitted to the catalog
+   * Gets merged records that are ready to be emitted to the catalog.
+   * Previously returned EntityRecord[][], now returns a flat array of merged EntityRecords.
    */
-  getRecordsToEmit(batchSize: number): Promise<EntityRecord[][]>;
+  getRecordsToEmit(batchSize: number): Promise<EntityRecord[]>;
 
   /**
    * Marks records as having been emitted to the catalog
