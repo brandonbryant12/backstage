@@ -85,7 +85,7 @@ describe('Router()', () => {
     });
   });
 
-  describe('GET /issues', () => {
+  describe('POST /issues', () => {
     it('should return 200 for valid projectKey', async () => {
       const mockResponse = {
         projectUrl: 'http://example.com/browse/TEST',
@@ -115,6 +115,46 @@ describe('Router()', () => {
         .send({});
       expect(res.status).toBe(400);
       expect(res.text).toContain('Project key is required');
+    });
+
+    it('should support component, label, and statusesNames', async () => {
+      const mockResponse = {
+        projectUrl: 'http://example.com/browse/TEST',
+        issues: [
+          {
+            name: 'Bug',
+            iconUrl: 'https://example.com/bug-icon.jpg',
+            total: 1,
+            url: 'http://example.com/browse/TEST',
+          },
+          {
+            name: 'Task',
+            iconUrl: 'https://example.com/task-icon.jpg',
+            total: 2,
+            url: 'http://example.com/browse/TEST',
+          },
+        ],
+      };
+
+      jest.spyOn(mockJiraService, 'getIssues').mockResolvedValueOnce(mockResponse);
+
+      const res = await request(app)
+        .post('/issues')
+        .send({
+          projectKey: 'TEST',
+          component: 'backend-component',
+          label: 'my-label',
+          statusesNames: ['In Progress', 'To Do']
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(mockResponse);
+      expect(mockJiraService.getIssues).toHaveBeenCalledWith(
+        'TEST',
+        'backend-component',
+        'my-label',
+        ['In Progress', 'To Do']
+      );
     });
   });
 });

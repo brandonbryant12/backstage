@@ -2,31 +2,19 @@ import { LoggerService } from '@backstage/backend-plugin-api';
 import { Config } from '@backstage/config';
 import { z } from 'zod';
 
-export const statusCategorySchema = z.object({
-  id: z.number(),
-  key: z.string(),
-  name: z.string(),
-});
-
-export const statusSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  iconUrl: z.string().optional(),
-  statusCategory: statusCategorySchema,
-});
-
-export const projectStatusesResponseSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    statuses: z.array(statusSchema),
-  })
-);
-
 export const issueTypeSchema = z.object({
+  self: z.string(),
   id: z.string(),
+  description: z.string(),
+  iconUrl: z.string(),
   name: z.string(),
-  description: z.string().optional(),
+  subtask: z.boolean(),
+  avatarId: z.number().optional(),
+  hierarchyLevel: z.number().optional(),
+});
+
+export const projectResponseSchema = z.object({
+  issueTypes: z.array(issueTypeSchema),
 });
 
 export const searchResponseSchema = z.object({
@@ -38,7 +26,11 @@ export const searchResponseSchema = z.object({
       id: z.string(),
       key: z.string(),
       fields: z.object({
-        issuetype: issueTypeSchema,
+        issuetype: z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().optional(),
+        }),
       }),
     })
   ),

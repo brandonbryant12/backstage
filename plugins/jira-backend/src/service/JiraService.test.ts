@@ -225,35 +225,43 @@ describe('JiraService', () => {
       server.use(
         rest.post('http://localhost:7007/oauth', (_, res, ctx) => {
           return res(ctx.json({ token: 'mock-token', expires_in: 3600 }));
+        }),
+        rest.get('http://localhost:7007/api/2/project/TEST', (_, res, ctx) => {
+          return res(
+            ctx.json({
+              issueTypes: [
+                {
+                  self: 'http://example.com/issuetype/10001',
+                  id: '10001',
+                  description: 'Bug description',
+                  iconUrl: 'https://example.com/bug-icon.jpg',
+                  name: 'Bug',
+                  subtask: false,
+                },
+                {
+                  self: 'http://example.com/issuetype/10002',
+                  id: '10002',
+                  description: 'Task description',
+                  iconUrl: 'https://example.com/task-icon.jpg',
+                  name: 'Task',
+                  subtask: false,
+                },
+              ],
+            })
+          );
         })
       );
     });
 
-    it('should fetch issues successfully', async () => {
+    it('should fetch issues successfully with default parameters', async () => {
       server.use(
-        rest.get('http://localhost:7007/api/2/project/TEST/statuses', (_, res, ctx) => {
-          return res(
-            ctx.json([
-              {
-                id: '1',
-                name: 'To Do',
-                statuses: [
-                  {
-                    id: '10001',
-                    name: 'Bug',
-                    iconUrl: 'https://example.com/bug-icon.jpg',
-                    statusCategory: {
-                      id: 1,
-                      key: 'todo',
-                      name: 'To Do'
-                    },
-                  },
-                ],
-              },
-            ])
-          );
-        }),
-        rest.post('http://localhost:7007/api/2/search', (_, res, ctx) => {
+        rest.post('http://localhost:7007/api/2/search', (req, res, ctx) => {
+          const body = req.body as any;
+          expect(body.jql).toContain('project = "TEST"');
+          expect(body.jql).toContain('statuscategory not in ("Done")');
+          expect(body.jql).not.toContain('component =');
+          expect(body.jql).not.toContain('labels in');
+          expect(body.jql).not.toContain('status in');
           return res(
             ctx.json({
               startAt: 0,
@@ -267,7 +275,6 @@ describe('JiraService', () => {
                     issuetype: {
                       id: '10001',
                       name: 'Bug',
-                      description: 'A bug in the system'
                     },
                   },
                 },
@@ -285,6 +292,78 @@ describe('JiraService', () => {
             name: 'Bug',
             iconUrl: 'https://example.com/bug-icon.jpg',
             total: 1,
+            url: 'http://localhost:7007/app/browse/TEST',
+          },
+        ],
+      });
+    });
+
+    it('should support component, label, and statusesNames', async () => {
+      server.use(
+        rest.post('http://localhost:7007/api/2/search', (req, res, ctx) => {
+          const body = req.body as any;
+          expect(body.jql).toContain('project = "TEST"');
+          expect(body.jql).toContain('statuscategory not in ("Done")');
+          expect(body.jql).toContain('component = "backend-component"');
+          expect(body.jql).toContain('labels in ("my-label")');
+          expect(body.jql).toContain('status in ("In Progress","To Do")');
+
+          return res(
+            ctx.json({
+              startAt: 0,
+              maxResults: 50,
+              total: 3,
+              issues: [
+                {
+                  id: '1',
+                  key: 'TEST-1',
+                  fields: {
+                    issuetype: {
+                      id: '10001',
+                      name: 'Bug',
+                    },
+                  },
+                },
+                {
+                  id: '2',
+                  key: 'TEST-2',
+                  fields: {
+                    issuetype: {
+                      id: '10002',
+                      name: 'Task',
+                    },
+                  },
+                },
+                {
+                  id: '3',
+                  key: 'TEST-3',
+                  fields: {
+                    issuetype: {
+                      id: '10002',
+                      name: 'Task',
+                    },
+                  },
+                },
+              ],
+            })
+          );
+        })
+      );
+
+      const issues = await jiraService.getIssues('TEST', 'backend-component', 'my-label', ['In Progress', 'To Do']);
+      expect(issues).toEqual({
+        projectUrl: 'http://localhost:7007/app/browse/TEST',
+        issues: [
+          {
+            name: 'Bug',
+            iconUrl: 'https://example.com/bug-icon.jpg',
+            total: 1,
+            url: 'http://localhost:7007/app/browse/TEST',
+          },
+          {
+            name: 'Task',
+            iconUrl: 'https://example.com/task-icon.jpg',
+            total: 2,
             url: 'http://localhost:7007/app/browse/TEST',
           },
         ],

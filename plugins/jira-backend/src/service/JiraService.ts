@@ -6,9 +6,9 @@ import {
   JiraTicketOptions, 
   JiraCreateIssueResponse,
   createIssueResponseSchema,
-  projectStatusesResponseSchema,
   searchResponseSchema,
   JiraIssues,
+  projectResponseSchema,
 } from './types';
 
 interface TokenResponse {
@@ -139,13 +139,16 @@ export class JiraService implements AbstractJiraAPIService {
     return this.appUrl;
   }
 
-  private async getProjectStatuses(projectKey: string) {
+  private async getProjectIssueTypes(projectKey: string) {
     const response = await this.makeAuthenticatedRequest({
       method: 'get',
-      endpoint: `project/${projectKey}/statuses`,
+      endpoint: `project/${projectKey}`,
     });
-
-    return projectStatusesResponseSchema.parse(response);
+    const parsed = projectResponseSchema.parse(response);
+    return parsed.issueTypes.map(it => ({
+      name: it.name,
+      iconUrl: it.iconUrl || '',
+    }));
   }
 
   private async searchIssues(jql: string) {
@@ -158,7 +161,6 @@ export class JiraService implements AbstractJiraAPIService {
         fields: ['issuetype'],
       },
     });
-
     return searchResponseSchema.parse(response);
   }
 
@@ -184,30 +186,31 @@ export class JiraService implements AbstractJiraAPIService {
         jqlParts.push(`status in (${statusesNames.map(s => `"${s}"`).join(',')})`);
       }
 
-      const [statuses, issues] = await Promise.all([
-        this.getProjectStatuses(projectKey),
+      const [issueTypesData, issues] = await Promise.all([
+        this.getProjectIssueTypes(projectKey),
         this.searchIssues(jqlParts.join(' AND ')),
       ]);
 
       const projectUrl = `${this.getAppUrl()}/browse/${projectKey}`;
-      const filteredStatuses = statuses
-        .flatMap(status => status.statuses)
-        .filter(status => status.statusCategory?.name !== 'Done');
 
-      const issueSummaries = filteredStatuses.reduce((acc: { name: string; iconUrl: string; total: number; url: string; }[], issueType) => {
-        const existing = acc.find(counter => counter.name === issueType.name);
-        if (!existing) {
+      const issueCounts = new Map<string, number>();
+      for (const issue of issues.issues) {
+        const typeName = issue.fields.issuetype.name;
+        issueCounts.set(typeName, (issueCounts.get(typeName) || 0) + 1);
+      }
+
+      const issueSummaries = issueTypesData.reduce((acc, issueType) => {
+        const total = issueCounts.get(issueType.name) ?? 0;
+        if (total > 0) {
           acc.push({
             name: issueType.name,
-            iconUrl: issueType.iconUrl || '',
-            total: issues.issues.filter(
-              issue => issue.fields.issuetype.name === issueType.name,
-            ).length,
+            iconUrl: issueType.iconUrl,
+            total,
             url: projectUrl,
           });
         }
         return acc;
-      }, []);
+      }, [] as Array<{name: string; iconUrl: string; total: number; url: string}>);
 
       return {
         projectUrl,
