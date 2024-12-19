@@ -1,0 +1,1 @@
+export { catalogEntityAggregatorAdminPlugin, CatalogEntityAggregatorAdminPage } from './plugin';

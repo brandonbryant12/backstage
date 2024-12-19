@@ -5,6 +5,7 @@ import { RawEntitiesStore } from '../database/RawEntitiesStore';
 import { EntityRecord } from '../types';
 import { JsonObject } from '@backstage/types';
 import { EntityAggregatorService } from './EntityAggregatorService';
+import { mergeRecords } from '../utils/recordMerger';
 
 export class EntityAggregatorServiceImpl implements EntityAggregatorService {
   private readonly cleanupSchedule = {
@@ -95,37 +96,8 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
 
   async getRecordsToEmit(batchSize: number): Promise<EntityRecord[]> {
     const entityGroups = await this.store.getRecordsToEmit(batchSize);
-    const mergedRecords = entityGroups.map(records => this.mergeRecords(records));
+    const mergedRecords = entityGroups.map(records => mergeRecords(records));
     return mergedRecords;
-  }
-
-  private mergeRecords(records: EntityRecord[]): EntityRecord {
-    const sortedRecords = [...records].sort((a, b) => b.priorityScore - a.priorityScore);
-    const highestPriorityRecord = sortedRecords[0];
-
-    const mergedRecord: EntityRecord = {
-      ...highestPriorityRecord,
-      metadata: {
-        ...highestPriorityRecord.metadata,
-        annotations: {},
-      },
-    };
-
-    const allKeys = new Set(
-      sortedRecords.flatMap(r => Object.keys(r.metadata.annotations || {}))
-    );
-
-    for (const key of allKeys) {
-      for (const record of sortedRecords) {
-        const annotations = record.metadata.annotations || {};
-        if (key in annotations) {
-          mergedRecord.metadata.annotations![key] = annotations[key];
-          break;
-        }
-      }
-    }
-
-    return mergedRecord;
   }
 
   async markEmitted(entityRefs: string[]): Promise<void> {

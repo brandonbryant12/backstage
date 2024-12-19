@@ -6,6 +6,7 @@ import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/
 import { DataSourceA } from './datasources/DataSourceA';
 import { DataSourceB } from './datasources/DataSourceB';
 import { entityAggregatorService } from './service/EntityAggregatorServiceRef';
+import { createRouter } from './router';
 
 export const entityAggregatorModule = createBackendModule({
   pluginId: 'catalog',
@@ -19,35 +20,36 @@ export const entityAggregatorModule = createBackendModule({
         database: coreServices.database,
         entityAggregator: entityAggregatorService,
         config: coreServices.rootConfig,
+        httpRouter: coreServices.httpRouter,
       },
-      async init({ logger, entityAggregator, config }) {
+      async init({ logger, entityAggregator, config, httpRouter }) {
         const isEnabled = config.getOptionalBoolean('entityAggregator.enabled') || false;
         if(!isEnabled) {
-          logger.info("Entity Aggregator Disabled")
+          logger.info("Entity Aggregator Disabled");
           return;
         }
         const dataSources = [
           new DataSourceA(
-            { 
-              name: 'datasource-a', 
+            {
+              name: 'datasource-a',
               priority: 100,
               refreshSchedule: {
                 frequency: { seconds: 10 },
                 timeout: { minutes: 10 },
               },
               ttlSeconds: 60,
-            }, 
+            },
             logger,
           ),
           new DataSourceB(
-            { 
-              name: 'datasource-b', 
+            {
+              name: 'datasource-b',
               priority: 50,
               refreshSchedule: {
                 frequency: { seconds: 30 },
                 timeout: { minutes: 10 },
               },
-            }, 
+            },
             logger,
           ),
         ];
@@ -57,8 +59,10 @@ export const entityAggregatorModule = createBackendModule({
         }
 
         entityAggregator.start();
-
         logger.info('Entity aggregator started');
+
+        const router = await createRouter({ logger, entityAggregator });
+        httpRouter.use(router);
       },
     });
   },
