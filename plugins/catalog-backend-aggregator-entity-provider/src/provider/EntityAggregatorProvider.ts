@@ -17,6 +17,10 @@ export class EntityAggregatorProvider implements EntityProvider {
     timeout: { minutes: 5 },
   };
 
+  private capitalizeKind(kind: string): string {
+    return kind.charAt(0).toUpperCase() + kind.slice(1);
+  }
+
   constructor(
     private readonly name: string,
     private readonly service: EntityAggregatorService,
@@ -77,7 +81,7 @@ export class EntityAggregatorProvider implements EntityProvider {
         mutations.push({
           entity: {
             apiVersion: 'backstage.io/v1alpha1',
-            kind,
+            kind: this.capitalizeKind(kind),
             metadata: record.metadata,
             spec: record.spec,
           },

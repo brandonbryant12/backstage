@@ -13,14 +13,14 @@ export async function createRouter(
     entityAggregator: EntityAggregatorService,
   }
 ): Promise<express.Router> {
-  const { logger, entityAggregator } = options;
+  const { entityAggregator } = options;
 
   const router = Router();
   router.use(express.json());
 
   router.get('/raw-entities/:namespace/:kind/:name', async (req, res) => {
     const { namespace, kind, name } = req.params;
-    const entityRef = stringifyEntityRef({ kind, namespace, name }).charAt(0).toUpperCase() + stringifyEntityRef({ kind, namespace, name }).slice(1);
+    const entityRef = stringifyEntityRef({ kind, namespace, name });
 
     const records = await entityAggregator.getRecordsByEntityRef(entityRef);
     if (!records || records.length === 0) {

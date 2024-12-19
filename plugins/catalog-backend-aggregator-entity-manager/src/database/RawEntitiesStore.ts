@@ -59,6 +59,10 @@ export class RawEntitiesStore {
     return /^[a-zA-Z0-9]+:[^/]+\/[^/]+$/.test(entityRef);
   }
 
+  private normalizeEntityRef(entityRef: string): string {
+    return entityRef.toLowerCase();
+  }
+
   async upsertRecords(records: EntityRecord[]): Promise<void> {
     try {
       if (records.length === 0) return;
@@ -70,7 +74,10 @@ export class RawEntitiesStore {
           return false;
         }
         return true;
-      });
+      }).map(record => ({
+        ...record,
+        entityRef: this.normalizeEntityRef(record.entityRef)
+      }));
       
       if (validRecords.length === 0) {
         return;
@@ -193,8 +200,9 @@ export class RawEntitiesStore {
 
   async getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]> {
     try {
+      const normalizedRef = this.normalizeEntityRef(entityRef);
       const records = await this.knex(TABLE_NAME)
-        .where('entityRef', entityRef)
+        .where('entityRef', normalizedRef)
         .where(builder => 
           builder
             .whereNull('expirationDate')
