@@ -9,7 +9,7 @@ export interface MockEntityOptions {
 
 export function generateMockEntities(count: number, options: MockEntityOptions): Entity[] {
   const timestamp = new Date().toISOString();
-  const { source, tier = 'frontend', team = 'team-a', apiVersion = 'v1' } = options;
+  const { source, tier = 'frontend', team = 'team-a' } = options;
 
   return Array.from({ length: count }, (_, i) => {
     const id = `${i}`;

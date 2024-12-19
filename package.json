@@ -53,5 +53,8 @@
       "prettier --write"
     ]
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.4.1",
+  "dependencies": {
+    "@types/lodash": "^4.17.13"
+  }
 }

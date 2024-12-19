@@ -23,9 +23,9 @@ export const entityAggregatorModule = createBackendModule({
         httpRouter: coreServices.httpRouter,
       },
       async init({ logger, entityAggregator, config, httpRouter }) {
-        const isEnabled = config.getOptionalBoolean('entityAggregator.enabled') || false;
+        const isEnabled = config.getOptionalBoolean('entityAggregator.manager.enabled') || false;
         if(!isEnabled) {
-          logger.info("Entity Aggregator Disabled");
+          logger.info("Entity Aggregator Manager Disabled");
           return;
         }
         const dataSources = [

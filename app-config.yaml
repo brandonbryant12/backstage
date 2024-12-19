@@ -113,4 +113,7 @@ permission:
   enabled: true
 
 entityAggregator:
-  enabled: true
+  manager:
+    enabled: true
+  provider:
+    enabled: true

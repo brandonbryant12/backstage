@@ -1,6 +1,5 @@
 import { Entity } from '@backstage/catalog-model';
 import { DataSource } from './DataSource';
-import { chunk } from 'lodash';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { SchedulerServiceTaskScheduleDefinition } from '@backstage/backend-plugin-api';
 import { generateMockEntities } from './mockEntityFactory';
@@ -22,7 +21,6 @@ export class DataSourceB extends DataSource {
 
   async refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void> {
     try {
-      // Generate test entities (10 of each type)
       const entities = generateMockEntities(10, {
         source: 'DataSourceB',
         tier: 'backend',
