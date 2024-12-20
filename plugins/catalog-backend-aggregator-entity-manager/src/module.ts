@@ -61,7 +61,7 @@ export const entityAggregatorModule = createBackendModule({
         entityAggregator.start();
         logger.info('Entity aggregator started');
 
-        const router = await createRouter({ logger, entityAggregator });
+        const router = await createRouter({ logger, entityAggregator, config });
         httpRouter.use(router);
       },
     });

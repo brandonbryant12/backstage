@@ -5,18 +5,24 @@ import { EntityAggregatorService } from '../src/service/EntityAggregatorService'
 import { stringifyEntityRef } from '@backstage/catalog-model';
 import { mergeRecords } from './utils/recordMerger';
 import { NotFoundError } from '@backstage/errors';
-import { errorHandler } from '@backstage/backend-common';
+import { MiddlewareFactory } from "@backstage/backend-defaults/rootHttpRouter";
+import { Config } from '@backstage/config';
 
 export async function createRouter(
   options: {
     logger: LoggerService,
     entityAggregator: EntityAggregatorService,
+    config: Config
   }
 ): Promise<express.Router> {
-  const { entityAggregator } = options;
+  const { entityAggregator, logger, config } = options;
 
   const router = Router();
   router.use(express.json());
+
+  router.get('/health', async (_req, res) => {
+    res.json({ status: 'ok' });
+  });
 
   router.get('/raw-entities/:namespace/:kind/:name', async (req, res) => {
     const { namespace, kind, name } = req.params;
@@ -32,14 +38,15 @@ export async function createRouter(
       datasource: r.dataSource,
       entity: r,
     }));
-    
+
     res.json({
       entities,
       mergedEntity: merged,
     });
   });
 
-  router.use(errorHandler());
+  const middleware = MiddlewareFactory.create({ logger, config })
+  router.use(middleware.error())
 
   return router;
 }
