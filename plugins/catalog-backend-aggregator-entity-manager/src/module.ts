@@ -3,10 +3,9 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
-import { DataSourceA } from './datasources/DataSourceA';
-import { DataSourceB } from './datasources/DataSourceB';
 import { entityAggregatorService } from './service/EntityAggregatorServiceRef';
 import { createRouter } from './router';
+import { GithubDataSource } from './datasources/github/GithubDataSource';
 
 export const entityAggregatorModule = createBackendModule({
   pluginId: 'catalog',
@@ -21,36 +20,27 @@ export const entityAggregatorModule = createBackendModule({
         entityAggregator: entityAggregatorService,
         config: coreServices.rootConfig,
         httpRouter: coreServices.httpRouter,
+        urlReader: coreServices.urlReader,
       },
-      async init({ logger, entityAggregator, config, httpRouter }) {
-        const isEnabled = config.getOptionalBoolean('entityAggregator.manager.enabled') || false;
+      async init({ logger, entityAggregator, config, httpRouter, urlReader }) {
+        const isEnabled = config.getOptionalBoolean('entityAggregator.manager.enabled') || true;
         if(!isEnabled) {
           logger.info("Entity Aggregator Manager Disabled");
           return;
         }
+
         const dataSources = [
-          new DataSourceA(
+          new GithubDataSource(
             {
-              name: 'datasource-a',
-              priority: 100,
+              name: 'github-datasource',
+              priority: 80,
               refreshSchedule: {
-                frequency: { seconds: 10 },
-                timeout: { minutes: 10 },
-              },
-              ttlSeconds: 60,
-            },
-            logger,
-          ),
-          new DataSourceB(
-            {
-              name: 'datasource-b',
-              priority: 50,
-              refreshSchedule: {
-                frequency: { seconds: 30 },
-                timeout: { minutes: 10 },
+                frequency: { seconds: 60 },
+                timeout: { minutes: 5 },
               },
             },
             logger,
+            urlReader,
           ),
         ];
 

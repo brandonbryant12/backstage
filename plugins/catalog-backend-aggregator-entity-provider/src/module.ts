@@ -20,7 +20,7 @@ export const catalogModuleProvider = createBackendModule({
         config: coreServices.rootConfig,
       },
       async init({ entityAggregator, logger, scheduler, catalog, config }) {
-        const isEnabled = config.getOptionalBoolean('entityAggregator.provider.enabled') || false;
+        const isEnabled = config.getOptionalBoolean('entityAggregator.provider.enabled') || true;
         if(!isEnabled) {
           logger.info("Entity Aggregator Provider Disabled");
           return;
