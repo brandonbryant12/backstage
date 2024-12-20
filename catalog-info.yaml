@@ -122,3 +122,124 @@ metadata:
 spec:
   owner: engineering
   domain: business-domain
+---
+# Frontend Web App
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: frontend-web
+  description: Main web application frontend
+  annotations:
+    github.com/project-slug: example/frontend-web
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - react
+    - typescript
+    - web
+spec:
+  type: frontend
+  lifecycle: production
+  owner: team-a
+  system: example-system
+  dependsOn:
+    - component:auth-service
+    - component:api-gateway
+---
+# API Gateway
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: api-gateway
+  description: API Gateway service
+  annotations:
+    github.com/project-slug: example/api-gateway
+  tags:
+    - golang
+    - gateway
+spec:
+  type: service
+  lifecycle: production
+  owner: team-b
+  system: example-system
+  dependsOn:
+    - component:auth-service
+    - component:user-service
+    - component:notification-service
+---
+# User Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service
+  description: User management microservice
+  annotations:
+    github.com/project-slug: example/user-service
+  tags:
+    - nodejs
+    - microservice
+spec:
+  type: service
+  lifecycle: production
+  owner: team-b
+  system: example-system
+  dependsOn:
+    - resource:user-db
+---
+# User Database
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: user-db
+  description: User service database
+  annotations:
+    backstage.io/managed-by: aws
+spec:
+  type: database
+  owner: team-b
+  system: example-system
+---
+# Notification Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: notification-service
+  description: Email and push notification service
+  annotations:
+    github.com/project-slug: example/notification-service
+  tags:
+    - python
+    - microservice
+spec:
+  type: service
+  lifecycle: production
+  owner: team-b
+  system: example-system
+  dependsOn:
+    - resource:notification-queue
+    - resource:notification-db
+---
+# Notification Queue
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: notification-queue
+  description: Message queue for notifications
+  annotations:
+    backstage.io/managed-by: aws
+spec:
+  type: messaging
+  owner: team-b
+  system: example-system
+---
+# Notification Database
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: notification-db
+  description: Notification service database
+  annotations:
+    backstage.io/managed-by: aws
+spec:
+  type: database
+  owner: team-b
+  system: example-system
