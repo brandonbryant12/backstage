@@ -22,7 +22,8 @@ export abstract class DataSource {
     logger: LoggerService,
   ) {
     this.config = config;
-    this.logger = logger.child({ datasource: config.name });
+    // Removed logger.child(), just use the logger directly
+    this.logger = logger;
   }
 
   getName(): string {

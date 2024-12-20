@@ -41,7 +41,7 @@ export const RawEntitiesPage = () => {
   const { loading, error, rawEntities, mergedEntity } = useRawEntities();
   const [currentTab, setCurrentTab] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 

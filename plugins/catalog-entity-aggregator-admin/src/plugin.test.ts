@@ -1,7 +1,8 @@
 import { catalogEntityAggregatorAdminPlugin } from './plugin';
 
-describe('catalog-entity-aggregator-admin', () => {
-  it('should export plugin', () => {
+describe('catalogEntityAggregatorAdminPlugin', () => {
+  it('should be defined', () => {
     expect(catalogEntityAggregatorAdminPlugin).toBeDefined();
+    expect(catalogEntityAggregatorAdminPlugin.getId()).toBe('catalog-entity-aggregator-admin');
   });
 });

@@ -1,18 +1,19 @@
 import request from 'supertest';
-import { createRouter } from './router';
 import express from 'express';
-import { LoggerService } from '@backstage/backend-plugin-api';
+import { createRouter } from './router';
 import { EntityAggregatorService } from './service/EntityAggregatorService';
 import { mockServices } from '@backstage/backend-test-utils';
+import { ConfigReader } from '@backstage/config';
 
 describe('router', () => {
   let app: express.Express;
-  let logger: LoggerService;
+  let logger: ReturnType<typeof mockServices.logger.mock>;
   let entityAggregator: jest.Mocked<EntityAggregatorService>;
+  let config: ConfigReader;
 
   beforeEach(async () => {
     logger = mockServices.logger.mock();
-
+    config = new ConfigReader({});
     entityAggregator = {
       addDataSource: jest.fn(),
       start: jest.fn(),
@@ -21,7 +22,7 @@ describe('router', () => {
       getRecordsByEntityRef: jest.fn(),
     } as unknown as jest.Mocked<EntityAggregatorService>;
 
-    const router = await createRouter({ logger, entityAggregator });
+    const router = await createRouter({ logger, entityAggregator, config });
     app = express().use(router);
   });
 
@@ -46,7 +47,7 @@ describe('router', () => {
         metadata: { name: 'test', annotations: { 'jenkins.io/job-full-name': 'job' } },
         spec: {},
         priorityScore: 50,
-      }
+      },
     ]);
 
     const res = await request(app).get('/raw-entities/default/component/test');
