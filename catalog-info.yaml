@@ -1,13 +1,124 @@
+---
+# Main Application
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: example
   description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
+  annotations:
+    github.com/project-slug: example/example-app
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - typescript
+    - web
 spec:
   type: website
-  owner: john@example.com
+  owner: team-a
   lifecycle: experimental
+  system: example-system
+  dependsOn:
+    - resource:example-db
+    - component:auth-service
+---
+# Database
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: example-db
+  description: Main application database
+  annotations:
+    backstage.io/managed-by: aws
+spec:
+  type: database
+  owner: team-a
+  system: example-system
+---
+# Auth Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: auth-service
+  description: Authentication service
+  annotations:
+    github.com/project-slug: example/auth-service
+spec:
+  type: service
+  lifecycle: production
+  owner: team-b
+  system: example-system
+---
+# Team A
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-a
+  description: Frontend Development Team
+spec:
+  type: team
+  profile:
+    displayName: Team A
+    email: team-a@example.com
+  parent: engineering
+  children: []
+  members: 
+    - john@example.com
+    - jane@example.com
+---
+# Team B
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-b
+  description: Backend Development Team
+spec:
+  type: team
+  profile:
+    displayName: Team B
+    email: team-b@example.com
+  parent: engineering
+  children: []
+  members: 
+    - alice@example.com
+    - bob@example.com
+---
+# Engineering Department
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: engineering
+  description: Engineering Department
+spec:
+  type: department
+  profile:
+    displayName: Engineering
+    email: engineering@example.com
+  parent: org
+  children: 
+    - team-a
+    - team-b
+---
+# API
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: example-api
+  description: Example REST API
+  tags:
+    - rest
+    - api
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-b
+  definition:
+    $text: https://example.com/api-spec.yaml
+---
+# Documentation
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: example-system
+  description: Example System
+spec:
+  owner: engineering
+  domain: business-domain
