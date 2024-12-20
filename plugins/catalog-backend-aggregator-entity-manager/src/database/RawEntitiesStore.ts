@@ -25,7 +25,6 @@ export class RawEntitiesStore {
         table.string('dataSource').notNullable();
         table.string('entityRef', 255).notNullable();
         
-        // JSON fields
         if (this.knex.client.config.client === 'pg') {
           table.jsonb('metadata').notNullable();
           table.jsonb('spec').notNullable();
@@ -34,16 +33,12 @@ export class RawEntitiesStore {
           table.json('spec').notNullable();
         }
 
-        // Removed lastTouched field
-
         table.timestamp('expirationDate');
-        
-        // Other fields
         table.integer('priorityScore').notNullable();
         table.string('contentHash').notNullable();
         table.boolean('updated').notNullable().defaultTo(false);
         
-        // Indexes and constraints
+      
         table.unique(['dataSource', 'entityRef']);
         table.index('entityRef');
         table.index(['dataSource', 'expirationDate']);
@@ -66,8 +61,6 @@ export class RawEntitiesStore {
   async upsertRecords(records: EntityRecord[]): Promise<void> {
     try {
       if (records.length === 0) return;
-
-      // Validate records before insertion
       const validRecords = records.filter(record => {
         if (!record.entityRef || !this.validateEntityRef(record.entityRef)) {
           this.logger.warn(`Invalid entityRef format: ${record.entityRef}. Must match pattern 'kind:namespace/name'`);
@@ -85,7 +78,6 @@ export class RawEntitiesStore {
 
       await this.knex.transaction(async trx => {
         if (this.knex.client.config.client === 'pg') {
-          // PostgreSQL - use more efficient bulk insert
           await trx(TABLE_NAME)
             .insert(
               validRecords.map(record => ({
@@ -113,7 +105,6 @@ export class RawEntitiesStore {
             .onConflict(['dataSource', 'entityRef'])
             .merge();
         } else {
-          // SQLite - bulk insert with JSON stringification
           await trx(TABLE_NAME)
             .insert(
               validRecords.map(record => ({
@@ -143,7 +134,6 @@ export class RawEntitiesStore {
   async getRecordsToEmit(batchSize: number = 1000): Promise<EntityRecord[][]> {
     const updatedFlag = this.knex.client.config.client === 'pg' ? true : 1;
     
-    // Get entityRefs that need emission
     const entityRefsToEmit = await this.knex(TABLE_NAME)
       .where('updated', updatedFlag)
       .distinct('entityRef')
@@ -154,7 +144,6 @@ export class RawEntitiesStore {
       return [];
     }
 
-    // Get all valid records for these entityRefs
     const records = await this.knex(TABLE_NAME)
       .whereIn('entityRef', entityRefsToEmit)
       .where(builder => 
@@ -165,7 +154,6 @@ export class RawEntitiesStore {
       .orderBy(['entityRef', 'priorityScore'])
       .select();
 
-    // Group records by entityRef
     const recordsByRef = records.reduce((groups, record) => {
       const parsed = {
         ...record,
