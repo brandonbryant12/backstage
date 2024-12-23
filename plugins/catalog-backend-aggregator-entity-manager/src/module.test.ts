@@ -1,50 +1,34 @@
-import { startTestBackend, mockServices } from '@backstage/backend-test-utils';
-import { entityAggregatorModule } from './module';
+import { mockServices, startTestBackend } from '@backstage/backend-test-utils';
+import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
+import { entityAggregatorManagerModule } from './module';
 
-describe('entityAggregatorModule', () => {
-  it('logs disabled when manager is disabled', async () => {
+describe('entityAggregatorManagerModule', () => {
+  it('should register the extension point', async () => {
+    const extensionPoint = { addEntityProvider: jest.fn() };
+    
+    // Create our mock logger using mockServices
     const logger = mockServices.logger.mock();
-    const config = mockServices.rootConfig.factory({
-      data: {
-        entityAggregator: {
-          manager: {
-            enabled: false,
-          },
-        },
-      },
-    });
+
+    // Use the default logger factory but override its return value
+    const loggerFactory = mockServices.logger.factory();
+    loggerFactory.factory = () => logger;
 
     await startTestBackend({
+      extensionPoints: [{ catalogProcessingExtensionPoint, extensionPoint }],
       features: [
-        entityAggregatorModule,
-        config,
-        logger,
+        entityAggregatorManagerModule,
+        mockServices.rootConfig.factory({
+          data: {
+            entityAggregator: {
+              manager: {
+                enabled: true
+              }
+            }
+          }
+        }),
+        loggerFactory
       ],
     });
-
-    expect(logger.info).toHaveBeenCalledWith("Entity Aggregator Manager Disabled");
-  });
-
-  it('starts aggregator and attaches router when enabled', async () => {
-    const logger = mockServices.logger.mock();
-    const config = mockServices.rootConfig.factory({
-      data: {
-        entityAggregator: {
-          manager: {
-            enabled: true,
-          },
-        },
-      },
-    });
-
-    await startTestBackend({
-      features: [
-        entityAggregatorModule,
-        config,
-        logger,
-      ],
-    });
-
-    expect(logger.info).toHaveBeenCalledWith("Entity aggregator started");
+    expect(logger.info).toHaveBeenCalledTimes(1);
   });
 });

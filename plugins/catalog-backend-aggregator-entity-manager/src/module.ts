@@ -7,7 +7,7 @@ import { entityAggregatorService } from './service/EntityAggregatorServiceRef';
 import { createRouter } from './router';
 import { GithubDataSource } from './datasources/github/GithubDataSource';
 
-export const entityAggregatorModule = createBackendModule({
+export const entityAggregatorManagerModule = createBackendModule({
   pluginId: 'catalog',
   moduleId: 'entity-aggregator',
   register(env) {

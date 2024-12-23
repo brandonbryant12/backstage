@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { useRawEntities } from '../hooks/useRawEntities';
-import { Page, Header, Content, Progress, ResponseErrorPanel } from '@backstage/core-components';
+import {
+  Page,
+  Header,
+  Content,
+  Progress,
+  ResponseErrorPanel,
+  CodeSnippet,
+} from '@backstage/core-components';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { CodeSnippet } from '@backstage/core-components';
 
 const styles = {
   container: {

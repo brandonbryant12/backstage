@@ -1,5 +1,6 @@
 import React from 'react';
 import { renderInTestApp } from '@backstage/test-utils';
+import { screen } from '@testing-library/react';
 import { RawEntitiesPage } from './RawEntitiesPage';
 import { useRawEntities } from '../hooks/useRawEntities';
 import { useEntity } from '@backstage/plugin-catalog-react';
@@ -31,8 +32,8 @@ describe('RawEntitiesPage', () => {
       mergedEntity: undefined,
     });
 
-    const { getByText } = await renderInTestApp(<RawEntitiesPage />);
-    expect(getByText('Error: Something went wrong')).toBeInTheDocument();
+    await renderInTestApp(<RawEntitiesPage />);
+    expect(screen.getByText('Error: Something went wrong')).toBeInTheDocument();
   });
 
   it('renders empty state', async () => {
@@ -43,8 +44,8 @@ describe('RawEntitiesPage', () => {
       mergedEntity: undefined,
     });
 
-    const { getByText } = await renderInTestApp(<RawEntitiesPage />);
-    expect(getByText('No raw entity data could be found.')).toBeInTheDocument();
+    await renderInTestApp(<RawEntitiesPage />);
+    expect(screen.getByText('No raw entity data could be found.')).toBeInTheDocument();
   });
 
   it('renders merged and raw entities and allows tab switching', async () => {
@@ -79,9 +80,9 @@ describe('RawEntitiesPage', () => {
       },
     });
 
-    const { getByText, getAllByRole } = await renderInTestApp(<RawEntitiesPage />);
-    expect(getByText('Merged Entity')).toBeInTheDocument();
-    const tabs = getAllByRole('tab');
+    await renderInTestApp(<RawEntitiesPage />);
+    expect(screen.getByText('Merged Entity')).toBeInTheDocument();
+    const tabs = screen.getAllByRole('tab');
     expect(tabs.length).toBe(3);
   });
 });
