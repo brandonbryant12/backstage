@@ -69,41 +69,6 @@ export function generateMockEntities(count: number, options: MockEntityOptions):
         }
       },
 
-      // API
-      {
-        apiVersion: 'backstage.io/v1alpha1',
-        kind: 'API',
-        metadata: {
-          name: `api-${id}`,
-          namespace: 'default',
-          description: `API ${id} from Source ${source === 'DataSourceA' ? 'A' : 'B'}`,
-          annotations: {
-            ...(source === 'DataSourceA' ? {
-              'backstage.io/techdocs-ref': 'dir:.',
-              'jenkins.io/job-full-name': `service-${id}-ci`,
-            } : {}),
-            [source]: source === 'DataSourceA' ? 'primary-source' : 'secondary-source',
-            'timestamp': timestamp
-          }
-        },
-        spec: {
-          type: 'openapi',
-          lifecycle: 'production',
-          owner: team,
-          definition: JSON.stringify({
-            openapi: '3.0.0',
-            info: {
-              title: `API ${id}`,
-              version: source === 'DataSourceA' ? '1.0.0' : '2.0.0',
-              description: source === 'DataSourceA' 
-                ? `OpenAPI specification for API ${id}`
-                : `Enhanced OpenAPI specification for API ${id}`
-            }
-          }),
-          system: 'payment-system'
-        }
-      },
-
       // Entity specific to source (User for A, System for B)
       ...(source === 'DataSourceA' ? [{
         apiVersion: 'backstage.io/v1alpha1',

@@ -38,7 +38,6 @@ export class RawEntitiesStore {
         table.string('contentHash').notNullable();
         table.boolean('updated').notNullable().defaultTo(false);
         
-      
         table.unique(['dataSource', 'entityRef']);
         table.index('entityRef');
         table.index(['dataSource', 'expirationDate']);
@@ -61,17 +60,21 @@ export class RawEntitiesStore {
   async upsertRecords(records: EntityRecord[]): Promise<void> {
     try {
       if (records.length === 0) return;
-      const validRecords = records.filter(record => {
-        if (!record.entityRef || !this.validateEntityRef(record.entityRef)) {
-          this.logger.warn(`Invalid entityRef format: ${record.entityRef}. Must match pattern 'kind:namespace/name'`);
-          return false;
-        }
-        return true;
-      }).map(record => ({
-        ...record,
-        entityRef: this.normalizeEntityRef(record.entityRef)
-      }));
-      
+      const validRecords = records
+        .filter(record => {
+          if (!record.entityRef || !this.validateEntityRef(record.entityRef)) {
+            this.logger.warn(
+              `Invalid entityRef format: ${record.entityRef}. Must match pattern 'kind:namespace/name'`,
+            );
+            return false;
+          }
+          return true;
+        })
+        .map(record => ({
+          ...record,
+          entityRef: this.normalizeEntityRef(record.entityRef),
+        }));
+
       if (validRecords.length === 0) {
         return;
       }
@@ -89,7 +92,8 @@ export class RawEntitiesStore {
                 priorityScore: record.priorityScore,
                 expirationDate: record.expirationDate,
                 contentHash: this.computeHash(record),
-                updated: trx.raw(`
+                updated: trx.raw(
+                  `
                   CASE 
                     WHEN EXISTS (
                       SELECT 1 FROM "${TABLE_NAME}" 
@@ -99,8 +103,10 @@ export class RawEntitiesStore {
                     ) THEN true 
                     ELSE false 
                   END
-                `, [record.dataSource, record.entityRef, this.computeHash(record)])
-              }))
+                `,
+                  [record.dataSource, record.entityRef, this.computeHash(record)],
+                ),
+              })),
             )
             .onConflict(['dataSource', 'entityRef'])
             .merge();
@@ -116,8 +122,8 @@ export class RawEntitiesStore {
                 priorityScore: record.priorityScore,
                 expirationDate: record.expirationDate,
                 contentHash: this.computeHash(record),
-                updated: 1
-              }))
+                updated: 1,
+              })),
             )
             .onConflict(['dataSource', 'entityRef'])
             .merge();
@@ -133,7 +139,7 @@ export class RawEntitiesStore {
 
   async getRecordsToEmit(batchSize: number = 1000): Promise<EntityRecord[][]> {
     const updatedFlag = this.knex.client.config.client === 'pg' ? true : 1;
-    
+
     const entityRefsToEmit = await this.knex(TABLE_NAME)
       .where('updated', updatedFlag)
       .distinct('entityRef')
@@ -146,10 +152,8 @@ export class RawEntitiesStore {
 
     const records = await this.knex(TABLE_NAME)
       .whereIn('entityRef', entityRefsToEmit)
-      .where(builder => 
-        builder
-          .whereNull('expirationDate')
-          .orWhere('expirationDate', '>', new Date())
+      .where(builder =>
+        builder.whereNull('expirationDate').orWhere('expirationDate', '>', new Date()),
       )
       .orderBy(['entityRef', 'priorityScore'])
       .select();
@@ -160,7 +164,7 @@ export class RawEntitiesStore {
         metadata: this.parseJsonField(record.metadata),
         spec: this.parseJsonField(record.spec),
       };
-      
+
       const group = groups.get(record.entityRef) || [];
       group.push(parsed);
       groups.set(record.entityRef, group);
@@ -176,13 +180,11 @@ export class RawEntitiesStore {
 
   async markEmitted(entityRefs: string[]): Promise<void> {
     if (entityRefs.length === 0) return;
-    
+
     const updatedFlag = this.knex.client.config.client === 'pg' ? false : 0;
-    
-    await this.knex(TABLE_NAME)
-      .whereIn('entityRef', entityRefs)
-      .update({ updated: updatedFlag });
-    
+
+    await this.knex(TABLE_NAME).whereIn('entityRef', entityRefs).update({ updated: updatedFlag });
+
     this.logger.debug(`Marked ${entityRefs.length} entity refs as emitted`);
   }
 
@@ -191,10 +193,8 @@ export class RawEntitiesStore {
       const normalizedRef = this.normalizeEntityRef(entityRef);
       const records = await this.knex(TABLE_NAME)
         .where('entityRef', normalizedRef)
-        .where(builder => 
-          builder
-            .whereNull('expirationDate')
-            .orWhere('expirationDate', '>', new Date())
+        .where(builder =>
+          builder.whereNull('expirationDate').orWhere('expirationDate', '>', new Date()),
         )
         .orderBy('priorityScore', 'desc')
         .select();
@@ -206,6 +206,46 @@ export class RawEntitiesStore {
       }));
     } catch (error) {
       this.logger.error(`Failed to get records for ${entityRef}: ${error}`);
+      throw error;
+    }
+  }
+
+  async removeExpiredRecords(): Promise<number> {
+    try {
+      const result = await this.knex(TABLE_NAME)
+        .where('expirationDate', '<=', new Date())
+        .delete();
+
+      if (result > 0) {
+        this.logger.info(`Removed ${result} expired records from database`);
+      } else {
+        this.logger.debug('No expired records to remove');
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error('Failed to remove expired records', error as Error);
+      throw error;
+    }
+  }
+
+  /**
+   * Returns a list of entityRefs in the database, along with a count of distinct dataSources.
+   */
+  async listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>> {
+    try {
+      const rows = await this.knex(TABLE_NAME)
+        .select('entityRef')
+        .countDistinct({ dataSourceCount: 'dataSource' })
+        .groupBy('entityRef')
+        .orderBy('entityRef', 'asc');
+
+      return rows.map(row => ({
+        entityRef: row.entityRef,
+        dataSourceCount: Number(row.dataSourceCount),
+      }));
+    } catch (error) {
+      this.logger.error('Failed to list entity refs', error as Error);
       throw error;
     }
   }
@@ -223,24 +263,5 @@ export class RawEntitiesStore {
       return JSON.parse(field);
     }
     return field;
-  }
-
-  async removeExpiredRecords(): Promise<number> {
-    try {
-      const result = await this.knex(TABLE_NAME)
-        .where('expirationDate', '<=', new Date())
-        .delete();
-      
-      if (result > 0) {
-        this.logger.info(`Removed ${result} expired records from database`);
-      } else {
-        this.logger.debug('No expired records to remove');
-      }
-      
-      return result;
-    } catch (error) {
-      this.logger.error('Failed to remove expired records', error as Error);
-      throw error;
-    }
   }
 }

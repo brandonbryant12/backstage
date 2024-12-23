@@ -4,7 +4,7 @@ import { EntityRecord } from '../types';
 /**
  * EntityAggregatorService handles the aggregation of entities from multiple data sources,
  * managing their refresh schedules and cleanup of expired records.
- * 
+ *
  * @public
  */
 export interface EntityAggregatorService {
@@ -20,7 +20,6 @@ export interface EntityAggregatorService {
 
   /**
    * Gets merged records that are ready to be emitted to the catalog.
-   * Previously returned EntityRecord[][], now returns a flat array of merged EntityRecords.
    */
   getRecordsToEmit(batchSize: number): Promise<EntityRecord[]>;
 
@@ -33,4 +32,9 @@ export interface EntityAggregatorService {
    * Gets all records for a specific entity reference
    */
   getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]>;
+
+  /**
+   * Lists all entity references in the database along with a count of distinct dataSources
+   */
+  listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>>;
 }

@@ -15397,6 +15397,7 @@ __metadata:
     "@backstage/plugin-catalog-react": "npm:^1.14.1"
     "@backstage/test-utils": "npm:^1.7.2"
     "@backstage/theme": "npm:^0.6.2"
+    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^"
     "@material-ui/core": "npm:^4.9.13"
     "@material-ui/icons": "npm:^4.9.1"
     "@material-ui/lab": "npm:^4.0.0-alpha.61"
@@ -15410,6 +15411,7 @@ __metadata:
     react-use: "npm:^17.2.4"
   peerDependencies:
     react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-router-dom: "*"
   languageName: unknown
   linkType: soft
 

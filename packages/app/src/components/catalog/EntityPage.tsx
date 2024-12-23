@@ -53,13 +53,10 @@ import {
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
-
 import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
-
-import { CatalogEntityAggregatorAdminPage } from 'backstage-plugin-catalog-entity-aggregator-admin';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -127,7 +124,6 @@ const overviewContent = (
     <Grid item md={6} xs={12}>
       <EntityCatalogGraphCard variant="gridItem" height={400} />
     </Grid>
-
     <Grid item md={4} xs={12}>
       <EntityLinksCard />
     </Grid>
@@ -180,10 +176,6 @@ const serviceEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
-
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
-    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -219,10 +211,6 @@ const websiteEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
-
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
-    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -234,10 +222,6 @@ const defaultEntityPage = (
 
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
-    </EntityLayout.Route>
-
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -288,10 +272,6 @@ const apiPage = (
         </Grid>
       </Grid>
     </EntityLayout.Route>
-
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
-    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -307,9 +287,6 @@ const userPage = (
           <EntityOwnershipCard variant="gridItem" />
         </Grid>
       </Grid>
-    </EntityLayout.Route>
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -332,9 +309,6 @@ const groupPage = (
           <EntityLinksCard />
         </Grid>
       </Grid>
-    </EntityLayout.Route>
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -364,6 +338,7 @@ const systemPage = (
         </Grid>
       </Grid>
     </EntityLayout.Route>
+
     <EntityLayout.Route path="/diagram" title="Diagram">
       <EntityCatalogGraphCard
         variant="gridItem"
@@ -383,9 +358,6 @@ const systemPage = (
         unidirectional={false}
       />
     </EntityLayout.Route>
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
-    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -404,9 +376,6 @@ const domainPage = (
           <EntityHasSystemsCard variant="gridItem" />
         </Grid>
       </Grid>
-    </EntityLayout.Route>
-    <EntityLayout.Route path="/raw-entities" title="Raw Entities">
-      <CatalogEntityAggregatorAdminPage />
     </EntityLayout.Route>
   </EntityLayout>
 );

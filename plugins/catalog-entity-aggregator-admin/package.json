@@ -30,6 +30,7 @@
     "@backstage/errors": "^1.2.6",
     "@backstage/plugin-catalog-react": "^1.14.1",
     "@backstage/theme": "^0.6.2",
+    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^",
     "@material-ui/core": "^4.9.13",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.61",
@@ -38,7 +39,8 @@
     "react-use": "^17.2.4"
   },
   "peerDependencies": {
-    "react": "^16.13.1 || ^17.0.0 || ^18.0.0"
+    "react": "^16.13.1 || ^17.0.0 || ^18.0.0",
+    "react-router-dom": "*"
   },
   "devDependencies": {
     "@backstage/cli": "^0.29.2",

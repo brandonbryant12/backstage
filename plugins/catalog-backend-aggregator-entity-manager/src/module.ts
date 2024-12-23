@@ -5,7 +5,8 @@ import {
 import { catalogProcessingExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
 import { entityAggregatorService } from './service/EntityAggregatorServiceRef';
 import { createRouter } from './router';
-import { GithubDataSource } from './datasources/github/GithubDataSource';
+import { DataSourceA } from './datasources/DataSourceA';
+import { DataSourceB } from './datasources/DataSourceB';
 
 export const entityAggregatorManagerModule = createBackendModule({
   pluginId: 'catalog',
@@ -30,19 +31,31 @@ export const entityAggregatorManagerModule = createBackendModule({
         }
 
         const dataSources = [
-          new GithubDataSource(
+          new DataSourceA(
             {
-              name: 'github-datasource',
-              priority: 80,
+              name: 'datasource-a',
+              priority: 100,
               refreshSchedule: {
-                frequency: { seconds: 60 },
-                timeout: { minutes: 5 },
+                frequency: { seconds: 10 },
+                timeout: { minutes: 10 },
+              },
+              ttlSeconds: 60,
+            },
+            logger,
+          ),
+          new DataSourceB(
+            {
+              name: 'datasource-b',
+              priority: 50,
+              refreshSchedule: {
+                frequency: { seconds: 30 },
+                timeout: { minutes: 10 },
               },
             },
             logger,
-            urlReader,
           ),
         ];
+
 
         for (const source of dataSources) {
           entityAggregator.addDataSource(source);

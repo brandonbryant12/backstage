@@ -5,34 +5,37 @@ import {
   discoveryApiRef,
   fetchApiRef,
 } from '@backstage/core-plugin-api';
-
-import { rootRouteRef } from './routes';
-import { catalogEntityAggregatorAdminApiRef } from './api/catalogEntityAggregatorAdminApiRef';
-import { CatalogEntityAggregatorAdminClient } from './api/CatalogEntityAggregatorAdminClient';
+import {
+  allEntitiesRouteRef,
+} from './routes';
+import {
+  CatalogEntityAggregatorAdminClient,
+  catalogEntityAggregatorAdminApiRef,
+} from './api/CatalogEntityAggregatorAdminApi';
 
 export const catalogEntityAggregatorAdminPlugin = createPlugin({
   id: 'catalog-entity-aggregator-admin',
   apis: [
     createApiFactory({
       api: catalogEntityAggregatorAdminApiRef,
-      deps: { 
+      deps: {
         discoveryApi: discoveryApiRef,
         fetchApi: fetchApiRef,
       },
-      factory: ({ discoveryApi, fetchApi }) => 
+      factory: ({ discoveryApi, fetchApi }) =>
         new CatalogEntityAggregatorAdminClient({ discoveryApi, fetchApi }),
     }),
   ],
   routes: {
-    root: rootRouteRef,
+    root: allEntitiesRouteRef,
   },
 });
 
-export const CatalogEntityAggregatorAdminPage = catalogEntityAggregatorAdminPlugin.provide(
+export const CatalogEntityAggregatorAdminIndexPage = catalogEntityAggregatorAdminPlugin.provide(
   createRoutableExtension({
-    name: 'CatalogEntityAggregatorAdminPage',
+    name: 'CatalogEntityAggregatorAdminIndexPage',
     component: () =>
-      import('./components/RawEntitiesPage').then(m => m.RawEntitiesPage),
-    mountPoint: rootRouteRef,
+      import('./components/EntityAggregatorAdminPage').then(m => m.EntityAggregatorAdminPage),
+    mountPoint: allEntitiesRouteRef,
   }),
 );

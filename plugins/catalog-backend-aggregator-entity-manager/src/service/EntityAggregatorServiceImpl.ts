@@ -70,13 +70,12 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
         dataSource: source.getName(),
         entityRef: this.getEntityRef(entity),
         metadata: entity.metadata,
-        spec: entity.spec || {} as JsonObject,
+        spec: entity.spec || ({} as JsonObject),
         priorityScore: source.getPriority(),
         expirationDate: source.getExpirationDate?.(),
       }));
       await this.store.upsertRecords(entityRecords);
       this.logger.info(`Processed ${entities.length} entities from ${source.getName()}`);
-      
     } catch (error) {
       this.logger.error(
         `Failed to process entities from ${source.getName()}`,
@@ -106,5 +105,9 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
 
   async getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]> {
     return this.store.getRecordsByEntityRef(entityRef);
+  }
+
+  async listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>> {
+    return this.store.listEntityRefs();
   }
 }

@@ -50,7 +50,9 @@ describe('RawEntitiesStore', () => {
     await store.upsertRecords(records);
     const result = await knex('entityRecords').select();
     expect(result).toHaveLength(0);
-    expect(logger.warn).toHaveBeenCalledWith('Invalid entityRef format: invalidRef. Must match pattern \'kind:namespace/name\'');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Invalid entityRef format: invalidRef. Must match pattern \'kind:namespace/name\'',
+    );
   });
 
   it.each(databases.eachSupportedId())('should handle empty upsert', async databaseId => {
@@ -62,15 +64,19 @@ describe('RawEntitiesStore', () => {
 
   it.each(databases.eachSupportedId())('should mark emitted', async databaseId => {
     const { store, knex } = await createStore(databaseId);
-    await store.upsertRecords([{
-      dataSource: 'test-source',
-      entityRef: 'component:default/service-emit',
-      metadata: { name: 'emit' },
-      spec: {},
-      priorityScore: 1,
-    }]);
+    await store.upsertRecords([
+      {
+        dataSource: 'test-source',
+        entityRef: 'component:default/service-emit',
+        metadata: { name: 'emit' },
+        spec: {},
+        priorityScore: 1,
+      },
+    ]);
     await store.markEmitted(['component:default/service-emit']);
-    const updatedRecord = await knex('entityRecords').where('entityRef', 'component:default/service-emit').first();
+    const updatedRecord = await knex('entityRecords')
+      .where('entityRef', 'component:default/service-emit')
+      .first();
     const expected = knex.client.config.client === 'pg' ? false : 0;
     expect(updatedRecord.updated).toBe(expected);
   });
@@ -83,13 +89,15 @@ describe('RawEntitiesStore', () => {
   it.each(databases.eachSupportedId())('should get records to emit', async databaseId => {
     const { store, knex } = await createStore(databaseId);
     const updatedFlag = knex.client.config.client === 'pg' ? true : 1;
-    await store.upsertRecords([{
-      dataSource: 'test-source',
-      entityRef: 'component:default/service-emit-2',
-      metadata: { name: 'emit-2' },
-      spec: {},
-      priorityScore: 1,
-    }]);
+    await store.upsertRecords([
+      {
+        dataSource: 'test-source',
+        entityRef: 'component:default/service-emit-2',
+        metadata: { name: 'emit-2' },
+        spec: {},
+        priorityScore: 1,
+      },
+    ]);
     await knex('entityRecords').update({ updated: updatedFlag });
     const batches = await store.getRecordsToEmit();
     expect(batches.length).toBe(1);
@@ -116,7 +124,9 @@ describe('RawEntitiesStore', () => {
     expect(records).toHaveLength(1);
     expect(records[0].dataSource).toBe('test-source');
     expect(records[0].metadata).toEqual({ name: 'service-2' });
-    const rawRecords = await knex('entityRecords').where('entityRef', 'component:default/service-2').select();
+    const rawRecords = await knex('entityRecords')
+      .where('entityRef', 'component:default/service-2')
+      .select();
     expect(rawRecords).toHaveLength(1);
     expect(JSON.parse(rawRecords[0].metadata)).toEqual({ name: 'service-2' });
   });
@@ -156,7 +166,7 @@ describe('RawEntitiesStore', () => {
     const complexMetadata = {
       name: 'service-4',
       annotations: {
-        'backstage.io/techdocs-ref': 'dir:.'
+        'backstage.io/techdocs-ref': 'dir:.',
       },
       labels: {
         tier: 'production',
@@ -172,7 +182,45 @@ describe('RawEntitiesStore', () => {
     await store.upsertRecords([testRecord]);
     const records = await store.getRecordsByEntityRef('component:default/service-4');
     expect(records[0].metadata).toEqual(complexMetadata);
-    const rawRecords = await knex('entityRecords').where('entityRef', 'component:default/service-4').select();
+    const rawRecords = await knex('entityRecords')
+      .where('entityRef', 'component:default/service-4')
+      .select();
     expect(JSON.parse(rawRecords[0].metadata)).toEqual(complexMetadata);
+  });
+
+  it.each(databases.eachSupportedId())('should list all entityRefs with dataSource counts', async databaseId => {
+    const { store, knex } = await createStore(databaseId);
+
+    await store.upsertRecords([
+      {
+        dataSource: 'source-a',
+        entityRef: 'component:default/test',
+        metadata: { name: 'test' },
+        spec: {},
+        priorityScore: 50,
+      },
+      {
+        dataSource: 'source-b',
+        entityRef: 'component:default/test',
+        metadata: { name: 'test' },
+        spec: {},
+        priorityScore: 60,
+      },
+      {
+        dataSource: 'source-a',
+        entityRef: 'api:default/other',
+        metadata: { name: 'other' },
+        spec: {},
+        priorityScore: 70,
+      },
+    ]);
+
+    const refs = await store.listEntityRefs();
+    expect(refs).toEqual(
+      expect.arrayContaining([
+        { entityRef: 'api:default/other', dataSourceCount: 1 },
+        { entityRef: 'component:default/test', dataSourceCount: 2 },
+      ]),
+    );
   });
 });
