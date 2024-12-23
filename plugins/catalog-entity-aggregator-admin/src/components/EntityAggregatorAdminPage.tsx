@@ -42,6 +42,7 @@ export const EntityAggregatorAdminPage = () => {
   });
 
   const { loading, error, data } = useAllEntityRefs();
+  
   const { 
     loading: detailLoading = false, 
     error: detailError, 

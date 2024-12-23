@@ -189,7 +189,7 @@ describe('RawEntitiesStore', () => {
   });
 
   it.each(databases.eachSupportedId())('should list all entityRefs with dataSource counts', async databaseId => {
-    const { store, knex } = await createStore(databaseId);
+    const { store } = await createStore(databaseId);
 
     await store.upsertRecords([
       {

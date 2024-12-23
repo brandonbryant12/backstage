@@ -238,7 +238,9 @@ export class RawEntitiesStore {
         .select('entityRef')
         .countDistinct({ dataSourceCount: 'dataSource' })
         .groupBy('entityRef')
-        .orderBy('entityRef', 'asc');
+        .orderBy('entityRef', 'asc')
+        .limit(3000)
+        .select<Array<{ entityRef: string; dataSourceCount: string | number }>>();
 
       return rows.map(row => ({
         entityRef: row.entityRef,

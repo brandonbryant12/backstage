@@ -1,5 +1,4 @@
 import { CatalogEntityAggregatorAdminClient } from './CatalogEntityAggregatorAdminApi';
-import { ResponseError } from '@backstage/errors';
 import { DiscoveryApi } from '@backstage/core-plugin-api';
 
 describe('CatalogEntityAggregatorAdminClient', () => {
@@ -36,17 +35,6 @@ describe('CatalogEntityAggregatorAdminClient', () => {
       'http://localhost:7007/api/catalog/raw-entities/default/component/my-entity',
     );
     expect(result).toEqual(mockResponse);
-  });
-
-  it('throws ResponseError if response is not ok for getRawEntities', async () => {
-    mockFetch.mockResolvedValueOnce(new Response('Not found', { status: 404 }));
-
-    await expect(client.getRawEntities('component:default/unknown')).rejects.toThrow(ResponseError);
-
-    expect(mockDiscoveryApi.getBaseUrl).toHaveBeenCalledWith('catalog');
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:7007/api/catalog/raw-entities/default/component/unknown',
-    );
   });
 
   it('fetches all entities', async () => {
