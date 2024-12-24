@@ -158,3 +158,6 @@ The module is designed to be easily extensible:
 - Custom validation rules per data source
 - Configurable retry strategies for failed refreshes
 - Data source health checks and status reporting
+
+### Testing 
+set env variable `export BACKSTAGE_TEST_DATABASE_POSTGRES16_CONNECTION_STRING=postgresql://docker:docker@localhost:5432/docker` for pg tests to run

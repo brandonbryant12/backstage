@@ -34,7 +34,12 @@ describe('RawEntitiesStore', () => {
     expect(result).toHaveLength(1);
     expect(result[0].dataSource).toBe('test-source');
     expect(result[0].entityRef).toBe('component:default/service-1');
-    expect(JSON.parse(result[0].metadata)).toEqual({ name: 'service-1' });
+    
+    const metadata = typeof result[0].metadata === 'string' 
+      ? JSON.parse(result[0].metadata) 
+      : result[0].metadata;
+    expect(metadata).toEqual({ name: 'service-1' });
+    
     expect(logger.debug).toHaveBeenCalledWith('Processed 1 records in a single transaction');
   });
 
@@ -128,7 +133,11 @@ describe('RawEntitiesStore', () => {
       .where('entityRef', 'component:default/service-2')
       .select();
     expect(rawRecords).toHaveLength(1);
-    expect(JSON.parse(rawRecords[0].metadata)).toEqual({ name: 'service-2' });
+    
+    const metadata = typeof rawRecords[0].metadata === 'string' 
+      ? JSON.parse(rawRecords[0].metadata) 
+      : rawRecords[0].metadata;
+    expect(metadata).toEqual({ name: 'service-2' });
   });
 
   it.each(databases.eachSupportedId())('should return empty if no records found by entityRef', async databaseId => {
@@ -185,7 +194,11 @@ describe('RawEntitiesStore', () => {
     const rawRecords = await knex('entityRecords')
       .where('entityRef', 'component:default/service-4')
       .select();
-    expect(JSON.parse(rawRecords[0].metadata)).toEqual(complexMetadata);
+      
+    const metadata = typeof rawRecords[0].metadata === 'string' 
+      ? JSON.parse(rawRecords[0].metadata) 
+      : rawRecords[0].metadata;
+    expect(metadata).toEqual(complexMetadata);
   });
 
   it.each(databases.eachSupportedId())('should list all entityRefs with dataSource counts', async databaseId => {

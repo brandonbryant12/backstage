@@ -261,6 +261,9 @@ export class RawEntitiesStore {
   }
 
   private parseJsonField(field: any): any {
+    if (typeof field === 'object' && field !== null) {
+      return field;
+    }
     if (typeof field === 'string') {
       return JSON.parse(field);
     }
