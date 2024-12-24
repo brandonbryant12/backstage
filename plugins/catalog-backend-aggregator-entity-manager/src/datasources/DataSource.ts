@@ -22,8 +22,11 @@ export abstract class DataSource {
     logger: LoggerService,
   ) {
     this.config = config;
-    // Removed logger.child(), just use the logger directly
     this.logger = logger;
+  }
+
+  public getConfig(): DataSourceConfig {
+    return this.config;
   }
 
   getName(): string {
@@ -38,14 +41,10 @@ export abstract class DataSource {
     return this.config.refreshSchedule;
   }
 
-  public getExpirationDate(): Date | undefined {
-    if (!this.config.ttlSeconds) {
-      return undefined;
-    }
-    const expirationDate = new Date();
-    expirationDate.setSeconds(expirationDate.getSeconds() + this.config.ttlSeconds);
-    return expirationDate;
-  }
-
+  /**
+   * Implement this method to fetch entities from your data source.
+   * Use the provided callback to send entities to the aggregator.
+   * The callback can be called multiple times if needed.
+   */
   abstract refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void>;
 }

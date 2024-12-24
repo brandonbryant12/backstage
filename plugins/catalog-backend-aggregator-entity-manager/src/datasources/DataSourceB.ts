@@ -10,12 +10,14 @@ export class DataSourceB extends DataSource {
       name: string; 
       priority: number; 
       refreshSchedule: SchedulerServiceTaskScheduleDefinition;
+      ttlSeconds?: number;
     },
     logger: LoggerService,
   ) {
     super({
       ...config,
       refreshSchedule: config.refreshSchedule,
+      ttlSeconds: config.ttlSeconds,
     }, logger);
   }
 

@@ -60,20 +60,31 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
         }
       },
     });
-    this.logger.info(`Scheduled expired records cleanup with schedule: ${JSON.stringify(this.cleanupSchedule)}`);
+    this.logger.info(
+      `Scheduled expired records cleanup with schedule: ${JSON.stringify(this.cleanupSchedule)}`,
+    );
   }
 
   private async processEntities(source: DataSource, entities: Entity[]): Promise<void> {
     try {
       this.logger.info(`Starting to process ${entities.length} entities from ${source.getName()}`);
+
+      const ttl = source.getConfig().ttlSeconds;
+      let expirationDate: Date | undefined;
+      if (ttl && ttl > 0) {
+        expirationDate = new Date();
+        expirationDate.setSeconds(expirationDate.getSeconds() + ttl);
+      }
+
       const entityRecords: EntityRecord[] = entities.map(entity => ({
         dataSource: source.getName(),
         entityRef: this.getEntityRef(entity),
         metadata: entity.metadata,
         spec: entity.spec || ({} as JsonObject),
         priorityScore: source.getPriority(),
-        expirationDate: source.getExpirationDate?.(),
+        expirationDate,
       }));
+
       await this.store.upsertRecords(entityRecords);
       this.logger.info(`Processed ${entities.length} entities from ${source.getName()}`);
     } catch (error) {
