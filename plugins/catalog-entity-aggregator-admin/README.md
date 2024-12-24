@@ -1,13 +1,32 @@
-# catalog-entity-aggregator-admin
+# Entity Aggregation Admin View
 
-Welcome to the catalog-entity-aggregator-admin plugin!
+A Backstage plugin providing an admin interface for entity aggregation.
+- [Entity Aggregation Provider](../catalog-backend-aggregator-entity-provider/README.md)
+- Entity Aggregation Admin View (this module)
+- [Entity Aggregation Manager](../catalog-backend-aggregator-entity-manager/README.md)
 
-_This plugin was created through the Backstage CLI_
+## Install
 
-## Getting started
+1. Add to `packages/app/package.json`:
+```json
+{
+  "dependencies": {
+    "backstage-plugin-catalog-entity-aggregator-admin": "^0.1.0"
+  }
+}
+```
 
-Your plugin has been added to the example app in this repository, meaning you'll be able to access it by running `yarn start` in the root directory, and then navigating to [/catalog-entity-aggregator-admin](http://localhost:3000/catalog-entity-aggregator-admin).
+2. Add route in `packages/app/src/App.tsx`:
+```tsx
+import { CatalogEntityAggregatorAdminIndexPage } from 'backstage-plugin-catalog-entity-aggregator-admin';
 
-You can also serve the plugin in isolation by running `yarn start` in the plugin directory.
-This method of serving the plugin provides quicker iteration speed and a faster startup and hot reloads.
-It is only meant for local development, and the setup for it can be found inside the [/dev](./dev) directory.
+<Route
+  path="/catalog-entity-aggregator-admin"
+  element={<CatalogEntityAggregatorAdminIndexPage />}
+/>
+```
+
+## Features
+
+- View aggregated entities
+- Inspect entity merging
