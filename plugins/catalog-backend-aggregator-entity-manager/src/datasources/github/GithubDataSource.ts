@@ -21,7 +21,7 @@ export class GithubDataSource extends DataSource {
   }
 
   getAllTargetUrls(): string[] {
-    return ['https://github.com/brandonbryant12/backstage/blob/master/catalog-info.yaml'];
+    return [];
   }
 
   async refresh(provide: (entities: Entity[]) => Promise<void>): Promise<void> {
