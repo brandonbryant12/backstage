@@ -1,5 +1,4 @@
 import { EntityMeta } from '@backstage/catalog-model';
-import { JsonObject } from '@backstage/types';
 
 export interface EntityRecord {
   dataSource: string;
@@ -7,7 +6,7 @@ export interface EntityRecord {
   metadata: EntityMeta & {
     annotations?: Record<string, string>;
   };
-  spec: JsonObject;
+  spec: Record<string, any>;
   priorityScore: number;
   expirationDate?: Date;
   contentHash?: string;

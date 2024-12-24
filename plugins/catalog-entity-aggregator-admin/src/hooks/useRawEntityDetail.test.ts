@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useRawEntityDetail } from './useRawEntityDetail';
 import { useApi } from '@backstage/core-plugin-api';
 
@@ -7,13 +7,18 @@ jest.mock('@backstage/core-plugin-api', () => ({
   useApi: jest.fn(),
 }));
 
-describe('useRawEntityDetail', () => {
+describe('useRawEntityDetails', () => {
   const mockApi = {
     getRawEntities: jest.fn(),
   };
 
   beforeEach(() => {
+    jest.clearAllMocks();
     (useApi as jest.Mock).mockReturnValue(mockApi);
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
   it('should return loading initially', () => {
@@ -25,7 +30,7 @@ describe('useRawEntityDetail', () => {
   });
 
   it('should return data once loaded', async () => {
-    mockApi.getRawEntities.mockResolvedValue({
+    const mockResponse = {
       entities: [
         {
           datasource: 'a',
@@ -38,14 +43,14 @@ describe('useRawEntityDetail', () => {
         metadata: { name: 'test' },
         spec: {},
       },
-    });
+    };
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useRawEntityDetail('component:default/test'),
-    );
-    await waitForNextUpdate();
+    mockApi.getRawEntities.mockResolvedValue(mockResponse);
 
-    expect(result.current.loading).toBe(false);
+    const { result } = renderHook(() => useRawEntityDetail('component:default/test'));
+
+    await waitFor(() => expect(mockApi.getRawEntities).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBeUndefined();
     expect(result.current.rawEntities).toHaveLength(1);
     expect(result.current.mergedEntity).toBeDefined();
@@ -55,12 +60,9 @@ describe('useRawEntityDetail', () => {
     const error = new Error('Test error');
     mockApi.getRawEntities.mockRejectedValue(error);
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useRawEntityDetail('component:default/test'),
-    );
-    await waitForNextUpdate();
-
-    expect(result.current.loading).toBe(false);
+    const { result } = renderHook(() => useRawEntityDetail('component:default/test'));
+    await waitFor(() => expect(mockApi.getRawEntities).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe(error);
     expect(result.current.rawEntities).toBeUndefined();
     expect(result.current.mergedEntity).toBeUndefined();

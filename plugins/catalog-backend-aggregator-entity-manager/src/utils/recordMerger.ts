@@ -3,14 +3,7 @@ import _ from 'lodash';
 
 const ARRAY_PATHS = {
   metadata: ['tags', 'links'],
-  spec: [
-    'implementsApis',
-    'consumesApis',
-    'providesApis',
-    'dependsOn',
-    'systems',
-    'owner'
-  ]
+  spec: ['implementsApis', 'consumesApis', 'providesApis', 'dependsOn', 'systems', 'owner']
 } as const;
 
 export function mergeRecords(records: EntityRecord[]): EntityRecord {
@@ -18,89 +11,77 @@ export function mergeRecords(records: EntityRecord[]): EntityRecord {
     throw new Error('Cannot merge empty records array');
   }
 
-  const baseRecord = records.reduce((highest, current) => 
-    current.priorityScore > highest.priorityScore ? current : highest
-  );
-
+  // Sort records by priority descending (highest first)
+  const sortedRecords = _.orderBy(records, 'priorityScore', 'desc');
+  const baseRecord = sortedRecords[0];
+  
   const result: EntityRecord = {
     ...baseRecord,
-    metadata: {
-      ...(baseRecord.metadata || {}),
-      annotations: {}
-    },
-    spec: {
-      ...(baseRecord.spec || {})
-    }
+    metadata: { ...(baseRecord.metadata || {}), annotations: {} },
+    spec: { ...(baseRecord.spec || {}) }
   };
 
-  const collectors = new Map<string, Set<string>>();
+  // Merge annotations in priority order (highest priority wins)
+  const mergedAnnotations = _.reduce(
+    sortedRecords,
+    (acc, record) => ({ ...acc, ...(record.metadata?.annotations || {}) }),
+    {}
+  );
+
+  // Initialize collectors for array fields
+  const arrayCollectors = initializeArrayCollectors();
   
-  for (const section of ['metadata', 'spec'] as const) {
-    for (const field of ARRAY_PATHS[section]) {
-      collectors.set(`${section}.${field}`, new Set<string>());
-    }
-  }
-
-  const annotations = new Map<string, string>();
+  // Collect array values from all records
+  populateArrayCollectors(sortedRecords, arrayCollectors);
   
-  for (const record of records) {
-    if (record.metadata?.annotations) {
-      for (const [key, value] of Object.entries(record.metadata.annotations)) {
-        if (!annotations.has(key)) {
-          annotations.set(key, value);
-        }
-      }
-    }
-  }
+  // Merge collected arrays into result
+  mergeArraysIntoResult(result, arrayCollectors);
 
-  for (const record of records) {
-    if (record.metadata) {
-      for (const field of ARRAY_PATHS.metadata) {
-        const values = record.metadata[field];
-        if (Array.isArray(values)) {
-          const collector = collectors.get(`metadata.${field}`);
-          values.forEach(item => {
-            if (item !== null && item !== undefined) {
-              collector?.add(JSON.stringify(item));
-            }
-          });
-        }
-      }
-    }
-
-    if (record.spec) {
-      for (const field of ARRAY_PATHS.spec) {
-        const values = record.spec[field];
-        if (Array.isArray(values)) {
-          const collector = collectors.get(`spec.${field}`);
-          values.forEach(item => {
-            if (item !== null && item !== undefined) {
-              collector?.add(JSON.stringify(item));
-            }
-          });
-        }
-      }
-    }
-  }
-
-  for (const [path, values] of collectors) {
-    if (values.size === 0) continue;
-
-    const [section, field] = path.split('.');
-    if (section === 'metadata' || section === 'spec') {
-      const parsedValues = Array.from(values)
-        .map(item => JSON.parse(item))
-        .filter(item => item !== null && item !== undefined);
-        
-      if (parsedValues.length > 0) {
-        (result[section] as Record<string, any[]>)[field] = parsedValues;
-      }
-    }
-  }
-
-  if (annotations.size > 0) {
-    result.metadata.annotations = Object.fromEntries(annotations);
+  if (!_.isEmpty(mergedAnnotations)) {
+    result.metadata.annotations = mergedAnnotations;
   }
 
   return result;
+}
+
+function initializeArrayCollectors() {
+  return new Map(
+    Object.entries(ARRAY_PATHS).flatMap(([section, fields]) =>
+      fields.map(field => [`${section}.${field}`, new Set<string>()])
+    )
+  );
+}
+
+function populateArrayCollectors(records: EntityRecord[], collectors: Map<string, Set<string>>) {
+  records.forEach(record => {
+    Object.entries(ARRAY_PATHS).forEach(([section, fields]) => {
+      const sectionData = record[section as keyof typeof ARRAY_PATHS];
+      if (!sectionData) return;
+
+      fields.forEach(field => {
+        const values = sectionData[field];
+        if (Array.isArray(values)) {
+          const collector = collectors.get(`${section}.${field}`);
+          values.forEach(item => {
+            if (!!item) collector?.add(JSON.stringify(item));
+          });
+        }
+      });
+    });
+  });
+}
+
+function mergeArraysIntoResult(result: EntityRecord, collectors: Map<string, Set<string>>) {
+  collectors.forEach((values, path) => {
+    if (values.size === 0) return;
+    
+    const [section, field] = path.split('.');
+    const parsedValues = Array.from(values)
+      .map(item => JSON.parse(item))
+      .filter(Boolean);
+    
+    if (parsedValues.length > 0) {
+      (result[section as keyof typeof ARRAY_PATHS] as Record<string, any[]>)[field] = parsedValues;
+    }
+  });
 }
