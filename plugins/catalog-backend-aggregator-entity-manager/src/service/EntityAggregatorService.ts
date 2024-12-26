@@ -1,40 +1,31 @@
-import { DataSource } from '../datasources/DataSource';
 import { EntityRecord } from '../types';
 
 /**
- * EntityAggregatorService handles the aggregation of entities from multiple data sources,
- * managing their refresh schedules and cleanup of expired records.
- *
  * @public
  */
 export interface EntityAggregatorService {
   /**
-   * Adds a data source to be managed by the aggregator
-   */
-  addDataSource(source: DataSource): void;
-
-  /**
-   * Starts the service, initializing all data source schedules and cleanup tasks
-   */
-  start(): Promise<void>;
-
-  /**
-   * Gets merged records that are ready to be emitted to the catalog.
+   * Gets merged records that are ready to be emitted.
    */
   getRecordsToEmit(batchSize: number): Promise<EntityRecord[]>;
 
   /**
-   * Marks records as having been emitted to the catalog
+   * Marks records as emitted.
    */
   markEmitted(entityRefs: string[]): Promise<void>;
 
   /**
-   * Gets all records for a specific entity reference
+   * Gets records for a specific entity reference.
    */
   getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]>;
 
   /**
-   * Lists all entity references in the database along with a count of distinct dataSources
+   * Lists all entity references in the database along with a count of distinct dataSources.
    */
   listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>>;
+
+  /**
+   * Returns the subset of entity refs that do not have a valid (non-expired) record in the aggregator’s data store.
+   */
+  getInvalidEntityRefs(entityRefs: string[]): Promise<string[]>;
 }

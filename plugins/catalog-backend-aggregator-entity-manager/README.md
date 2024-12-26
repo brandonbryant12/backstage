@@ -47,7 +47,7 @@ The Entity Aggregation Manager is responsible for:
 The module maintains its state in a database table with the following structure:
 
 ```sql
-CREATE TABLE entityRecords (
+CREATE TABLE unmerged_entity_records (
   id TEXT PRIMARY KEY,
   dataSource TEXT NOT NULL,
   entityRef TEXT NOT NULL,

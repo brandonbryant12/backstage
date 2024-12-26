@@ -20,7 +20,6 @@ export const entityAggregatorService = createServiceRef<EntityAggregatorService>
     async factory({ logger, scheduler, database }) {
       const store = await RawEntitiesStore.create(database, logger);
       return new EntityAggregatorServiceImpl(
-        'entity-aggregator',
         store,
         logger,
         scheduler,

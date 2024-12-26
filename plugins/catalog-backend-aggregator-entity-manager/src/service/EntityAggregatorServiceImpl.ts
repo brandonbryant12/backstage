@@ -8,106 +8,67 @@ import { EntityAggregatorService } from './EntityAggregatorService';
 import { mergeRecords } from '../utils/recordMerger';
 
 export class EntityAggregatorServiceImpl implements EntityAggregatorService {
-  private readonly cleanupSchedule = {
-    frequency: { seconds: 10 },
-    timeout: { minutes: 5 },
-  };
-
   private readonly dataSources: DataSource[] = [];
 
   constructor(
-    private readonly name: string,
     private readonly store: RawEntitiesStore,
     private readonly logger: LoggerService,
     private readonly scheduler: SchedulerService,
-  ) {
-    this.logger.debug(`Initialized entity aggregator service`);
-  }
+  ) {}
 
   addDataSource(source: DataSource): void {
     this.dataSources.push(source);
-    this.logger.debug(`Added data source: ${source.getName()}`);
   }
 
-  async start(): Promise<void> {
+  start(): void {
     for (const source of this.dataSources) {
       const schedule = source.getSchedule();
       if (schedule) {
         const runner = this.scheduler.createScheduledTaskRunner(schedule);
-        await runner.run({
+        runner.run({
           id: `datasource-refresh-${source.getName()}`,
           fn: async () => {
-            await source.refresh(entities => this.processEntities(source, entities));
+            const entities = new Array<Entity>();
+            await source.refresh(async e => {
+              entities.push(...e);
+            });
+            await this.processEntities(source, entities);
           },
         });
-        this.logger.info(
-          `Scheduled refresh for ${source.getName()} with schedule: ${JSON.stringify(schedule)}`,
-        );
       }
     }
-
-    const cleanupRunner = this.scheduler.createScheduledTaskRunner(this.cleanupSchedule);
-    await cleanupRunner.run({
-      id: `${this.name}-cleanup-expired`,
-      fn: async () => {
-        try {
-          const removedCount = await this.store.removeExpiredRecords();
-          if (removedCount > 0) {
-            this.logger.info(`Cleanup task completed: removed ${removedCount} expired records`);
-          }
-        } catch (error) {
-          this.logger.error('Failed to cleanup expired records', error as Error);
-        }
-      },
-    });
-    this.logger.info(
-      `Scheduled expired records cleanup with schedule: ${JSON.stringify(this.cleanupSchedule)}`,
-    );
   }
 
   private async processEntities(source: DataSource, entities: Entity[]): Promise<void> {
-    try {
-      this.logger.info(`Starting to process ${entities.length} entities from ${source.getName()}`);
-
-      const ttl = source.getConfig().ttlSeconds;
-      let expirationDate: Date | undefined;
-      if (ttl && ttl > 0) {
-        expirationDate = new Date();
-        expirationDate.setSeconds(expirationDate.getSeconds() + ttl);
-      }
-
-      const entityRecords: EntityRecord[] = entities.map(entity => ({
-        dataSource: source.getName(),
-        entityRef: this.getEntityRef(entity),
-        metadata: entity.metadata,
-        spec: entity.spec || ({} as JsonObject),
-        priorityScore: source.getPriority(),
-        expirationDate,
-      }));
-
-      await this.store.upsertRecords(entityRecords);
-      this.logger.info(`Processed ${entities.length} entities from ${source.getName()}`);
-    } catch (error) {
-      this.logger.error(
-        `Failed to process entities from ${source.getName()}`,
-        error as JsonObject,
-      );
+    const ttl = source.getConfig().ttlSeconds;
+    let expirationDate: Date | undefined;
+    if (ttl && ttl > 0) {
+      expirationDate = new Date();
+      expirationDate.setSeconds(expirationDate.getSeconds() + ttl);
     }
+    const records: EntityRecord[] = entities.map(entity => ({
+      dataSource: source.getName(),
+      entityRef: this.getEntityRef(entity),
+      metadata: entity.metadata,
+      spec: entity.spec || ({} as JsonObject),
+      priorityScore: source.getPriority(),
+      expirationDate,
+    }));
+    await this.store.upsertRecords(records);
+    this.logger.info(`Processed ${entities.length} entities from data source ${source.getName()}`);
   }
 
   private getEntityRef(entity: Entity): string {
-    try {
-      return `${entity.kind}:${entity.metadata.namespace || 'default'}/${entity.metadata.name}`;
-    } catch (error) {
-      this.logger.error(`Failed to generate entityRef for entity`, error as Error);
-      return `unknown:default/error-${Date.now()}`;
-    }
+    const kind = entity.kind.toLowerCase();
+    const namespace = (entity.metadata.namespace || 'default').toLowerCase();
+    const name = entity.metadata.name.toLowerCase();
+    return `${kind}:${namespace}/${name}`;
   }
 
   async getRecordsToEmit(batchSize: number): Promise<EntityRecord[]> {
     const entityGroups = await this.store.getRecordsToEmit(batchSize);
-    const mergedRecords = entityGroups.map(records => mergeRecords(records));
-    return mergedRecords;
+    const merged = entityGroups.map(r => mergeRecords(r));
+    return merged;
   }
 
   async markEmitted(entityRefs: string[]): Promise<void> {
@@ -120,5 +81,14 @@ export class EntityAggregatorServiceImpl implements EntityAggregatorService {
 
   async listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>> {
     return this.store.listEntityRefs();
+  }
+
+  async getInvalidEntityRefs(entityRefs: string[]): Promise<string[]> {
+    const withValidRecord = await this.store.getEntityRecordsByEntityRefs(entityRefs);
+    return entityRefs.filter(ref => !withValidRecord.includes(ref));
+  }
+
+  removeExpiredRecords(): Promise<number> {
+    return this.store.removeExpiredRecords();
   }
 }
