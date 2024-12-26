@@ -13,6 +13,8 @@ describe('EntityAggregatorProvider', () => {
     mockService = {
       getRecordsToEmit: jest.fn().mockResolvedValue([]),
       markEmitted: jest.fn().mockResolvedValue(undefined),
+      removeExpiredRecords: jest.fn(),
+      getInvalidEntityRefs: jest.fn(),
     };
     mockLogger = {
       info: jest.fn(),
@@ -30,6 +32,7 @@ describe('EntityAggregatorProvider', () => {
     };
     mockDatabase = {
       getClient: jest.fn().mockResolvedValue({}),
+      queryByLocation: jest.fn(),
     };
 
     provider = new EntityAggregatorProvider(
@@ -51,6 +54,9 @@ describe('EntityAggregatorProvider', () => {
   it('connect schedules tasks', async () => {
     await provider.connect(mockConnection);
     expect(mockScheduler.createScheduledTaskRunner).toHaveBeenCalled();
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      expect.stringContaining('Scheduled entity emission'),
+    );
   });
 
   it('emitUpdatedEntities with no connection logs warning', async () => {
@@ -65,6 +71,7 @@ describe('EntityAggregatorProvider', () => {
     await provider.connect(mockConnection);
     mockService.getRecordsToEmit.mockResolvedValueOnce([]);
     await (provider as any).emitUpdatedEntities();
+    expect(mockLogger.debug).toHaveBeenCalledWith('No entities to emit');
     expect(mockConnection.applyMutation).not.toHaveBeenCalled();
   });
 
@@ -117,5 +124,39 @@ describe('EntityAggregatorProvider', () => {
       'Failed to emit updated entities',
       error,
     );
+  });
+
+  it('purges expired records successfully', async () => {
+    mockService.removeExpiredRecords = jest.fn().mockResolvedValue(5);
+    await provider.connect(mockConnection);
+    await (provider as any).purgeExpiredRecords();
+    expect(mockService.removeExpiredRecords).toHaveBeenCalled();
+    expect(mockLogger.info).toHaveBeenCalledWith('Removed 5 expired records from the database');
+  });
+
+  it('purges invalid entities based on location query', async () => {
+    const locationPrefix = 'test-location';
+    const mockEntities = {
+      items: [
+        { entity_ref: 'component:default/test1' },
+        { entity_ref: 'component:default/test2' },
+      ],
+    };
+    mockDatabase.queryByLocation = jest.fn()
+      .mockResolvedValueOnce(mockEntities)
+      .mockResolvedValueOnce({ items: [] });
+    mockService.getInvalidEntityRefs.mockResolvedValue(['component:default/test1']);
+
+    await provider.connect(mockConnection);
+    await (provider as any).purgeExpiredRecords();
+
+    expect(mockDatabase.queryByLocation).toHaveBeenCalledWith(locationPrefix, 0, 1000);
+    expect(mockService.getInvalidEntityRefs).toHaveBeenCalledWith(['component:default/test1', 'component:default/test2']);
+    expect(mockConnection.applyMutation).toHaveBeenCalledWith({
+      type: 'delta',
+      added: [],
+      removed: ['component:default/test1'],
+    });
+    expect(mockDatabase.queryByLocation).toHaveBeenCalledTimes(2);
   });
 });
