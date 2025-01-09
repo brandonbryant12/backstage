@@ -1,142 +1,235 @@
 import { mockServices } from '@backstage/backend-test-utils';
 import { GithubDataSource } from './GithubDataSource';
 import { LoggerService, UrlReaderService } from '@backstage/backend-plugin-api';
+import { ScmIntegrationRegistry } from '@backstage/integration';
+import fetch from 'node-fetch';
+import yaml from 'yaml';
 import { Entity } from '@backstage/catalog-model';
 
-describe('GithubDataSource', () => {
-  let logger: LoggerService;
-  let urlReader: UrlReaderService;
-  const mockUrls = ['https://example.com/catalog-info.yaml'];
+jest.mock('node-fetch', () => jest.fn());
 
-  const mockYamlContent = `---
-# Main Application
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: example
-  description: An example of a Backstage application.
-  annotations:
-    github.com/project-slug: example/example-app
-    backstage.io/techdocs-ref: dir:.
-  tags:
-    - typescript
-    - web
-spec:
-  type: website
-  owner: team-a
-  lifecycle: experimental
-  system: example-system
-  dependsOn:
-    - resource:example-db
-    - component:auth-service
----
-# Database
-apiVersion: backstage.io/v1alpha1
-kind: Resource
-metadata:
-  name: example-db
-  description: Main application database
-  annotations:
-    backstage.io/managed-by: aws
-spec:
-  type: database
-  owner: team-a
-  system: example-system`;
+describe('GithubDataSource', () => {
+  let logger: jest.Mocked<LoggerService>;
+  let urlReader: jest.Mocked<UrlReaderService>;
+  let scmIntegrations: jest.Mocked<ScmIntegrationRegistry>;
 
   beforeEach(() => {
     logger = mockServices.logger.mock();
     urlReader = {
-      readUrl: jest.fn().mockResolvedValue({
-        buffer: jest.fn().mockResolvedValue(Buffer.from(mockYamlContent)),
-      }),
+      readUrl: jest.fn(),
       readTree: jest.fn(),
       search: jest.fn(),
-    };
+    } as any;
+
+    scmIntegrations = {
+      github: {
+        list: jest.fn(),
+      },
+    } as any;
+
+    (fetch as jest.Mock).mockReset();
   });
 
-  it('returns mocked target URLs', () => {
-    const ds = new GithubDataSource({
-      name: 'github-source',
-      priority: 100,
-    }, logger, urlReader);
-
-    jest.spyOn(ds, 'getAllTargetUrls').mockReturnValue(mockUrls);
-
-    const urls = ds.getAllTargetUrls();
-    expect(urls).toEqual(mockUrls);
-    expect(urls).toHaveLength(1);
-  });
-
-  it('refreshes entities and provides them', async () => {
-    const ds = new GithubDataSource({
-      name: 'github-source',
-      priority: 100,
-      refreshSchedule: { frequency: { seconds: 10 }, timeout: { minutes: 10 } },
-      ttlSeconds: 60,
-    }, logger, urlReader);
-
-    jest.spyOn(ds, 'getAllTargetUrls').mockReturnValue(mockUrls);
-
-    const provide = jest.fn().mockResolvedValue(undefined);
-    await ds.refresh(provide);
-    
-    const providedEntities = provide.mock.calls[0][0];
-    
-    expect(providedEntities[0]).toEqual(
-      expect.objectContaining({
-        apiVersion: "backstage.io/v1alpha1",
-        kind: 'Component',
-        metadata: expect.objectContaining({
-          name: 'example',
-          annotations: expect.objectContaining({
-            'github.com/project-slug': 'example/example-app',
-          }),
-        }),
-        spec: expect.objectContaining({
-          type: 'website',
-          owner: 'team-a',
-          system: 'example-system',
-        })
-      })
-    );
-
-    expect(providedEntities[1]).toEqual(
-      expect.objectContaining({
-        apiVersion: "backstage.io/v1alpha1",
-        kind: 'Resource',
-        metadata: expect.objectContaining({
-          name: 'example-db',
-          annotations: expect.objectContaining({
-            'backstage.io/managed-by': 'aws',
-          }),
-        }),
-        spec: expect.objectContaining({
-          type: 'database',
-          owner: 'team-a',
-          system: 'example-system',
-        })
-      })
-    );
-
-    expect(providedEntities).toHaveLength(2);
-    expect(provide).toHaveBeenCalledTimes(1);
-    expect(urlReader.readUrl).toHaveBeenCalledWith(mockUrls[0]);
-  });
-
-  it('handles errors gracefully', async () => {
-    urlReader.readUrl = jest.fn().mockRejectedValue(new Error('Failed to fetch'));
-
-    const ds = new GithubDataSource({
-      name: 'github-source',
-      priority: 100,
-    }, logger, urlReader);
-
-    jest.spyOn(ds, 'getAllTargetUrls').mockReturnValue(mockUrls);
+  it('logs a warning if no GitHub integrations found', async () => {
+    scmIntegrations.github.list.mockReturnValue([]);
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
 
     const provide = jest.fn();
     await ds.refresh(provide);
 
+    expect(logger.warn).toHaveBeenCalledWith('No GitHub integrations found, skipping data fetch.');
     expect(provide).not.toHaveBeenCalled();
-    expect(logger.error).toHaveBeenCalled();
+  });
+
+  it('skips if integration config has no org', async () => {
+    scmIntegrations.github.list.mockReturnValue([
+      { host: 'github.com', apiBaseUrl: 'https://api.github.com' } as any,
+    ]);
+
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
+
+    const provide = jest.fn();
+    await ds.refresh(provide);
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('missing org property'),
+    );
+    expect(provide).not.toHaveBeenCalled();
+  });
+
+  it('skips if apiBaseUrl is not set', async () => {
+    scmIntegrations.github.list.mockReturnValue([
+      { host: 'github.com', org: 'test-org', apiBaseUrl: undefined } as any,
+    ]);
+
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
+
+    const provide = jest.fn();
+    await ds.refresh(provide);
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('No apiBaseUrl set for GitHub host=github.com'),
+    );
+    expect(provide).not.toHaveBeenCalled();
+  });
+
+  it('queries org repositories, logs if none found', async () => {
+    scmIntegrations.github.list.mockReturnValue([
+      {
+        host: 'github.com',
+        org: 'test-org',
+        apiBaseUrl: 'https://api.github.com',
+        rawBaseUrl: 'https://raw.githubusercontent.com',
+      } as any,
+    ]);
+
+    (fetch as jest.Mock).mockImplementation(async (url: string) => {
+      if (url.endsWith('/graphql')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              repositoryOwner: {
+                repositories: {
+                  nodes: [],
+                  pageInfo: { hasNextPage: false, endCursor: null },
+                },
+              },
+            },
+          }),
+        };
+      }
+      throw new Error('Unexpected fetch call');
+    });
+
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
+    const provide = jest.fn();
+
+    await ds.refresh(provide);
+
+    expect(logger.info).toHaveBeenCalledWith(
+      'No repositories with catalog-info.yaml found in org: test-org',
+    );
+    expect(provide).not.toHaveBeenCalled();
+  });
+
+  it('queries org repositories and fetches catalog-info.yaml', async () => {
+    scmIntegrations.github.list.mockReturnValue([
+      {
+        host: 'github.com',
+        org: 'test-org',
+        apiBaseUrl: 'https://api.github.com',
+        rawBaseUrl: 'https://raw.githubusercontent.com',
+      } as any,
+    ]);
+
+    (fetch as jest.Mock).mockImplementation(async (url: string, options: any) => {
+      if (url.includes('/graphql')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              repositoryOwner: {
+                repositories: {
+                  nodes: [
+                    {
+                      name: 'repoA',
+                      url: 'https://github.com/test-org/repoA',
+                      isArchived: false,
+                      defaultBranchRef: { name: 'main' },
+                      catalogInfo: { id: 'some-id' },
+                    },
+                  ],
+                  pageInfo: { hasNextPage: false, endCursor: null },
+                },
+              },
+            },
+          }),
+        };
+      }
+      throw new Error(`Unexpected fetch call: ${url}`);
+    });
+
+    urlReader.readUrl.mockResolvedValue({
+      text: async () => `kind: Component\nmetadata:\n  name: from-repoA`,
+    } as any);
+
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
+    const provide = jest.fn();
+
+    await ds.refresh(provide);
+    expect(provide).toHaveBeenCalledWith([
+      expect.objectContaining<Entity>({ kind: 'Component', metadata: { name: 'from-repoA' } }),
+    ]);
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('Provided 1 entities from repo=repoA'),
+    );
+  });
+
+  it('honors concurrencyLimit in config', async () => {
+    scmIntegrations.github.list.mockReturnValue([
+      {
+        host: 'github.com',
+        org: 'test-org',
+        apiBaseUrl: 'https://api.github.com',
+        rawBaseUrl: 'https://raw.githubusercontent.com',
+      } as any,
+    ]);
+
+    (fetch as jest.Mock).mockImplementation(async (url: string) => ({
+      ok: true,
+      json: async () => ({
+        data: {
+          repositoryOwner: {
+            repositories: {
+              nodes: [
+                { name: 'repo1', isArchived: false, defaultBranchRef: { name: 'main' }, catalogInfo: { id: 'some-id' } },
+                { name: 'repo2', isArchived: false, defaultBranchRef: { name: 'main' }, catalogInfo: { id: 'some-id' } },
+                { name: 'repo3', isArchived: false, defaultBranchRef: { name: 'main' }, catalogInfo: { id: 'some-id' } },
+              ],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        },
+      }),
+    }));
+
+    urlReader.readUrl.mockResolvedValue({
+      text: async () => `kind: Component\nmetadata:\n  name: test-repo`,
+    } as any);
+
+    const ds = new GithubDataSource(
+      {
+        name: 'gh',
+        priority: 100,
+        concurrencyLimit: 1,
+      },
+      logger,
+      urlReader,
+      scmIntegrations,
+    );
+
+    const provide = jest.fn();
+    await ds.refresh(provide);
+
+    // concurrencyLimit=1 means tasks run sequentially
+    expect(provide).toHaveBeenCalledTimes(3);
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('Provided 1 entities from repo=repo3'),
+    );
+  });
+
+  it('logs error if top-level refresh fails', async () => {
+    scmIntegrations.github.list.mockImplementation(() => {
+      throw new Error('Integration config error');
+    });
+    const ds = new GithubDataSource({ name: 'gh', priority: 100 }, logger, urlReader, scmIntegrations);
+
+    const provide = jest.fn();
+    await ds.refresh(provide);
+    expect(logger.error).toHaveBeenCalledWith(
+      'Failed to refresh GitHub data source',
+      expect.any(Error),
+    );
   });
 });
