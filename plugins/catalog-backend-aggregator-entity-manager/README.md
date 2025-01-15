@@ -162,48 +162,52 @@ The module is designed to be easily extensible:
 ### Testing 
 set env variable `export BACKSTAGE_TEST_DATABASE_POSTGRES16_CONNECTION_STRING=postgresql://docker:docker@localhost:5432/docker` for pg tests to run
 
+# Backstage Entity Aggregator
 
-%%==============================================================================
-%% A high-level diagram illustrating how the aggregator manager & provider work
-%% together with the Backstage catalog. Drawn from the code & readmes above, and 
-%% knowledge of Backstage's catalog processing loop.
-%%==============================================================================
+A Backstage backend plugin that allows collecting and merging entity data from multiple sources before ingesting it into the Backstage catalog.
 
+## Overview
+
+The Entity Aggregator plugin provides a flexible way to:
+- Collect entity metadata from multiple data sources
+- Merge overlapping entity information using priority-based rules
+- Efficiently sync the aggregated data with the Backstage catalog
+- Handle conflicts and duplicates across different data sources
+
+## Architecture
+
+The following sequence diagram illustrates how the Aggregator Manager and Provider work together with the Backstage catalog. It shows the flow of data from various sources through the aggregation process and into the Backstage catalog.
+
+```mermaid
 sequenceDiagram
     participant DS as Data Source(s)<br>(A, B, GitHub, etc.)
     participant M as Aggregator Manager
     participant DB as "Aggregator DB (unmerged_entity_records)"
     participant P as Aggregator Provider
     participant C as Backstage Catalog<br>(Processing Loop + DB)
-
-    %% Step 1: Manager periodically collects data
+    
     DS->>M: (on schedule) fetch Entities
     note right of DS: Example: <br/>• GitHub repos<br/>• APIs<br/>• Internal services
     M->>DB: upsert unmerged entity records
     note right of DB: Entities remain <br/>unmerged in a single table
-
-    %% Step 2: Manager merges on demand
+    
     note over M: Merge logic is triggered <br/>when provider requests data
     M-->>M: *Priority-based merging* <br/>(recordMerger.ts)
-
-    %% Step 3: Provider is also on a schedule
+    
     P->>M: getRecordsToEmit(batchSize)
     M->>DB: read updated (unmerged) records
     M->>M: merge relevant records into final entities
     M->>P: return merged entities
-
-    %% Step 4: Provider adds (or removes) them in the catalog
+    
     note over P: Provider implements<br/>EntityProvider interface
     P->>C: applyMutation(added, removed) <br/>(type: "delta")
     note right of C: Backstage's catalog <br/>ingestion loop begins:
     C-->>C: parse → validate → process → store
     note right of C: Final processed entities <br/>are stored in the Catalog DB
-
-    %% Step 5: Provider signals completion
+    
     P->>M: markEmitted(entityRefs)
     M->>DB: sets updated = false <br/>(so these records are not re-emitted)
-
-    %% Step 6: Provider purges invalid references
+    
     alt Expired or invalid
       P->>M: purgeExpiredRecords()
       M->>DB: query aggregator records by locationKey
@@ -212,6 +216,14 @@ sequenceDiagram
       P->>C: applyMutation(removed = invalid)
       note right of C: Catalog cleans up <br/>orphaned references
     end
-
-    %% End
+    
     note over C: Entities now appear in <br/>Backstage Catalog with full metadata
+```
+
+### Key Components
+
+- **Data Sources**: External systems that provide entity data (e.g., GitHub repositories, APIs, internal services)
+- **Aggregator Manager**: Handles data collection and implements merging logic
+- **Aggregator DB**: Stores unmerged entity records in a single table
+- **Aggregator Provider**: Implements Backstage's EntityProvider interface
+- **Backstage Catalog**: Processes and stores the final entities
