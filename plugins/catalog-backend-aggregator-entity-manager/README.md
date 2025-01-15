@@ -161,3 +161,57 @@ The module is designed to be easily extensible:
 
 ### Testing 
 set env variable `export BACKSTAGE_TEST_DATABASE_POSTGRES16_CONNECTION_STRING=postgresql://docker:docker@localhost:5432/docker` for pg tests to run
+
+
+%%==============================================================================
+%% A high-level diagram illustrating how the aggregator manager & provider work
+%% together with the Backstage catalog. Drawn from the code & readmes above, and 
+%% knowledge of Backstage's catalog processing loop.
+%%==============================================================================
+
+sequenceDiagram
+    participant DS as Data Source(s)<br>(A, B, GitHub, etc.)
+    participant M as Aggregator Manager
+    participant DB as "Aggregator DB (unmerged_entity_records)"
+    participant P as Aggregator Provider
+    participant C as Backstage Catalog<br>(Processing Loop + DB)
+
+    %% Step 1: Manager periodically collects data
+    DS->>M: (on schedule) fetch Entities
+    note right of DS: Example: <br/>• GitHub repos<br/>• APIs<br/>• Internal services
+    M->>DB: upsert unmerged entity records
+    note right of DB: Entities remain <br/>unmerged in a single table
+
+    %% Step 2: Manager merges on demand
+    note over M: Merge logic is triggered <br/>when provider requests data
+    M-->>M: *Priority-based merging* <br/>(recordMerger.ts)
+
+    %% Step 3: Provider is also on a schedule
+    P->>M: getRecordsToEmit(batchSize)
+    M->>DB: read updated (unmerged) records
+    M->>M: merge relevant records into final entities
+    M->>P: return merged entities
+
+    %% Step 4: Provider adds (or removes) them in the catalog
+    note over P: Provider implements<br/>EntityProvider interface
+    P->>C: applyMutation(added, removed) <br/>(type: "delta")
+    note right of C: Backstage's catalog <br/>ingestion loop begins:
+    C-->>C: parse → validate → process → store
+    note right of C: Final processed entities <br/>are stored in the Catalog DB
+
+    %% Step 5: Provider signals completion
+    P->>M: markEmitted(entityRefs)
+    M->>DB: sets updated = false <br/>(so these records are not re-emitted)
+
+    %% Step 6: Provider purges invalid references
+    alt Expired or invalid
+      P->>M: purgeExpiredRecords()
+      M->>DB: query aggregator records by locationKey
+      M->>M: identify invalid or removed refs
+      M->>P: pass invalid references to remove
+      P->>C: applyMutation(removed = invalid)
+      note right of C: Catalog cleans up <br/>orphaned references
+    end
+
+    %% End
+    note over C: Entities now appear in <br/>Backstage Catalog with full metadata
