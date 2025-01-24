@@ -227,3 +227,57 @@ sequenceDiagram
 - **Aggregator DB**: Stores unmerged entity records in a single table
 - **Aggregator Provider**: Implements Backstage's EntityProvider interface
 - **Backstage Catalog**: Processes and stores the final entities
+
+
+
+## Johns Idea
+
+sequenceDiagram
+
+participant SN as EntityFragmentProvider (ie. service now, GitHub)
+
+participant ES as ExternalService
+
+participant SS as EntityStagingService
+
+participant SD as staged_entities_db
+
+participant AP as AggregatorProvider(s) (ie ApiAggregateProvider, ie ComponentAggregateProvider)
+
+participant BC as BackstageCatalog
+
+SN->>ES: Fetch partial entity data
+
+ES-->>SN: Return entity fragments
+
+SN->>SS: Provide fragments
+
+SS->>SD: Insert/update records
+
+AP->>SS: getRecordsToEmit()
+
+SS->>SD: Get updated records
+
+AP-->>AP: Merge records
+
+AP->>BC: applyMutation()
+
+AP->>SS: markEmitted()
+
+SS->>SD: Mark processed
+
+alt Invalid Records
+
+AP->>SS: purgeExpiredRecords()
+
+SS->>SD: Query stale refs
+
+SS-->>AP: Return invalid refs
+
+AP->>BC: Remove invalid
+
+AP-->>SS: Remove succesful removal
+
+SS->>SD: Remove invalid records
+
+end
