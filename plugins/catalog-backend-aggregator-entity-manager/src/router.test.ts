@@ -66,11 +66,17 @@ describe('router', () => {
     expect(res.body.entities).toHaveLength(1);
     expect(res.body.entities[0]).toEqual({
       providerId: 'provider-1',
-      entityRef: 'component:default/test',
       entity: { metadata: { name: 'test' }, spec: {} },
       priority: 100
     });
-    expect(res.body).toHaveProperty('merged');
+    expect(res.body.mergedEntity).toEqual({
+      apiVersion: 'backstage.io/v1alpha1',
+      metadata: {
+        name: 'test',
+        annotations: {},
+      },
+      spec: {},
+    });
   });
 
   it('should return 404 if no records found', async () => {

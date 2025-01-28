@@ -9,6 +9,12 @@ describe('EntityAggregatorServiceImpl', () => {
   beforeEach(() => {
     repository = {
       updateOrCreateMany: jest.fn(),
+      getEntityRecordsByEntityRef: jest.fn(),
+      listEntityRefs: jest.fn(),
+      findEntityGroupsByEntityRef: jest.fn(),
+      markAsProcessed: jest.fn(),
+      getExpiredEntityRefs: jest.fn(),
+      removeByEntityRefs: jest.fn(),
     } as unknown as jest.Mocked<EntityFragmentRepository>;
     
     service = new EntityAggregatorServiceImpl(repository);
@@ -36,5 +42,72 @@ describe('EntityAggregatorServiceImpl', () => {
       100,
       expiresAt
     );
+  });
+
+  it('gets records by entity ref', async () => {
+    const mockRecords = [{ entityRef: 'component:default/test', processed: false }];
+    repository.getEntityRecordsByEntityRef.mockResolvedValue(mockRecords);
+
+    const result = await service.getRecordsByEntityRef('component:default/test');
+    
+    expect(result).toEqual(mockRecords);
+    expect(repository.getEntityRecordsByEntityRef).toHaveBeenCalledWith('component:default/test');
+  });
+
+  it('lists entity refs with provider counts', async () => {
+    const mockList = [{ entityRef: 'component:default/test', providerCount: 2 }];
+    repository.listEntityRefs.mockResolvedValue(mockList);
+
+    const result = await service.listEntityRefs();
+    
+    expect(result).toEqual(mockList);
+    expect(repository.listEntityRefs).toHaveBeenCalled();
+  });
+
+  it('finds entity groups by entity ref', async () => {
+    const mockGroups = [[{ entityRef: 'component:default/test', processed: false }]];
+    const options = { kind: 'Component', needsProcessing: true, batchSize: 10 };
+    repository.findEntityGroupsByEntityRef.mockResolvedValue(mockGroups);
+
+    const result = await service.findEntityGroupsByEntityRef(options);
+    
+    expect(result).toEqual(mockGroups);
+    expect(repository.findEntityGroupsByEntityRef).toHaveBeenCalledWith(options);
+  });
+
+  it('marks entities as processed', async () => {
+    const entityRefs = ['component:default/test1', 'component:default/test2'];
+    await service.markEntitiesAsProcessed(entityRefs);
+    
+    expect(repository.markAsProcessed).toHaveBeenCalledWith(entityRefs);
+  });
+
+  it('skips marking entities as processed when array is empty', async () => {
+    await service.markEntitiesAsProcessed([]);
+    
+    expect(repository.markAsProcessed).not.toHaveBeenCalled();
+  });
+
+  it('gets expired record entity refs', async () => {
+    const mockRefs = ['component:default/test'];
+    repository.getExpiredEntityRefs.mockResolvedValue(mockRefs);
+
+    const result = await service.getExpiredRecordEntityRefs('Component');
+    
+    expect(result).toEqual(mockRefs);
+    expect(repository.getExpiredEntityRefs).toHaveBeenCalledWith('Component');
+  });
+
+  it('removes records by entity refs', async () => {
+    const entityRefs = ['component:default/test1', 'component:default/test2'];
+    await service.removeRecords(entityRefs);
+    
+    expect(repository.removeByEntityRefs).toHaveBeenCalledWith(entityRefs);
+  });
+
+  it('skips removing records when array is empty', async () => {
+    await service.removeRecords([]);
+    
+    expect(repository.removeByEntityRefs).not.toHaveBeenCalled();
   });
 });
