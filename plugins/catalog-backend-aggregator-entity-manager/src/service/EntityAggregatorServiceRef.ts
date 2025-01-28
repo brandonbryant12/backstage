@@ -10,16 +10,15 @@ import { EntityFragmentRepository } from '../database/EntityFragmentRepository';
 export const entityAggregatorService = createServiceRef<EntityAggregatorService>({
   id: 'entity-aggregator.service',
   scope: 'plugin',
-});
-
-export const entityAggregatorServiceFactory = createServiceFactory({
-  service: entityAggregatorService,
-  deps: {
-    logger: coreServices.logger,
-    database: coreServices.database,
-  },
-  async factory({ logger, database }) {
-    const repository = await EntityFragmentRepository.create(database, logger);
-    return new EntityAggregatorServiceImpl(repository);
-  },
+  defaultFactory: async service => createServiceFactory({
+    service,
+    deps: {
+      logger: coreServices.logger,
+      database: coreServices.database,
+    },
+    async factory({ logger, database }) {
+      const repository = await EntityFragmentRepository.create(database, logger);
+      return new EntityAggregatorServiceImpl(repository);
+    },
+  })
 });

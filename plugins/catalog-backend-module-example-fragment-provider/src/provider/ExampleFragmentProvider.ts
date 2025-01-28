@@ -3,7 +3,7 @@ import { generateMockEntities } from './mockEntityFactory'
 import { EntityAggregatorService } from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
 
 export class ExampleFragmentProvider {
-  private readonly schedule = { frequency: { minutes: 1 }, timeout: { minutes: 5 } };
+  private readonly schedule = { frequency: { minutes: 2 }, timeout: { minutes: 5 } };
 
   constructor(
     private readonly entityAggregatorService: EntityAggregatorService,
@@ -30,13 +30,13 @@ export class ExampleFragmentProvider {
       });
 
       const now = new Date();
-      const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+      const oneMinutesFromNow = new Date(now.getTime() + 1 * 60 * 1000);
 
       await this.entityAggregatorService.updateOrCreateEntityFragments(
         'ExampleFragmentProvider',
         entities,
         50,
-        fiveMinutesFromNow
+        oneMinutesFromNow
       );
 
       this.logger.info(

@@ -29,7 +29,7 @@
     "dist"
   ],
   "dependencies": {
-    "lodash": "^4.17.21",
-    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "^0.1.0"
+    "@core/plugin-catalog-backend-module-aggregator-entity-manager": "^0.1.0",
+    "lodash": "^4.17.21"
   }
 }

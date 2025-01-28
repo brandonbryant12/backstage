@@ -36,15 +36,15 @@ describe('router', () => {
 
   it('should list entity refs on /raw-entities', async () => {
     entityAggregator.listEntityRefs.mockResolvedValue([
-      { entityRef: 'component:default/test', count: 2 },
-      { entityRef: 'api:default/api1', count: 1 },
+      { entityRef: 'component:default/test', providerCount: 2 },
+      { entityRef: 'api:default/api1', providerCount: 1 },
     ]);
 
     const res = await request(app).get('/raw-entities');
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
-      { entityRef: 'component:default/test', count: 2 },
-      { entityRef: 'api:default/api1', count: 1 },
+      { entityRef: 'component:default/test', providerCount: 2 },
+      { entityRef: 'api:default/api1', providerCount: 1 },
     ]);
   });
 
@@ -68,7 +68,9 @@ describe('router', () => {
       providerId: 'provider-1',
       entityRef: 'component:default/test',
       entity: { metadata: { name: 'test' }, spec: {} },
+      priority: 100
     });
+    expect(res.body).toHaveProperty('merged');
   });
 
   it('should return 404 if no records found', async () => {

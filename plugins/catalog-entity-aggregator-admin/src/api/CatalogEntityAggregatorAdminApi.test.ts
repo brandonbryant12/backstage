@@ -20,11 +20,13 @@ describe('CatalogEntityAggregatorAdminClient', () => {
     const mockResponse = {
       entities: [
         {
-          datasource: 'DataSourceA',
+          providerId: 'provider-a',
+          entityRef: 'component:default/my-entity',
           entity: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
+          priority: 1
         },
       ],
-      mergedEntity: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
+      merged: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
     };
 
     mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 200 }));

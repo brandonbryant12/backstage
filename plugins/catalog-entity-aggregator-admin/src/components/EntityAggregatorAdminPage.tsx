@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
-import { CodeSnippet, Progress, ResponseErrorPanel, Table, TableColumn, Content, Header } from '@backstage/core-components';
+import { CodeSnippet, Progress, ResponseErrorPanel, Table, TableColumn, Content, Header, Page } from '@backstage/core-components';
 import Box from '@mui/material/Box';
 
 interface TabPanelProps {
@@ -27,7 +27,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
       role="tabpanel"
       id={`entity-tabpanel-${index}`}
       aria-labelledby={`entity-tab-${index}`}
-      sx={{ pt: 2 }}
+      sx={{ paddingTop: '16px' }}
     >
       {children}
     </Box>
@@ -90,42 +90,31 @@ export const EntityAggregatorAdminPage = () => {
 
   if (loading) {
     return (
-      <>
-        <Header title="Raw Entities" subtitle="View and manage aggregated entities" />
         <Content>
           <Progress />
         </Content>
-      </>
     );
   }
 
   if (error) {
     return (
-      <>
-        <Header title="Raw Entities" subtitle="View and manage aggregated entities" />
         <Content>
           <ResponseErrorPanel error={error} />
         </Content>
-      </>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <>
-        <Header title="Raw Entities" subtitle="View and manage aggregated entities" />
         <Content>
           <Typography>No aggregator entities found.</Typography>
         </Content>
-      </>
     );
   }
 
   return (
-    <>
-      <Header title="Raw Entities" subtitle="View and manage aggregated entities" />
       <Content>
-        <Box sx={{ maxWidth: '800px', margin: '0 auto' }}>
+        <Box sx={{ maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
           <Table
             title="Entities"
             options={{ 
@@ -151,24 +140,26 @@ export const EntityAggregatorAdminPage = () => {
 
             {!detailLoading && !detailError && (mergedEntity || rawEntities?.length) && (
               <Box sx={{ width: '100%' }}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: '16px' }}>
                   <Tabs 
                     value={dialogState.currentTab} 
                     onChange={handleTabChange}
                     aria-label="entity data tabs"
                     sx={{ 
-                      minHeight: 48,
+                      minHeight: '48px',
                       '& .MuiTab-root': {
-                        py: 1.5,
-                        px: 2,
+                        paddingTop: '12px',
+                        paddingBottom: '12px',
+                        paddingLeft: '16px',
+                        paddingRight: '16px',
                       }
                     }}
                   >
                     <Tab label="Merged Entity" />
                     {rawEntities?.map((r, idx) => (
                       <Tab 
-                        key={`${r.datasource}_${idx}`} 
-                        label={r.datasource}
+                        key={`${r.providerId}_${idx}`} 
+                        label={r.providerId}
                       />
                     ))}
                   </Tabs>
@@ -186,7 +177,7 @@ export const EntityAggregatorAdminPage = () => {
 
                 {rawEntities?.map((r, idx) => (
                   <TabPanel 
-                    key={r.datasource} 
+                    key={r.providerId} 
                     value={dialogState.currentTab} 
                     index={idx + 1}
                   >
@@ -207,6 +198,5 @@ export const EntityAggregatorAdminPage = () => {
           </DialogActions>
         </Dialog>
       </Content>
-    </>
   );
 };

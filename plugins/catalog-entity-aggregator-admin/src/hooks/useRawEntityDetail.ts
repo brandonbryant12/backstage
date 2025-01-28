@@ -4,8 +4,10 @@ import { useAsync } from 'react-use';
 import { Entity } from '@backstage/catalog-model';
 
 type RawEntity = {
-  datasource: string;
+  providerId: string;
+  entityRef: string;
   entity: Entity;
+  priority: number;
 };
 
 interface UseRawEntityDetailResult {
@@ -26,6 +28,6 @@ export function useRawEntityDetail(entityRef: string): UseRawEntityDetailResult 
     loading,
     error,
     rawEntities: value?.entities,
-    mergedEntity: value?.mergedEntity,
+    mergedEntity: value?.merged,
   };
 }

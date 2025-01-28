@@ -8,10 +8,9 @@ const ARRAY_PATHS = {
 } as const;
 
 export type EntityRecord = Entity & {
-  dataSource: string;
   entityRef: string;
   priority: number;
-  providerId: string;
+  providerId?: string;
 };
 
 export function mergeRecords(records: EntityFragmentRecord[]): Entity {

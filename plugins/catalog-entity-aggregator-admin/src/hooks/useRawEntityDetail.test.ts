@@ -33,11 +33,13 @@ describe('useRawEntityDetails', () => {
     const mockResponse = {
       entities: [
         {
-          datasource: 'a',
+          providerId: 'provider-a',
+          entityRef: 'component:default/test',
           entity: { apiVersion: 'v1', kind: 'Component', metadata: { name: 'test' }, spec: {} },
+          priority: 1
         },
       ],
-      mergedEntity: {
+      merged: {
         apiVersion: 'v1',
         kind: 'Component',
         metadata: { name: 'test' },

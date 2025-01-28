@@ -7,20 +7,12 @@ export interface CatalogEntityAggregatorAdminApi {
    */
   getRawEntities(entityRef: string): Promise<{
     entities: {
-      datasource: string;
-      entity: {
-        apiVersion: string;
-        kind: string;
-        metadata: any;
-        spec: any;
-      };
+      providerId: string;
+      entityRef: string;
+      entity: any;
+      priority: number;
     }[];
-    mergedEntity: {
-      apiVersion: string;
-      kind: string;
-      metadata: any;
-      spec: any;
-    };
+    merged: any;
   }>;
 
   /**

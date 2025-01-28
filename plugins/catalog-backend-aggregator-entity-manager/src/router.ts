@@ -6,6 +6,7 @@ import { stringifyEntityRef } from '@backstage/catalog-model';
 import { NotFoundError } from '@backstage/errors';
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { Config } from '@backstage/config';
+import { mergeRecords } from '@internal/entity-aggregation-common';
 
 export async function createRouter(options: {
   logger: LoggerService;
@@ -40,11 +41,13 @@ export async function createRouter(options: {
 
     const entities = records.map(r => ({
       providerId: r.provider_id,
-      entityRef: r.entity_ref,
       entity: JSON.parse(r.entity_json),
+      priority: r.priority
     }));
 
-    res.json({ entities });
+    const merged = mergeRecords(records)
+
+    res.json({ entities, mergedEntity: merged });
   });
 
   const middleware = MiddlewareFactory.create({ logger, config });
