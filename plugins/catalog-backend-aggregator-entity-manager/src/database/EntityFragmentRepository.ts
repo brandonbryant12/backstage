@@ -1,5 +1,5 @@
 import { Knex } from 'knex';
-import { LoggerService, DatabaseService } from '@backstage/backend-plugin-api';
+import { LoggerService, DatabaseService, resolvePackagePath } from '@backstage/backend-plugin-api';
 import { createHash } from 'crypto';
 import { Entity } from '@backstage/catalog-model';
 import { stringifyEntityRef } from '@backstage/catalog-model';
@@ -23,6 +23,8 @@ export type EntityFragmentRecord = {
 
 const TABLE_NAME = 'staging_entity_fragments';
 
+const migrationsDir = resolvePackagePath('@core/plugin-catalog-backend-module-aggregator-entity-manager', 'migrations');
+
 export class EntityFragmentRepository {
   private constructor(
     private readonly knex: Knex,
@@ -32,30 +34,10 @@ export class EntityFragmentRepository {
   static async create(db: DatabaseService, logger: LoggerService): Promise<EntityFragmentRepository> {
     const knex = await db.getClient();
     const store = new EntityFragmentRepository(knex as unknown as Knex, logger);
-    await store.setupSchema();
+    await knex.migrate.latest({ directory: migrationsDir })
     return store;
   }
-
-  private async setupSchema(): Promise<void> {
-    const hasTable = await this.knex.schema.hasTable(TABLE_NAME);
-    if (!hasTable) {
-      await this.knex.schema.createTable(TABLE_NAME, table => {
-        table.string('provider_id').notNullable();
-        table.string('entity_ref').notNullable();
-        table.string('kind').notNullable();
-        table.text('entity_json').notNullable();
-        table.integer('priority').notNullable();
-        table.timestamp('expires_at').nullable();
-        table.string('content_hash').notNullable();
-        table.boolean('needs_processing').notNullable().defaultTo(true);
-
-        table.primary(['provider_id', 'entity_ref']);
-      });
-      this.logger.info(`Created table ${TABLE_NAME} for staging entities`);
-    }
-  }
-
-
+  
   private validateEntityRef(entityRef: string): boolean {
     return /^[a-z0-9]+:[a-z0-9-]+\/[a-z0-9-]+$/.test(entityRef.toLowerCase());
   }
