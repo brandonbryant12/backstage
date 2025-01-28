@@ -2,9 +2,25 @@ import { EntityAggregatorServiceImpl } from './EntityAggregatorServiceImpl';
 import { EntityFragmentRepository } from '../database/EntityFragmentRepository';
 import { Entity } from '@backstage/catalog-model';
 
-describe('EntityAggregatorServiceImpl', () => {
+describe('EntityFragmentStagingServiceImpl', () => {
   let repository: jest.Mocked<EntityFragmentRepository>;
   let service: EntityAggregatorServiceImpl;
+
+  const mockEntityFragmentRecord = {
+    provider_id: 'test-provider',
+    entity_ref: 'component:default/test',
+    kind: 'Component',
+    entity_json: JSON.stringify({
+      apiVersion: 'v1',
+      kind: 'Component',
+      metadata: { name: 'test', namespace: 'default' },
+      spec: {},
+    }),
+    priority: 100,
+    content_hash: 'mock-hash',
+    needs_processing: true,
+    expires_at: new Date('2024-12-31'),
+  };
 
   beforeEach(() => {
     repository = {
@@ -45,7 +61,7 @@ describe('EntityAggregatorServiceImpl', () => {
   });
 
   it('gets records by entity ref', async () => {
-    const mockRecords = [{ entityRef: 'component:default/test', processed: false }];
+    const mockRecords = [mockEntityFragmentRecord];
     repository.getEntityRecordsByEntityRef.mockResolvedValue(mockRecords);
 
     const result = await service.getRecordsByEntityRef('component:default/test');
@@ -65,7 +81,7 @@ describe('EntityAggregatorServiceImpl', () => {
   });
 
   it('finds entity groups by entity ref', async () => {
-    const mockGroups = [[{ entityRef: 'component:default/test', processed: false }]];
+    const mockGroups = [[mockEntityFragmentRecord]];
     const options = { kind: 'Component', needsProcessing: true, batchSize: 10 };
     repository.findEntityGroupsByEntityRef.mockResolvedValue(mockGroups);
 
