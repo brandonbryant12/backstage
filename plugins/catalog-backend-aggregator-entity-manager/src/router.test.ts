@@ -15,12 +15,14 @@ describe('router', () => {
     logger = mockServices.logger.mock();
     config = new ConfigReader({});
     entityAggregator = {
-      addDataSource: jest.fn(),
-      start: jest.fn(),
-      getRecordsToEmit: jest.fn(),
-      markEmitted: jest.fn(),
+      updateOrCreateEntityFragments: jest.fn(),
       getRecordsByEntityRef: jest.fn(),
-    } as unknown as jest.Mocked<EntityAggregatorService>;
+      listEntityRefs: jest.fn(),
+      findEntityGroupsByEntityRef: jest.fn(),
+      markEntitiesAsProcessed: jest.fn(),
+      getExpiredRecordEntityRefs: jest.fn(),
+      removeRecords: jest.fn(),
+    } as jest.Mocked<EntityAggregatorService>;
 
     const router = await createRouter({ logger, entityAggregator, config });
     app = express().use(router);
@@ -32,28 +34,41 @@ describe('router', () => {
     expect(res.body).toEqual({ status: 'ok' });
   });
 
-  it('should return merged entities on /raw-entities', async () => {
+  it('should list entity refs on /raw-entities', async () => {
+    entityAggregator.listEntityRefs.mockResolvedValue([
+      { entityRef: 'component:default/test', count: 2 },
+      { entityRef: 'api:default/api1', count: 1 },
+    ]);
+
+    const res = await request(app).get('/raw-entities');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([
+      { entityRef: 'component:default/test', count: 2 },
+      { entityRef: 'api:default/api1', count: 1 },
+    ]);
+  });
+
+  it('should return entity records on /raw-entities/:namespace/:kind/:name', async () => {
     entityAggregator.getRecordsByEntityRef.mockResolvedValue([
       {
-        dataSource: 'a',
-        entityRef: 'component:default/test',
-        metadata: { name: 'test' },
-        spec: {},
-        priorityScore: 100,
-      },
-      {
-        dataSource: 'b',
-        entityRef: 'component:default/test',
-        metadata: { name: 'test', annotations: { 'jenkins.io/job-full-name': 'job' } },
-        spec: {},
-        priorityScore: 50,
+        provider_id: 'provider-1',
+        entity_ref: 'component:default/test',
+        kind: 'Component',
+        entity_json: JSON.stringify({ metadata: { name: 'test' }, spec: {} }),
+        priority: 100,
+        content_hash: 'hash1',
+        needs_processing: false,
       },
     ]);
 
     const res = await request(app).get('/raw-entities/default/component/test');
     expect(res.status).toBe(200);
-    expect(res.body.entities).toHaveLength(2);
-    expect(res.body.mergedEntity.metadata.annotations['jenkins.io/job-full-name']).toBe('job');
+    expect(res.body.entities).toHaveLength(1);
+    expect(res.body.entities[0]).toEqual({
+      providerId: 'provider-1',
+      entityRef: 'component:default/test',
+      entity: { metadata: { name: 'test' }, spec: {} },
+    });
   });
 
   it('should return 404 if no records found', async () => {

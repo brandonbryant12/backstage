@@ -1,31 +1,52 @@
-import { EntityRecord } from '../types';
+import { Entity } from "@backstage/catalog-model"
+import { EntityFragmentRecord } from "../database/EntityFragmentRepository"
 
 /**
  * @public
  */
 export interface EntityAggregatorService {
   /**
-   * Gets merged records that are ready to be emitted.
+   * add records to the staging database
    */
-  getRecordsToEmit(batchSize: number): Promise<EntityRecord[]>;
+  updateOrCreateEntityFragments(providerId: string, entities: Entity[], priority: number, expiresAt: Date) : Promise<void>
 
   /**
-   * Marks records as emitted.
+   * Get all records for a specific entity reference
    */
-  markEmitted(entityRefs: string[]): Promise<void>;
+  getRecordsByEntityRef(entityRef: string): Promise<EntityFragmentRecord[]>
 
   /**
-   * Gets records for a specific entity reference.
+   * List all entity refs with their provider counts
    */
-  getRecordsByEntityRef(entityRef: string): Promise<EntityRecord[]>;
+  listEntityRefs(): Promise<Array<{ entityRef: string; providerCount: number }>>
 
   /**
-   * Lists all entity references in the database along with a count of distinct dataSources.
+   * Find groups of entity fragments by entity reference
+   * @param options - Search options
+   * @param options.kind - Filter by entity kind
+   * @param options.needsProcessing - If true, only return groups where at least one record needs processing
+   * @param options.batchSize - Maximum number of groups to return (default: 1000)
+   * @returns Array of entity fragment record groups, where each group contains all records for a single entity ref
    */
-  listEntityRefs(): Promise<Array<{ entityRef: string; dataSourceCount: number }>>;
+  findEntityGroupsByEntityRef(options: {
+    kind?: string;
+    needsProcessing?: boolean;
+    batchSize?: number;
+  }): Promise<EntityFragmentRecord[][]>;
 
   /**
-   * Returns the subset of entity refs that do not have a valid (non-expired) record in the aggregator’s data store.
+   * Marks the given entity refs as processed
    */
-  getInvalidEntityRefs(entityRefs: string[]): Promise<string[]>;
+  markEntitiesAsProcessed(entityRefs: string[]): Promise<void>;
+
+  /**
+   * Gets entity refs for records that have expired
+   */
+  getExpiredRecordEntityRefs(kind: string): Promise<string[]>;
+
+  /**
+   * Removes all records for the given entity refs
+   */
+  removeRecords(entityRefs: string[]): Promise<void>;
+
 }

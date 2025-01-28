@@ -1,29 +1,25 @@
 import { 
   createServiceFactory, 
-  createServiceRef, 
+  createServiceRef,
   coreServices 
 } from '@backstage/backend-plugin-api';
-import { type EntityAggregatorService } from './EntityAggregatorService';
+import { EntityAggregatorService } from './EntityAggregatorService';
 import { EntityAggregatorServiceImpl } from './EntityAggregatorServiceImpl';
-import { RawEntitiesStore } from '../database/RawEntitiesStore';
+import { EntityFragmentRepository } from '../database/EntityFragmentRepository';
 
 export const entityAggregatorService = createServiceRef<EntityAggregatorService>({
   id: 'entity-aggregator.service',
-  scope: 'plugin', 
-  defaultFactory: async (service) => createServiceFactory({
-    service,
-    deps: {
-      logger: coreServices.logger,
-      scheduler: coreServices.scheduler,
-      database: coreServices.database,
-    },
-    async factory({ logger, scheduler, database }) {
-      const store = await RawEntitiesStore.create(database, logger);
-      return new EntityAggregatorServiceImpl(
-        store,
-        logger,
-        scheduler,
-      );
-    },
-  }),
+  scope: 'plugin',
+});
+
+export const entityAggregatorServiceFactory = createServiceFactory({
+  service: entityAggregatorService,
+  deps: {
+    logger: coreServices.logger,
+    database: coreServices.database,
+  },
+  async factory({ logger, database }) {
+    const repository = await EntityFragmentRepository.create(database, logger);
+    return new EntityAggregatorServiceImpl(repository);
+  },
 });

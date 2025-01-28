@@ -42,7 +42,7 @@
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^",
     "@core/plugin-catalog-backend-module-aggregator-entity-provider": "workspace:^",
     "app": "link:../app",
-    "backstage-plugin-catalog-backend-module-catalog-staging": "^0.1.0",
+    "backstage-plugin-catalog-backend-module-example-fragment-provider": "^0.1.0",
     "better-sqlite3": "^9.0.0",
     "node-gyp": "^10.0.0",
     "pg": "^8.11.3"

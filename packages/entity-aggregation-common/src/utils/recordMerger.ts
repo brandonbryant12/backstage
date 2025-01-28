@@ -1,23 +1,40 @@
-import { EntityRecord } from '../types';
 import _ from 'lodash';
+import { type EntityFragmentRecord } from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
+import { Entity } from '@backstage/catalog-model';
 
 const ARRAY_PATHS = {
   metadata: ['tags', 'links'],
   spec: ['implementsApis', 'consumesApis', 'providesApis', 'dependsOn', 'systems', 'owner']
 } as const;
 
-export function mergeRecords(records: EntityRecord[]): EntityRecord {
+export type EntityRecord = Entity & {
+  dataSource: string;
+  entityRef: string;
+  priority: number;
+  providerId: string;
+};
+
+export function mergeRecords(records: EntityFragmentRecord[]): Entity {
   if (_.isEmpty(records)) {
     throw new Error('Cannot merge empty records array');
   }
+  const parsedRecords = records.map(record => ({
+    ...JSON.parse(record.entity_json) as Entity,
+    providerId: record.provider_id,
+    entityRef: record.entity_ref,
+    priority: record.priority,
+  }));
 
-  // Sort records by priority descending (highest first)
-  const sortedRecords = _.orderBy(records, 'priorityScore', 'desc');
+  const sortedRecords = _.orderBy(parsedRecords, 'priority', 'desc');
   const baseRecord = sortedRecords[0];
   
-  const result: EntityRecord = {
-    ...baseRecord,
-    metadata: { ...(baseRecord.metadata || {}), annotations: {} },
+  const result: Entity = {
+    apiVersion: 'backstage.io/v1alpha1',
+    kind: baseRecord.kind,
+    metadata: { 
+      ...(baseRecord.metadata || {}), 
+      annotations: {} 
+    },
     spec: { ...(baseRecord.spec || {}) }
   };
 
@@ -52,7 +69,7 @@ function initializeArrayCollectors() {
   );
 }
 
-function populateArrayCollectors(records: EntityRecord[], collectors: Map<string, Set<string>>) {
+function populateArrayCollectors(records: Entity[], collectors: Map<string, Set<string>>) {
   records.forEach(record => {
     Object.entries(ARRAY_PATHS).forEach(([section, fields]) => {
       const sectionData = record[section as keyof typeof ARRAY_PATHS];
@@ -71,7 +88,7 @@ function populateArrayCollectors(records: EntityRecord[], collectors: Map<string
   });
 }
 
-function mergeArraysIntoResult(result: EntityRecord, collectors: Map<string, Set<string>>) {
+function mergeArraysIntoResult(result: Entity, collectors: Map<string, Set<string>>) {
   collectors.forEach((values, path) => {
     if (values.size === 0) return;
     

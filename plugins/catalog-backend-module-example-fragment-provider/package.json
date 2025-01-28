@@ -1,6 +1,6 @@
 {
-  "name": "@core/plugin-catalog-backend-module-aggregator-entity-provider",
-  "description": "The provider backend module for the catalog plugin.",
+  "name": "backstage-plugin-catalog-backend-module-example-fragment-provider",
+  "description": "The example-fragment-provider backend module for the catalog plugin.",
   "version": "0.1.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -24,18 +24,15 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "^1.0.2",
-    "@backstage/catalog-client": "^1.8.0",
-    "@backstage/catalog-model": "^1.7.0",
-    "@backstage/plugin-catalog-node": "^1.13.0",
-    "@backstage/types": "^1.1.1",
+    "@backstage/backend-plugin-api": "^0.6.9",
+    "@backstage/catalog-model": "^1.4.3",
+    "@backstage/plugin-catalog-node": "^1.6.1",
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "^0.1.0",
-    "@internal/entity-aggregation-common": "^0.1.0",
-    "knex": "^2.4.2"
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@backstage/backend-test-utils": "^1.1.0",
-    "@backstage/cli": "^0.29.2"
+    "@backstage/cli": "^0.25.1"
   },
   "files": [
     "dist"

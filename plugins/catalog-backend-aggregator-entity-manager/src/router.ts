@@ -3,7 +3,6 @@ import express from 'express';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { EntityAggregatorService } from '../src/service/EntityAggregatorService';
 import { stringifyEntityRef } from '@backstage/catalog-model';
-import { mergeRecords } from './utils/recordMerger';
 import { NotFoundError } from '@backstage/errors';
 import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
 import { Config } from '@backstage/config';
@@ -39,16 +38,13 @@ export async function createRouter(options: {
       throw new NotFoundError(`No records found for entityRef: ${entityRef}`);
     }
 
-    const merged = mergeRecords(records);
     const entities = records.map(r => ({
-      datasource: r.dataSource,
-      entity: r,
+      providerId: r.provider_id,
+      entityRef: r.entity_ref,
+      entity: JSON.parse(r.entity_json),
     }));
 
-    res.json({
-      entities,
-      mergedEntity: merged,
-    });
+    res.json({ entities });
   });
 
   const middleware = MiddlewareFactory.create({ logger, config });

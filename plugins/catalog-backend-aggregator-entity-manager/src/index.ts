@@ -1,3 +1,3 @@
 export { entityAggregatorManagerModule as default } from './module';
-export type { EntityRecord } from './types';
+export type { EntityFragmentRecord } from './database/EntityFragmentRepository';
 export { entityAggregatorService, type EntityAggregatorService } from './service';
