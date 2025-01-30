@@ -28,8 +28,8 @@ describe('EntityAggregatorAdminPage', () => {
       loading: false,
       error: undefined,
       data: [
-        { entityRef: 'component:default/service-a', dataSourceCount: 2 },
-        { entityRef: 'component:default/service-b', dataSourceCount: 3 },
+        { entityRef: 'component:default/service-a', providerCount: 2 },
+        { entityRef: 'component:default/service-b', providerCount: 3 },
       ] as AggregatorEntityRefData[],
     });
 
@@ -41,7 +41,7 @@ describe('EntityAggregatorAdminPage', () => {
           providerId: 'provider-a',
           entityRef: 'component:default/test',
           entity: { apiVersion: 'v1', kind: 'Component', metadata: { name: 'test' }, spec: {} },
-          priority: 1
+          priority: 1,
         },
       ],
       mergedEntity: {

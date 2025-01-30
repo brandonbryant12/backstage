@@ -227,3 +227,42 @@ sequenceDiagram
 - **Aggregator DB**: Stores unmerged entity records in a single table
 - **Aggregator Provider**: Implements Backstage's EntityProvider interface
 - **Backstage Catalog**: Processes and stores the final entities
+
+
+sequenceDiagram
+    participant FP as Fragment Provider(s)<br>(GitHub, Snow, etc.)
+    participant EM as Entity Aggregation<br>Manager
+    participant DB as Aggregator DB<br>(staging_entity_fragments)
+    participant AP as Aggregate Provider(s)<br>(Component, API)
+    participant BC as Backstage Catalog<br>Processing Loop
+
+    %% Primary Flow
+    FP->>FP: Fetch data from<br>external systems
+    FP->>EM: updateOrCreateEntityFragments()
+    EM->>DB: Write/Update fragments
+    note over DB: Each fragment has:<br>• priority<br>• expiration time<br>• processing flag
+
+    %% Processing Flow
+    AP->>EM: Request unprocessed fragments
+    EM->>DB: Query unprocessed records
+    DB-->>EM: Return fragment sets
+    EM-->>AP: Return grouped fragments
+
+    AP->>AP: Merge fragments into<br>final entity definitions
+    AP->>BC: applyMutation(added)
+    BC-->>BC: Process & store entities
+
+    AP->>EM: markAsProcessed()
+    EM->>DB: Update processing flags
+
+    %% Expiration Flow
+    rect rgb(240, 240, 240)
+        note over AP,DB: Secondary Flow: Expiration Handling
+        AP->>EM: getExpiredFragments()
+        EM->>DB: Query expired records
+        DB-->>EM: Return expired fragments
+        EM-->>AP: Return expired refs
+        AP->>BC: applyMutation(removed)
+        AP->>EM: confirmExpiredRemoval()
+        EM->>DB: Delete expired records
+    end

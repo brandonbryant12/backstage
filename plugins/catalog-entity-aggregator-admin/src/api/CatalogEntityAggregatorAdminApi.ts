@@ -12,13 +12,13 @@ export interface CatalogEntityAggregatorAdminApi {
       entity: any;
       priority: number;
     }[];
-    merged: any;
+    mergedEntity: any;
   }>;
 
   /**
-   * Lists all entity refs in the aggregator with data source counts
+   * Lists all entity refs in the aggregator with provider counts
    */
-  getAllEntities(): Promise<Array<{ entityRef: string; dataSourceCount: number }>>;
+  getAllEntities(): Promise<Array<{ entityRef: string; providerCount: number }>>;
 }
 
 export const catalogEntityAggregatorAdminApiRef = createApiRef<CatalogEntityAggregatorAdminApi>({
@@ -47,7 +47,15 @@ export class CatalogEntityAggregatorAdminClient implements CatalogEntityAggregat
       throw await ResponseError.fromResponse(response);
     }
 
-    return await response.json();
+    return await response.json() as {
+      entities: {
+        providerId: string;
+        entityRef: string;
+        entity: any;
+        priority: number;
+      }[];
+      mergedEntity: any;
+    };
   }
 
   async getAllEntities() {
@@ -58,6 +66,6 @@ export class CatalogEntityAggregatorAdminClient implements CatalogEntityAggregat
       throw await ResponseError.fromResponse(response);
     }
 
-    return (await response.json()) as Array<{ entityRef: string; dataSourceCount: number }>;
+    return (await response.json()) as Array<{ entityRef: string; providerCount: number }>;
   }
 }

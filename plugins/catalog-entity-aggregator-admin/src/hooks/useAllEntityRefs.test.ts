@@ -23,8 +23,8 @@ describe('useAllEntityRefs', () => {
 
   it('returns data after loading', async () => {
     const data = [
-      { entityRef: 'component:default/service-a', dataSourceCount: 2 },
-      { entityRef: 'component:default/service-b', dataSourceCount: 3 },
+      { entityRef: 'component:default/service-a', providerCount: 2 },
+      { entityRef: 'component:default/service-b', providerCount: 3 },
     ];
     
     mockApi.getAllEntities.mockResolvedValue(data);

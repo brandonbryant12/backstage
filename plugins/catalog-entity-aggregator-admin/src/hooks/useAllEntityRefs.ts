@@ -4,7 +4,7 @@ import { useAsync } from 'react-use';
 
 export type AggregatorEntityRefData = {
   entityRef: string;
-  dataSourceCount: number;
+  providerCount: number;
 };
 
 /**

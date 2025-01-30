@@ -23,10 +23,10 @@ describe('CatalogEntityAggregatorAdminClient', () => {
           providerId: 'provider-a',
           entityRef: 'component:default/my-entity',
           entity: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
-          priority: 1
+          priority: 1,
         },
       ],
-      merged: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
+      mergedEntity: { apiVersion: 'v1', kind: 'Component', metadata: {}, spec: {} },
     };
 
     mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 200 }));
@@ -41,8 +41,8 @@ describe('CatalogEntityAggregatorAdminClient', () => {
 
   it('fetches all entities', async () => {
     const mockResponse = [
-      { entityRef: 'component:default/service-a', dataSourceCount: 2 },
-      { entityRef: 'component:default/service-b', dataSourceCount: 3 },
+      { entityRef: 'component:default/service-a', providerCount: 2 },
+      { entityRef: 'component:default/service-b', providerCount: 3 },
     ];
 
     mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 200 }));
