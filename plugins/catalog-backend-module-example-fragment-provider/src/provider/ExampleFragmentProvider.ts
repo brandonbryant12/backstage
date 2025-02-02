@@ -30,13 +30,13 @@ export class ExampleFragmentProvider {
       });
 
       const now = new Date();
-      const oneMinutesFromNow = new Date(now.getTime() + 1 * 60 * 1000);
+      const oneDayFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
       await this.entityAggregatorService.updateOrCreateEntityFragments(
         'ExampleFragmentProvider',
         entities,
         50,
-        oneMinutesFromNow
+        oneDayFromNow
       );
 
       this.logger.info(
