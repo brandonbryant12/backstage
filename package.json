@@ -22,7 +22,9 @@
     "lint": "backstage-cli repo lint --since origin/master",
     "lint:all": "backstage-cli repo lint",
     "prettier:check": "prettier --check .",
-    "new": "backstage-cli new --scope internal"
+    "new": "backstage-cli new --scope internal",
+    "test:postgresql": "docker run --rm -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -p 5432:5432 -d postgres:13 && jest",
+    "test:postgresql:stop": "docker stop $(docker ps -q --filter ancestor=postgres:13)"
   },
   "workspaces": {
     "packages": [
@@ -35,8 +37,17 @@
     "@backstage/e2e-test-utils": "^0.1.1",
     "@playwright/test": "^1.32.3",
     "@spotify/prettier-config": "^12.0.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19",
     "node-gyp": "^10.0.0",
     "prettier": "^2.3.2",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.3",
     "typescript": "~5.4.0"
   },
   "resolutions": {
@@ -53,5 +64,9 @@
       "prettier --write"
     ]
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "yarn@4.4.1",
+  "dependencies": {
+    "@backstage/backend-test-utils": "^1.2.0",
+    "@types/lodash": "^4.17.13"
+  }
 }

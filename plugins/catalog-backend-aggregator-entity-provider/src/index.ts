@@ -1,0 +1,1 @@
+export { catalogModuleProvider as default } from './module';
