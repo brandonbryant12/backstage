@@ -80,7 +80,6 @@ export class EntityFragmentRepository {
             entityJson: JSON.stringify(entity),
           };
       })
-      .filter((r): r is { entityRef: string; kind: string; entityJson: string } => r !== null)
       .filter(r => this.validateEntityRef(r.entityRef));
 
     if (!recordsToInsert.length) return;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
-import { Alert } from '@backstage/core-components';
+import Alert from '@mui/material/Alert';
 import { useLocation } from 'react-router-dom';
 import { Link } from '@backstage/core-components';
 
@@ -12,7 +12,7 @@ export const ServicenowDeprecationBanner = () => {
 
   const shouldShowBanner = 
     entity.metadata.namespace === 'servicenow' && 
-    config.getBoolean('entityAggregator.provider.enabled', false);
+    config.getBoolean('entityAggregator.provider.enabled');
 
   if (!shouldShowBanner) return null;
 
