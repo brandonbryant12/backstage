@@ -95,6 +95,12 @@ catalog:
       rules:
         - allow: [User, Group]
 
+            # New template location for testing
+    - type: file
+      target: /Users/brandon/Development/my-backstage/examples/template.yaml
+      rules:
+        - allow: [Template]
+
     ## Uncomment these lines to add more example data
     # - type: url
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml

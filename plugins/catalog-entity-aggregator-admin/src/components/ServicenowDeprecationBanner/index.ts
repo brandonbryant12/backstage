@@ -1,1 +1,0 @@
-export { ServicenowDeprecationBanner } from './ServicenowDeprecationBanner';

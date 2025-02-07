@@ -29,4 +29,5 @@ backend.add(import('@backstage/plugin-search-backend-module-catalog'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 
 backend.add(import('backstage-plugin-catalog-backend-module-example-fragment-provider'));
+backend.add(import('@internal/backstage-plugin-catalog-backend-module-template-processor'));
 backend.start();

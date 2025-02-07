@@ -1,0 +1,37 @@
+{
+  "name": "@internal/processor-common",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "license": "Apache-2.0",
+  "private": true,
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.cjs.js",
+    "types": "dist/index.d.ts"
+  },
+  "backstage": {
+    "role": "node-library"
+  },
+  "scripts": {
+    "start": "backstage-cli package start",
+    "build": "backstage-cli package build",
+    "lint": "backstage-cli package lint",
+    "test": "backstage-cli package test",
+    "clean": "backstage-cli package clean",
+    "prepack": "backstage-cli package prepack",
+    "postpack": "backstage-cli package postpack"
+  },
+  "devDependencies": {
+    "@backstage/backend-test-utils": "^1.2.1",
+    "@backstage/cli": "^0.29.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@backstage/backend-plugin-api": "^1.1.1",
+    "@backstage/catalog-client": "^1.9.1",
+    "@backstage/catalog-model": "^1.7.3"
+  }
+}

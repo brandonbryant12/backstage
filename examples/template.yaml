@@ -1,0 +1,15 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: test-template
+  title: Test Template
+  description: A minimal template for testing the template processor !!!
+  annotations:
+     name: value!
+     yo: yo
+spec:
+  owner: user:guest
+  type: service
+  steps: []
+  output:
+    links: []

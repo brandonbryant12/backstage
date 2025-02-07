@@ -1,7 +1,6 @@
 import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
 import { ExampleFragmentProvider } from './ExampleFragmentProvider';
 import { EntityAggregatorService } from '@core/plugin-catalog-backend-module-aggregator-entity-manager';
-import { generateMockEntities } from './mockEntityFactory';
 
 describe('ExampleFragmentProvider', () => {
   let entityAggregatorService: jest.Mocked<EntityAggregatorService>;
@@ -50,12 +49,6 @@ describe('ExampleFragmentProvider', () => {
   });
 
   it('refreshes entities successfully', async () => {
-    const mockEntities = generateMockEntities(10, {
-      source: 'ExampleFragmentProvider',
-      tier: 'frontend',
-      team: 'team-a',
-    });
-
     await provider.start();
     const refreshFn = mockTaskRunner.run.mock.calls[0][0].fn;
     await refreshFn();
