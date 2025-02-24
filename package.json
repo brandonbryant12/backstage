@@ -67,6 +67,7 @@
   "packageManager": "yarn@4.4.1",
   "dependencies": {
     "@backstage/backend-test-utils": "^1.2.0",
-    "@types/lodash": "^4.17.13"
+    "@types/lodash": "^4.17.13",
+    "jwt-decode": "^4.0.0"
   }
 }
