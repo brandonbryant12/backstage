@@ -3,14 +3,15 @@
 <ai_context>
 Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
 Displays an empty state with a custom error icon and message when annotations are missing from an entity.
+Uses Material-UI v4 styling system for compatibility.
 </ai_context>
 */
 
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import ErrorIcon from '@mui/icons-material/Error';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import ErrorIcon from '@material-ui/icons/Error';
 import { CodeSnippet, Link, EmptyState } from '@backstage/core-components';
 import { Entity } from '@backstage/catalog-model';
 import { useEntity } from '@backstage/plugin-catalog-react';
@@ -67,7 +68,7 @@ function generateDescription(annotations: string[], entityKind = 'Component') {
     <>
       Add the missing {isSingular ? 'annotation' : 'annotations'}{' '}
       {annotations
-        .map(ann => <code>{ann}</code>)
+        .map(ann => <code key={ann}>{ann}</code>)
         .reduce((prev, curr) => (
           <>
             {prev}, {curr}

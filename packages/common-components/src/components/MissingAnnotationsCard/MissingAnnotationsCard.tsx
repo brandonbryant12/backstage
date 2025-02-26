@@ -1,17 +1,21 @@
+
 /*
 <ai_context>
 Created for issue #2 to provide a card wrapper around MissingAnnotationEmptyState.
 Includes a customizable title, the empty state content, and footer buttons for reading more and copying annotations.
+Uses Material-UI v4 components for compatibility.
 </ai_context>
 */
 
 import React from 'react';
-import Card from '@material-ui/core';
-import CardHeader from '@material-ui/core';
-import CardContent from '@material-ui/core';
-import CardActions from '@material-ui/core';
-import Button from '@material-ui/core';
-import Typography from '@material-ui/core';
+import { 
+  Card, 
+  CardHeader, 
+  CardContent, 
+  CardActions,
+  Button,
+  Typography
+} from '@material-ui/core';
 import { MissingAnnotationEmptyState } from '../MissingAnnotationEmptyState/MissingAnnotationEmptyState';
 
 export interface MissingAnnotationsCardProps {
