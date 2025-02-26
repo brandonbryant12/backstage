@@ -3,18 +3,18 @@
 <ai_context>
 Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
 Updated to use CustomEmptyState with error icon and entity prop, single code snippet on right.
+Moved to MissingAnnotationsCard directory for component consolidation.
 Uses Material-UI v4 styling system for compatibility.
 </ai_context>
 */
 
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ErrorIcon from '@material-ui/icons/Error';
 import { CodeSnippet, Link } from '@backstage/core-components';
 import { Entity } from '@backstage/catalog-model';
-import { CustomEmptyState } from '../CustomEmptyState';
+import { CustomEmptyState } from './CustomEmptyState';
 
 /** @public */
 export type MissingAnnotationEmptyStateClassKey = 'code';

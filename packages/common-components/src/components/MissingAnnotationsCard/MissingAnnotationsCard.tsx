@@ -17,7 +17,9 @@ import {
   Typography
 } from '@material-ui/core';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { MissingAnnotationEmptyState } from '../MissingAnnotationEmptyState/MissingAnnotationEmptyState';
+import { MissingAnnotationEmptyState } from './MissingAnnotationEmptyState';
+
+export { CustomEmptyState } from './CustomEmptyState';
 
 export interface MissingAnnotationsCardProps {
   title: string;

@@ -4,6 +4,7 @@
 Forked from @backstage/core-components EmptyState for issue #2.
 Removes image display and adjusts layout to place code snippet on right side.
 Updated to accept ReactNode title and fix duplicate action rendering.
+Moved to MissingAnnotationsCard directory for component consolidation.
 Uses Material-UI v4 Grid system for compatibility.
 </ai_context>
 */

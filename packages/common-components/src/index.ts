@@ -10,6 +10,5 @@ Updated to include MissingAnnotationEmptyState and MissingAnnotationsCard for is
 export * from './hooks/useClientEntityAccessCheck/accessCheckers';
 export * from './hooks/useClientEntityAccessCheck/useEntityAccessCheck';
 export * from './components/ConditionalOwnership/ConditionalOwnership';
-export * from './components/MissingAnnotationEmptyState/MissingAnnotationEmptyState';
 export * from './components/MissingAnnotationsCard/MissingAnnotationsCard';
       
