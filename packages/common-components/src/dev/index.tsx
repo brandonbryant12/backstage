@@ -8,11 +8,12 @@ Created to demonstrate all variations of the card as per user instructions.
 
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
-import { Box, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { Content, Header, Page } from '@backstage/core-components';
 import { MissingAnnotationsCard } from '../components/MissingAnnotationsCard/MissingAnnotationsCard';
 
-const DemoPage = () => {
+const demoPage = () => {
   return (
     <Page themeId="tool">
       <Header title="Missing Annotations Card Demo" />
@@ -42,11 +43,9 @@ const DemoPage = () => {
 };
 
 export default createDevApp()
-  .registerPlugin({
-    id: 'demo',
-    routes: {
-      root: { path: '/', element: <DemoPage /> },
-    },
-  })
+.addPage({
+  title: 'Missing Annotations',
+  element: demoPage(),
+})
   .render();
       
