@@ -22,7 +22,8 @@
     "test": "backstage-cli package test",
     "clean": "backstage-cli package clean",
     "prepack": "backstage-cli package prepack",
-    "postpack": "backstage-cli package postpack"
+    "postpack": "backstage-cli package postpack",
+    "dev": "backstage-cli package dev"
   },
   "devDependencies": {
     "@backstage/cli": "^0.29.2",
