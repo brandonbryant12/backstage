@@ -2,7 +2,7 @@
 /*
 <ai_context>
 Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
-Displays an empty state with a custom error icon and message when annotations are missing from an entity.
+Updated to use CustomEmptyState with error icon and entity prop, single code snippet on right.
 Uses Material-UI v4 styling system for compatibility.
 </ai_context>
 */
@@ -10,11 +10,11 @@ Uses Material-UI v4 styling system for compatibility.
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import ErrorIcon from '@material-ui/icons/Error';
-import { CodeSnippet, Link, EmptyState } from '@backstage/core-components';
+import { CodeSnippet, Link } from '@backstage/core-components';
 import { Entity } from '@backstage/catalog-model';
-import { useEntity } from '@backstage/plugin-catalog-react';
+import { CustomEmptyState } from '../CustomEmptyState';
 
 /** @public */
 export type MissingAnnotationEmptyStateClassKey = 'code';
@@ -90,29 +90,17 @@ function generateDescription(annotations: string[], entityKind = 'Component') {
  */
 export function MissingAnnotationEmptyState(props: {
   annotation: string | string[];
-  readMoreUrl?: string;
+  entity: Entity;
 }) {
-  let entity: Entity | undefined;
-  try {
-    const entityContext = useEntity();
-    entity = entityContext.entity;
-  } catch (err) {
-    // Ignore when entity context doesn't exist
-  }
-
-  const { annotation, readMoreUrl } = props;
+  const { annotation, entity } = props;
   const annotations = Array.isArray(annotation) ? annotation : [annotation];
-  const url =
-    readMoreUrl ||
-    'https://backstage.io/docs/features/software-catalog/well-known-annotations';
   const classes = useStyles();
 
   const entityKind = entity?.kind || 'Component';
   const { yamlText, lineNumbers } = generateYamlExample(annotations, entity);
 
   return (
-    <EmptyState
-      missing="field"
+    <CustomEmptyState
       title={
         <>
           <ErrorIcon color="error" style={{ verticalAlign: 'middle', marginRight: 8 }} />
@@ -121,24 +109,15 @@ export function MissingAnnotationEmptyState(props: {
       }
       description={generateDescription(annotations, entityKind)}
       action={
-        <>
-          <Typography variant="body1">
-            The example below highlights how to add the annotation(s) to your{' '}
-            {entityKind} YAML:
-          </Typography>
-          <div className={classes.code}>
-            <CodeSnippet
-              text={yamlText}
-              language="yaml"
-              showLineNumbers
-              highlightedNumbers={lineNumbers}
-              customStyle={{ background: 'inherit', fontSize: '115%' }}
-            />
-          </div>
-          <Button color="primary" component={Link} to={url}>
-            Read More
-          </Button>
-        </>
+        <Box className={classes.code}>
+          <CodeSnippet
+            text={yamlText}
+            language="yaml"
+            showLineNumbers
+            highlightedNumbers={lineNumbers}
+            customStyle={{ background: 'inherit', fontSize: '115%' }}
+          />
+        </Box>
       }
     />
   );

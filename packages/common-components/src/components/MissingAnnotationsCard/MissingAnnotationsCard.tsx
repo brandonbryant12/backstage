@@ -2,7 +2,7 @@
 /*
 <ai_context>
 Created for issue #2 to provide a card wrapper around MissingAnnotationEmptyState.
-Includes a customizable title, the empty state content, and footer buttons for reading more and copying annotations.
+Includes a customizable title, the empty state content with entity prop, and footer buttons.
 Uses Material-UI v4 components for compatibility.
 </ai_context>
 */
@@ -16,6 +16,7 @@ import {
   Button,
   Typography
 } from '@material-ui/core';
+import { useEntity } from '@backstage/plugin-catalog-react';
 import { MissingAnnotationEmptyState } from '../MissingAnnotationEmptyState/MissingAnnotationEmptyState';
 
 export interface MissingAnnotationsCardProps {
@@ -29,6 +30,7 @@ export interface MissingAnnotationsCardProps {
  */
 export function MissingAnnotationsCard(props: MissingAnnotationsCardProps) {
   const { title, annotation } = props;
+  const { entity } = useEntity();
   const annotations = Array.isArray(annotation) ? annotation : [annotation];
 
   const handleCopy = () => {
@@ -40,9 +42,11 @@ export function MissingAnnotationsCard(props: MissingAnnotationsCardProps) {
 
   return (
     <Card>
-      <CardHeader title={<Typography variant="h6">{title}</Typography>} />
+      <CardHeader 
+        title={<Typography variant="h6">{title}</Typography>}
+      />
       <CardContent>
-        <MissingAnnotationEmptyState annotation={annotation} />
+        <MissingAnnotationEmptyState annotation={annotation} entity={entity} />
       </CardContent>
       <CardActions>
         <Button
@@ -60,3 +64,4 @@ export function MissingAnnotationsCard(props: MissingAnnotationsCardProps) {
     </Card>
   );
 }
+      

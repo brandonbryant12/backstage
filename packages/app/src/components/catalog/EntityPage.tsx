@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button, Grid } from '@material-ui/core';
 import {
@@ -50,6 +51,7 @@ import {
   RELATION_PART_OF,
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
+import { MissingAnnotationsCard } from 'common-components';
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
@@ -129,6 +131,18 @@ const overviewContent = (
     </Grid>
     <Grid item md={8} xs={12}>
       <EntityHasSubcomponentsCard variant="gridItem" />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <MissingAnnotationsCard
+        title="Example Single Annotation"
+        annotation="my/annotation"
+      />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <MissingAnnotationsCard
+        title="Example Multiple Annotations"
+        annotation={["ann1", "ann2"]}
+      />
     </Grid>
   </Grid>
 );
@@ -391,3 +405,4 @@ export const entityPage = (
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
   </EntitySwitch>
 );
+      
