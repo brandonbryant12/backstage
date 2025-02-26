@@ -5,47 +5,25 @@ Forked from @backstage/core-components EmptyState for issue #2.
 Removes image display and adjusts layout to place code snippet on right side.
 Updated to accept ReactNode title and fix duplicate action rendering.
 Moved to MissingAnnotationsCard directory for component consolidation.
-Uses Material-UI v4 Grid system for compatibility.
+Uses Material-UI v5 Grid system.
 </ai_context>
 */
 
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import React, { ReactNode } from 'react';
-
-/** @public */
-export type CustomEmptyStateClassKey = 'root' | 'action' | 'content';
-
-const useStyles = makeStyles(
-  theme => ({
-    root: {
-      backgroundColor: theme.palette.background.default,
-      padding: theme.spacing(2, 0, 0, 0),
-    },
-    action: {
-      marginTop: theme.spacing(2),
-    },
-    content: {
-      margin: theme.spacing(2, 0),
-    },
-  }),
-  { name: 'CustomEmptyState' },
-);
-
-type Props = {
-  title: ReactNode;
-  description?: string | JSX.Element;
-  action?: JSX.Element;
-};
 
 /**
  * Customized empty state component with side-by-side layout
  * @public
  */
-export function CustomEmptyState(props: Props) {
+export function CustomEmptyState(props: {
+  title: ReactNode;
+  description?: string | JSX.Element;
+  action?: JSX.Element;
+}) {
   const { title, description, action } = props;
-  const classes = useStyles();
 
   return (
     <Grid
@@ -53,8 +31,11 @@ export function CustomEmptyState(props: Props) {
       direction="row"
       justifyContent="space-between"
       alignItems="flex-start"
-      className={classes.root}
       spacing={2}
+      sx={{
+        backgroundColor: theme => theme.palette.background.default,
+        padding: theme => theme.spacing(2, 0, 0, 0),
+      }}
     >
       <Grid item xs={12} md={6}>
         <Grid container direction="column">
@@ -69,8 +50,10 @@ export function CustomEmptyState(props: Props) {
         </Grid>
       </Grid>
       {action && (
-        <Grid item xs={12} md={6} className={classes.content}>
-          {action}
+        <Grid item xs={12} md={6}>
+          <Box sx={{ margin: theme => theme.spacing(2, 0) }}>
+            {action}
+          </Box>
         </Grid>
       )}
     </Grid>

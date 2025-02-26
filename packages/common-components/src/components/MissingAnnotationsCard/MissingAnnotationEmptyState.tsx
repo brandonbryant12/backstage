@@ -4,32 +4,16 @@
 Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
 Updated to use CustomEmptyState with error icon and entity prop, single code snippet on right.
 Moved to MissingAnnotationsCard directory for component consolidation.
-Uses Material-UI v4 styling system for compatibility.
+Uses Material-UI v5 styling system.
 </ai_context>
 */
 
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import ErrorIcon from '@material-ui/icons/Error';
+import Box from '@mui/material/Box';
+import ErrorIcon from '@mui/icons-material/Error';
 import { CodeSnippet, Link } from '@backstage/core-components';
 import { Entity } from '@backstage/catalog-model';
 import { CustomEmptyState } from './CustomEmptyState';
-
-/** @public */
-export type MissingAnnotationEmptyStateClassKey = 'code';
-
-const useStyles = makeStyles(
-  theme => ({
-    code: {
-      borderRadius: 6,
-      margin: theme.spacing(2, 0),
-      background:
-        theme.palette.type === 'dark' ? '#444' : theme.palette.common.white,
-    },
-  }),
-  { name: 'MissingAnnotationEmptyState' },
-);
 
 function generateYamlExample(
   annotations: string[],
@@ -94,7 +78,6 @@ export function MissingAnnotationEmptyState(props: {
 }) {
   const { annotation, entity } = props;
   const annotations = Array.isArray(annotation) ? annotation : [annotation];
-  const classes = useStyles();
 
   const entityKind = entity?.kind || 'Component';
   const { yamlText, lineNumbers } = generateYamlExample(annotations, entity);
@@ -109,7 +92,11 @@ export function MissingAnnotationEmptyState(props: {
       }
       description={generateDescription(annotations, entityKind)}
       action={
-        <Box className={classes.code}>
+        <Box sx={{
+          borderRadius: 6,
+          margin: theme => theme.spacing(2, 0),
+          background: theme => theme.palette.mode === 'dark' ? '#444' : theme.palette.common.white,
+        }}>
           <CodeSnippet
             text={yamlText}
             language="yaml"

@@ -1,3 +1,4 @@
+
 /*
 <ai_context>
 Unit tests for MissingAnnotationsCard component.
@@ -11,8 +12,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { EntityProvider } from '@backstage/plugin-catalog-react';
 import { MissingAnnotationsCard } from './MissingAnnotationsCard';
-import { ThemeProvider } from '@material-ui/core/styles';
-import { createTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { MemoryRouter } from 'react-router-dom';
 
 describe('MissingAnnotationsCard', () => {
@@ -92,3 +93,4 @@ describe('MissingAnnotationsCard', () => {
     );
   });
 });
+      

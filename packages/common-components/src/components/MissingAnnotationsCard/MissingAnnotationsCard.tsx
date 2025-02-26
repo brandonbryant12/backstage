@@ -3,7 +3,7 @@
 <ai_context>
 Created for issue #2 to provide a card wrapper around MissingAnnotationEmptyState.
 Includes a customizable title, the empty state content with entity prop, and footer buttons.
-Uses Material-UI v4 components for compatibility.
+Uses Material-UI v5 components.
 </ai_context>
 */
 
@@ -15,7 +15,7 @@ import {
   CardActions,
   Button,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { MissingAnnotationEmptyState } from './MissingAnnotationEmptyState';
 
@@ -53,7 +53,6 @@ export function MissingAnnotationsCard(props: MissingAnnotationsCardProps) {
       <CardActions>
         <Button
           variant="outlined"
-          color="default"
           href="https://backstage.io/docs/features/software-catalog/well-known-annotations"
           target="_blank"
         >
