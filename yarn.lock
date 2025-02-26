@@ -17369,6 +17369,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common-components@workspace:packages/common-components"
   dependencies:
+    "@backstage/catalog-model": "npm:^1.7.3"
     "@backstage/cli": "npm:^0.29.2"
     "@backstage/core-components": "npm:^0.16.0"
     "@backstage/core-plugin-api": "npm:^1.10.1"
