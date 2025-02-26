@@ -24,18 +24,18 @@
     "postpack": "backstage-cli package postpack"
   },
   "dependencies": {
-    "@backstage/backend-plugin-api": "^1.0.2",
-    "@backstage/catalog-client": "^1.8.0",
-    "@backstage/catalog-model": "^1.7.0",
-    "@backstage/plugin-catalog-node": "^1.13.0",
-    "@backstage/types": "^1.1.1",
+    "@backstage/backend-plugin-api": "^1.2.0",
+    "@backstage/catalog-client": "^1.9.1",
+    "@backstage/catalog-model": "^1.7.3",
+    "@backstage/plugin-catalog-node": "^1.16.0",
+    "@backstage/types": "^1.2.1",
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "^0.1.0",
     "@internal/entity-aggregation-common": "^0.1.0",
     "knex": "^2.4.2"
   },
   "devDependencies": {
-    "@backstage/backend-test-utils": "^1.1.0",
-    "@backstage/cli": "^0.29.2",
+    "@backstage/backend-test-utils": "^1.3.0",
+    "@backstage/cli": "^0.30.0",
     "@types/jest": "^29.0.0"
   },
   "files": [

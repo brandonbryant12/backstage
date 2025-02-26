@@ -3,18 +3,18 @@
 <ai_context>
 Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
 Displays an empty state with a custom error icon and message when annotations are missing from an entity.
-Updated to use MUI4 and standalone EmptyState component for compatibility.
+Uses Material-UI v4 styling system for compatibility.
 </ai_context>
 */
 
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import ErrorIcon from '@mui/icons-material/Error';
-import { Link } from '@backstage/core-components';
+import ErrorIcon from '@material-ui/icons/Error';
+import { CodeSnippet, Link, EmptyState } from '@backstage/core-components';
 import { Entity } from '@backstage/catalog-model';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { EmptyState } from '../EmptyState/EmptyState';
 
 /** @public */
 export type MissingAnnotationEmptyStateClassKey = 'code';
@@ -26,10 +26,6 @@ const useStyles = makeStyles(
       margin: theme.spacing(2, 0),
       background:
         theme.palette.type === 'dark' ? '#444' : theme.palette.common.white,
-    },
-    errorIcon: {
-      verticalAlign: 'middle',
-      marginRight: theme.spacing(1),
     },
   }),
   { name: 'MissingAnnotationEmptyState' },
@@ -68,9 +64,24 @@ spec:
 
 function generateDescription(annotations: string[], entityKind = 'Component') {
   const isSingular = annotations.length <= 1;
-  return `Add the missing ${isSingular ? 'annotation' : 'annotations'} ${annotations
-    .map(ann => `"${ann}"`)
-    .join(', ')} to your ${entityKind} YAML file to enable this feature. Alternatively, use the Annotation Wizard to generate a complete "catalog-info.yaml".`;
+  return (
+    <>
+      Add the missing {isSingular ? 'annotation' : 'annotations'}{' '}
+      {annotations
+        .map(ann => <code key={ann}>{ann}</code>)
+        .reduce((prev, curr) => (
+          <>
+            {prev}, {curr}
+          </>
+        ))}{' '}
+      to your {entityKind} YAML file to enable this feature. Alternatively, use
+      the{' '}
+      <Link to="/create/templates/default/catalog-info">
+        Annotation Wizard
+      </Link>{' '}
+      to generate a complete <code>catalog-info.yaml</code>.
+    </>
+  );
 }
 
 /**
@@ -98,22 +109,36 @@ export function MissingAnnotationEmptyState(props: {
 
   const entityKind = entity?.kind || 'Component';
   const { yamlText, lineNumbers } = generateYamlExample(annotations, entity);
-  const description = `${generateDescription(annotations, entityKind)}\n\nThe example below highlights how to add the annotation(s) to your ${entityKind} YAML:\n\n${yamlText}`;
 
   return (
     <EmptyState
       missing="field"
       title={
         <>
-          <ErrorIcon className={classes.errorIcon} color="error" />
+          <ErrorIcon color="error" style={{ verticalAlign: 'middle', marginRight: 8 }} />
           Missing Configuration
         </>
       }
-      description={description}
+      description={generateDescription(annotations, entityKind)}
       action={
-        <Button color="primary" component={Link} to={url}>
-          Read More
-        </Button>
+        <>
+          <Typography variant="body1">
+            The example below highlights how to add the annotation(s) to your{' '}
+            {entityKind} YAML:
+          </Typography>
+          <div className={classes.code}>
+            <CodeSnippet
+              text={yamlText}
+              language="yaml"
+              showLineNumbers
+              highlightedNumbers={lineNumbers}
+              customStyle={{ background: 'inherit', fontSize: '115%' }}
+            />
+          </div>
+          <Button color="primary" component={Link} to={url}>
+            Read More
+          </Button>
+        </>
       }
     />
   );
