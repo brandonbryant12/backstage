@@ -1,13 +1,3 @@
-
-/*
-<ai_context>
-Unit tests for MissingAnnotationsCard component.
-Enhanced to achieve 100% coverage while maintaining simplicity.
-Tests basic rendering, clipboard functionality, and edge cases.
-Covers branch conditions in MissingAnnotationEmptyState and handleCopy in MissingAnnotationsCard.
-</ai_context>
-*/
-
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { EntityProvider } from '@backstage/plugin-catalog-react';
@@ -15,6 +5,11 @@ import { MissingAnnotationsCard } from './MissingAnnotationsCard';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import { MemoryRouter } from 'react-router-dom';
+
+jest.mock('@backstage/plugin-catalog-react', () => ({
+  ...jest.requireActual('@backstage/plugin-catalog-react'),
+  EntityRefLink: () => <>EntityRefLink</>
+}));
 
 describe('MissingAnnotationsCard', () => {
   const mockEntity = {
@@ -93,4 +88,3 @@ describe('MissingAnnotationsCard', () => {
     );
   });
 });
-      

@@ -1,20 +1,14 @@
-
-/*
-<ai_context>
-Forked from @backstage/plugin-catalog-react to customize the title and description for issue #2.
-Updated to use CustomEmptyState with error icon and entity prop, single code snippet on right.
-Moved to MissingAnnotationsCard directory for component consolidation.
-Uses Material-UI v5 styling system.
-</ai_context>
-*/
-
 import React from 'react';
 import Box from '@mui/material/Box';
 import ErrorIcon from '@mui/icons-material/Error';
-import { CodeSnippet, Link } from '@backstage/core-components';
+import { CodeSnippet } from '@backstage/core-components';
+import { EntityRefLink } from '@backstage/plugin-catalog-react';
 import { Entity } from '@backstage/catalog-model';
 import { CustomEmptyState } from './CustomEmptyState';
 
+/**
+ * Generates example YAML with specified annotations
+ */
 function generateYamlExample(
   annotations: string[],
   entity?: Entity,
@@ -28,22 +22,23 @@ function generateYamlExample(
 kind: ${kind}
 metadata:
   name: ${name}
-  annotations:${annotations.map(ann => `\n    ${ann}: value`).join('')}
+  annotations:
+${annotations.map(ann => `    ${ann}: value`).join('\n')}
 spec:
   type: ${type}
   owner: ${owner}`;
 
-  let line = 6; // Line 6 is where annotations begin
-  const lineNumbers: number[] = [];
-  annotations.forEach(() => {
-    lineNumbers.push(line);
-    line++;
-  });
+  const lineNumbers = calculateHighlightedLines(annotations);
 
   return {
     yamlText,
     lineNumbers,
   };
+}
+
+function calculateHighlightedLines(annotations: string[]): number[] {
+  const startLine = 6;
+  return annotations.map((_, index) => startLine + index);
 }
 
 function generateDescription(annotations: string[], entityKind = 'Component') {
@@ -58,20 +53,21 @@ function generateDescription(annotations: string[], entityKind = 'Component') {
             {prev}, {curr}
           </>
         ))}{' '}
-      to your {entityKind} YAML file to enable this feature. Alternatively, use
-      the{' '}
-      <Link to="/create/templates/default/catalog-info">
+      to your {entityKind} YAML file to enable this feature.
+      
+      <Box component="p" mt={1} mb={1}>
+        The figure example shows an annotation in a component YAML file (highlighted text).
+      </Box>
+      
+      Alternatively, use the{' '}
+      <EntityRefLink entityRef={{ kind: 'Template', namespace: 'default', name: 'catalog-info-template' }}>
         Annotation Wizard
-      </Link>{' '}
+      </EntityRefLink>{' '}
       to generate a complete <code>catalog-info.yaml</code>.
     </>
   );
 }
 
-/**
- * @public
- * Renders an empty state when an annotation is missing from an entity.
- */
 export function MissingAnnotationEmptyState(props: {
   annotation: string | string[];
   entity: Entity;
@@ -85,17 +81,17 @@ export function MissingAnnotationEmptyState(props: {
   return (
     <CustomEmptyState
       title={
-        <>
-          <ErrorIcon color="error" style={{ verticalAlign: 'middle', marginRight: 8 }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+          <ErrorIcon color="error" style={{ marginRight: 8 }} />
           Missing Configuration
-        </>
+        </Box>
       }
       description={generateDescription(annotations, entityKind)}
       action={
         <Box sx={{
           borderRadius: 6,
-          margin: theme => theme.spacing(2, 0),
           background: theme => theme.palette.mode === 'dark' ? '#444' : theme.palette.common.white,
+          mt: 0.5,
         }}>
           <CodeSnippet
             text={yamlText}
@@ -109,4 +105,3 @@ export function MissingAnnotationEmptyState(props: {
     />
   );
 }
-      
