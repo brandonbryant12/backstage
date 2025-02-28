@@ -16,8 +16,11 @@ export interface MissingAnnotationsCardProps {
 }
 /**
  * @public
- * A card that displays a missing annotation message with actions.
+ * A card that displays a missing annotation me
+ * 
+ * ssage with actions.
  */
+
 export function MissingAnnotationsCard(props: MissingAnnotationsCardProps) {
   const { title, annotation } = props;
   const { entity } = useEntity();
