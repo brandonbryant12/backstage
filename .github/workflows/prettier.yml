@@ -1,0 +1,36 @@
+name: Prettier Code Formatter
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Run weekly on Mondays
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      
+      - name: Install dependencies
+        run: yarn install --immutable
+      
+      - name: Run Prettier
+        run: yarn prettier:write
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'style: apply prettier formatting'
+          title: 'style: apply prettier formatting'
+          body: 'This PR applies Prettier formatting to all files according to project standards.'
+          branch: prettier-format
+          base: master
+          delete-branch: true
