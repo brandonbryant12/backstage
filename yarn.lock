@@ -5665,7 +5665,7 @@ __metadata:
     "@backstage/plugin-catalog-node": "npm:^1.16.0"
     "@backstage/plugin-permission-common": "npm:^0.8.4"
     "@backstage/types": "npm:^1.2.1"
-    "@types/express": "npm:^4"
+    "@types/express": "npm:^5.0.0"
     "@types/jest": "npm:^29.0.0"
     "@types/supertest": "npm:^6.0.0"
     express: "npm:^4.21.2"
@@ -12611,7 +12611,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*":
+"@types/express@npm:*, @types/express@npm:^5.0.0":
   version: 5.0.0
   resolution: "@types/express@npm:5.0.0"
   dependencies:
@@ -12623,7 +12623,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4, @types/express@npm:^4.17.21, @types/express@npm:^4.17.6":
+"@types/express@npm:^4.17.21, @types/express@npm:^4.17.6":
   version: 4.17.21
   resolution: "@types/express@npm:4.17.21"
   dependencies:
