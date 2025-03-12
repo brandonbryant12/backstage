@@ -14879,6 +14879,8 @@ __metadata:
     "@backstage/core-components": "npm:^0.16.4"
     "@backstage/core-plugin-api": "npm:^1.10.4"
     "@backstage/dev-utils": "npm:^1.1.7"
+    "@backstage/plugin-search": "npm:^1.4.23"
+    "@backstage/plugin-search-react": "npm:^1.8.6"
     "@backstage/test-utils": "npm:^1.7.5"
     "@backstage/theme": "npm:^0.6.4"
     "@material-ui/core": "npm:^4.9.13"
@@ -14893,6 +14895,7 @@ __metadata:
     react-use: "npm:^17.2.4"
   peerDependencies:
     react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-router-dom: "*"
   languageName: unknown
   linkType: soft
 
