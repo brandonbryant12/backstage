@@ -1,4 +1,5 @@
 # macOS
+*.manager
 .DS_Store
 
 # Logs
