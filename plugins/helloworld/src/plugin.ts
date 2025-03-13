@@ -1,9 +1,16 @@
+
 import {
   createPlugin,
   createRoutableExtension,
 } from '@backstage/core-plugin-api';
-
 import { rootRouteRef, catalogCardsRouteRef, apiCardsRouteRef } from './routes';
+
+// Import individual card components
+import { EntityConsumedApisCard } from './components/apiCards/EntityConsumedApisCard';
+import { EntityProvidedApisCard } from './components/apiCards/EntityProvidedApisCard';
+import { EntityDependsOnComponentsCard } from './components/catalogCards/EntityDependsOnComponentsCard';
+import { EntityDependsOnResourcesCard } from './components/catalogCards/EntityDependsOnResourcesCard';
+import { EntityHasSubcomponentsCard } from './components/catalogCards/EntityHasSubcomponentsCard';
 
 export const helloworldPlugin = createPlugin({
   id: 'helloworld',
@@ -23,20 +30,45 @@ export const HelloworldPage = helloworldPlugin.provide(
   }),
 );
 
-export const CatalogCardsPage = helloworldPlugin.provide(
+// Export individual API cards
+export const EntityConsumedApisCardExtension = helloworldPlugin.provide(
   createRoutableExtension({
-    name: 'CatalogCardsPage',
-    component: () =>
-      import('./components/CatalogCardsPage').then(m => m.CatalogCardsPage),
+    name: 'EntityConsumedApisCard',
+    component: () => Promise.resolve(EntityConsumedApisCard),
+    mountPoint: apiCardsRouteRef,
+  }),
+);
+
+export const EntityProvidedApisCardExtension = helloworldPlugin.provide(
+  createRoutableExtension({
+    name: 'EntityProvidedApisCard',
+    component: () => Promise.resolve(EntityProvidedApisCard),
+    mountPoint: apiCardsRouteRef,
+  }),
+);
+
+// Export individual catalog cards
+export const EntityDependsOnComponentsCardExtension = helloworldPlugin.provide(
+  createRoutableExtension({
+    name: 'EntityDependsOnComponentsCard',
+    component: () => Promise.resolve(EntityDependsOnComponentsCard),
     mountPoint: catalogCardsRouteRef,
   }),
 );
 
-export const ApiCardsPage = helloworldPlugin.provide(
+export const EntityDependsOnResourcesCardExtension = helloworldPlugin.provide(
   createRoutableExtension({
-    name: 'ApiCardsPage',
-    component: () =>
-      import('./components/ApiCardsPage').then(m => m.ApiCardsPage),
-    mountPoint: apiCardsRouteRef,
+    name: 'EntityDependsOnResourcesCard',
+    component: () => Promise.resolve(EntityDependsOnResourcesCard),
+    mountPoint: catalogCardsRouteRef,
   }),
 );
+
+export const EntityHasSubcomponentsCardExtension = helloworldPlugin.provide(
+  createRoutableExtension({
+    name: 'EntityHasSubcomponentsCard',
+    component: () => Promise.resolve(EntityHasSubcomponentsCard),
+    mountPoint: catalogCardsRouteRef,
+  }),
+);
+      
