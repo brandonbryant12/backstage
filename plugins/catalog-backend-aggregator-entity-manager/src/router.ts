@@ -51,6 +51,8 @@ export async function createRouter(options: {
   });
 
   const middleware = MiddlewareFactory.create({ logger, config });
+
+  //@ts-ignore
   router.use(middleware.error());
 
   return router;

@@ -22,6 +22,7 @@ export const entityAggregatorManagerModule = createBackendModule({
       },
       async init({ logger, entityAggregator, config, httpRouter }) {
         const router = await createRouter({ logger, entityAggregator, config });
+        //@ts-ignore
         httpRouter.use(router);
       },
     });
