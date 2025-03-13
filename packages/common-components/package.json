@@ -48,6 +48,6 @@
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^6.4.6",
     "@mui/material": "^6.4.6",
-    "@mui/styles": "^5.0.0"
+    "@mui/styles": "^6.0.0"
   }
 }
