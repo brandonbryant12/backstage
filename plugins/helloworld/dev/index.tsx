@@ -1,8 +1,3 @@
-
-/* <ai_context>
-Dev server entry point for the helloworld plugin, showcasing various entity-related cards.
-</ai_context> */
-
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
 import { helloworldPlugin } from '../src/plugin';
@@ -13,13 +8,14 @@ import { EntityDependsOnResourcesCard } from '../src/components/catalogCards/Ent
 import { EntityHasSubcomponentsCard } from '../src/components/catalogCards/EntityHasSubcomponentsCard';
 import { Entity, RELATION_CONSUMES_API, RELATION_PROVIDES_API } from '@backstage/catalog-model';
 import {
+  CatalogApi,
   EntityProvider,
   catalogApiRef,
-  entityRouteRef,
 } from '@backstage/plugin-catalog-react';
+import { CatalogEntityPage, CatalogIndexPage } from '@backstage/plugin-catalog';
 import { Grid } from '@mui/material';
-import { catalogPlugin } from '@backstage/plugin-catalog';
 
+// --- Mock Entities and API ---
 // Define mock entity with relations for all cards
 const mockEntity: Entity = {
   apiVersion: 'backstage.io/v1alpha1',
@@ -145,37 +141,44 @@ const mockCatalogApi = {
   },
 };
 
-// Helper to create a card page with both a populated entity and an empty entity
+// Helper to create a page with two EntityProviders (one with an entity and one empty)
 function createCardPage(card: JSX.Element) {
   return (
-      <Grid container spacing={2} padding={2}>
-        <Grid item xs={6}>
-          <EntityProvider entity={mockEntity}>{card}</EntityProvider>
-        </Grid>
-        <Grid item xs={6}>
-          <EntityProvider entity={mockEmptyEntity}>{card}</EntityProvider>
-        </Grid>
+    <Grid container spacing={2} padding={2}>
+      <Grid item xs={6}>
+        <EntityProvider entity={mockEntity}>{card}</EntityProvider>
       </Grid>
+      <Grid item xs={6}>
+        <EntityProvider entity={mockEmptyEntity}>{card}</EntityProvider>
+      </Grid>
+    </Grid>
   );
 }
 
-// Configure dev server with pages for each card
+// --- Create and render the dev app ---
 createDevApp()
-  .registerPlugin(catalogPlugin)
+  // Register the helloworld plugin
   .registerPlugin(helloworldPlugin)
-  // Bind the mock catalog API for dev usage
+  // Register the mock catalog API
   .registerApi({
     api: catalogApiRef,
     deps: {},
-    factory: () => mockCatalogApi,
+    factory: () => mockCatalogApi as CatalogApi,
   })
-  // Provide a simple entity page route so that EntityRefLink and similar references can resolve
+  // Register Catalog pages to bind the route refs, but hide them from the sidebar
   .addPage({
-    element: <div>Dev Entity Page (Placeholder)</div>,
-    title: 'Entity Page',
-    path: '/catalog/:namespace/:kind/:name',
+    element: <CatalogIndexPage />,
+    title: 'Catalog',
+    path: '/catalog',
+    showInSidebar: false,
   })
-  // Then the custom pages for each card
+  .addPage({
+    element: <CatalogEntityPage />,
+    title: 'Catalog Entity Page',
+    path: '/catalog/:namespace/:kind/:name/*',
+    showInSidebar: false,
+  })
+  // Register pages for your helloworld plugin cards
   .addPage({
     element: createCardPage(<EntityConsumedApisCard />),
     title: 'Consumed APIs Card',
@@ -202,4 +205,3 @@ createDevApp()
     path: '/helloworld/has-subcomponents',
   })
   .render();
-      
