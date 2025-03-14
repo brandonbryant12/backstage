@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Component that displays components an entity depends on, migrated to MUI 5.
-Removed title and variant usage, no table title.
-</ai_context> */
-
 import { RELATION_DEPENDS_ON, ComponentEntity } from '@backstage/catalog-model';
 import {
   TableColumn,
@@ -17,15 +12,10 @@ import {
 } from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
-export interface EntityDependsOnComponentsCardProps {
+export function EntityDependsOnComponentsCard(props: {
   columns?: TableColumn<ComponentEntity>[];
   tableOptions?: TableOptions;
-}
-
-/**
- * Component showing components that the entity depends on
- */
-export function EntityDependsOnComponentsCard(props: EntityDependsOnComponentsCardProps) {
+}) {
   const {
     columns = componentEntityColumns,
     tableOptions = {},
@@ -43,3 +33,4 @@ export function EntityDependsOnComponentsCard(props: EntityDependsOnComponentsCa
     />
   );
 }
+      

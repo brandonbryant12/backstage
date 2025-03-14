@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Provides preset column configurations for different entity types.
-</ai_context> */
-
 import { ComponentEntity, SystemEntity } from '@backstage/catalog-model';
 import { TableColumn } from '@backstage/core-components';
 import { columnFactories } from './columns';

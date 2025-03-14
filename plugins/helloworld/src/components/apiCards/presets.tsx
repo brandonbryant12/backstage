@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Provides preset column configurations for API entities.
-</ai_context> */
-
 import { ApiEntity } from '@backstage/catalog-model';
 import { EntityTable } from './EntityTable';
 import { TableColumn } from '@backstage/core-components';

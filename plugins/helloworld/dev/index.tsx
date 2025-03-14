@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Dev server configuration for local plugin development, showcasing various entity cards.
-Removed references to IntegrationsPage.
-</ai_context> */
-
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
 import { helloworldPlugin } from '../src/plugin';
@@ -78,8 +73,18 @@ const mockEmptyEntity: Entity = {
 // Create a map of all mock entities
 const mockEntitiesMap: Record<string, Entity> = {};
 
-// Generate mock API entities
+// Define arrays for types and lifecycles
+const apiTypes = ['openapi', 'graphql', 'grpc'];
+const lifecycles = ['production', 'experimental', 'deprecated', 'development'];
+const componentTypes = ['service', 'website', 'library'];
+const resourceTypes = ['database', 'queue', 'storage'];
+const subcomponentTypes = ['library', 'module', 'service'];
+
+// Generate mock entities
 Array.from({ length: 15 }, (_, i) => {
+  const typeIndex = i % 3;
+  const lifecycleIndex = i % 4;
+
   // Consumed APIs
   mockEntitiesMap[`api:default/consumed-api-${i + 1}`] = {
     apiVersion: 'backstage.io/v1alpha1',
@@ -90,15 +95,8 @@ Array.from({ length: 15 }, (_, i) => {
       description: `${loremDescription} This is consumed API #${i + 1}.`,
     },
     spec: {
-      type: i % 3 === 0 ? 'openapi' : i % 3 === 1 ? 'graphql' : 'grpc',
-      lifecycle:
-        i % 4 === 0
-          ? 'production'
-          : i % 4 === 1
-          ? 'experimental'
-          : i % 4 === 2
-          ? 'deprecated'
-          : 'development',
+      type: apiTypes[typeIndex],
+      lifecycle: lifecycles[lifecycleIndex],
     },
   };
 
@@ -112,15 +110,8 @@ Array.from({ length: 15 }, (_, i) => {
       description: `${loremDescription} This is provided API #${i + 1}.`,
     },
     spec: {
-      type: i % 3 === 0 ? 'openapi' : i % 3 === 1 ? 'graphql' : 'grpc',
-      lifecycle:
-        i % 4 === 0
-          ? 'production'
-          : i % 4 === 1
-          ? 'experimental'
-          : i % 4 === 2
-          ? 'deprecated'
-          : 'development',
+      type: apiTypes[typeIndex],
+      lifecycle: lifecycles[lifecycleIndex],
     },
   };
 
@@ -134,15 +125,8 @@ Array.from({ length: 15 }, (_, i) => {
       description: `${loremDescription} This is dependency component #${i + 1}.`,
     },
     spec: {
-      type: i % 3 === 0 ? 'service' : i % 3 === 1 ? 'website' : 'library',
-      lifecycle:
-        i % 4 === 0
-          ? 'production'
-          : i % 4 === 1
-          ? 'experimental'
-          : i % 4 === 2
-          ? 'deprecated'
-          : 'development',
+      type: componentTypes[typeIndex],
+      lifecycle: lifecycles[lifecycleIndex],
     },
   };
 
@@ -156,15 +140,8 @@ Array.from({ length: 15 }, (_, i) => {
       description: `${loremDescription} This is dependency resource #${i + 1}.`,
     },
     spec: {
-      type: i % 3 === 0 ? 'database' : i % 3 === 1 ? 'queue' : 'storage',
-      lifecycle:
-        i % 4 === 0
-          ? 'production'
-          : i % 4 === 1
-          ? 'experimental'
-          : i % 4 === 2
-          ? 'deprecated'
-          : 'development',
+      type: resourceTypes[typeIndex],
+      lifecycle: lifecycles[lifecycleIndex],
     },
   };
 
@@ -178,15 +155,8 @@ Array.from({ length: 15 }, (_, i) => {
       description: `${loremDescription} This is subcomponent #${i + 1}.`,
     },
     spec: {
-      type: i % 3 === 0 ? 'library' : i % 3 === 1 ? 'module' : 'service',
-      lifecycle:
-        i % 4 === 0
-          ? 'production'
-          : i % 4 === 1
-          ? 'experimental'
-          : i % 4 === 2
-          ? 'deprecated'
-          : 'development',
+      type: subcomponentTypes[typeIndex],
+      lifecycle: lifecycles[lifecycleIndex],
     },
   };
 });
@@ -261,3 +231,4 @@ createDevApp()
     path: '/helloworld/has-subcomponents',
   })
   .render();
+      

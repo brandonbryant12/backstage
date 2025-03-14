@@ -15,12 +15,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
     getEntitiesByRefs: jest.fn(),
   };
 
-  const Wrapper = ({ children }: { children?: React.ReactNode }) => (
-    <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
-      {children}
-    </TestApiProvider>
-  );
-
   afterEach(() => jest.resetAllMocks());
 
   it('should display empty message when no related entities exist', async () => {
@@ -37,7 +31,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
     const renderEntities = (entities: Entity[]) => entities as Entity[];
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
             columns={[]}
@@ -47,7 +41,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
             asRenderableEntities={renderEntities}
           />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
@@ -93,7 +87,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
     const renderEntities = (entities: Entity[]) => entities as Entity[];
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
             columns={[{ title: 'Name', field: 'metadata.name' }]}
@@ -103,7 +97,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
             asRenderableEntities={renderEntities}
           />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
@@ -116,3 +110,4 @@ describe('<EntityRelatedEntitiesCard />', () => {
     });
   });
 });
+      

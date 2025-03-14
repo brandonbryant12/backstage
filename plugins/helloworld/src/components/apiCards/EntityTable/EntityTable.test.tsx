@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Tests for the EntityTable component. Removed checks for table title, as the table no longer has one.
-</ai_context> */
-
 import { Entity } from '@backstage/catalog-model';
 import { renderInTestApp } from '@backstage/test-utils';
 import { screen, waitFor } from '@testing-library/react';
@@ -54,3 +50,4 @@ describe('<EntityTable />', () => {
     });
   });
 });
+      

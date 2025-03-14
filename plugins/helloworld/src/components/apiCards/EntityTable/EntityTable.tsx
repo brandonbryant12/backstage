@@ -13,7 +13,7 @@ import {
 /**
  * Props for EntityTable.
  */
-export interface EntityTableProps<T extends Entity> {
+interface EntityTableProps<T extends Entity> {
   entities: T[];
   emptyContent?: ReactNode;
   columns: TableColumn<T>[];
@@ -69,3 +69,4 @@ export const EntityTable = <T extends Entity>(props: EntityTableProps<T>) => {
 EntityTable.columns = columnFactories;
 EntityTable.systemEntityColumns = systemEntityColumns;
 EntityTable.componentEntityColumns = componentEntityColumns;
+      

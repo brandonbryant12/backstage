@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Base component for various entity relationship cards, migrated to MUI 5. 
-Now removing InfoCard title, variant usage, and not passing any title to the table.
-</ai_context> */
-
 import { Entity } from '@backstage/catalog-model';
 import { Typography } from '@mui/material';
 import {
@@ -21,13 +16,7 @@ import {
   TableOptions,
 } from '@backstage/core-components';
 
-/**
- * Props for EntityRelatedEntitiesCard
- */
-export interface EntityRelatedEntitiesCardProps<T extends Entity> {
-  /**
-   * (Removed the usage of title for the table.)
-   */
+interface EntityRelatedEntitiesCardProps<T extends Entity> {
   relationType: string;
   entityKind?: string;
   columns: TableColumn<T>[];
@@ -37,10 +26,6 @@ export interface EntityRelatedEntitiesCardProps<T extends Entity> {
   tableOptions?: TableOptions;
 }
 
-/**
- * A low level card component for building entity relationship cards
- * No longer displays a title or variant on the InfoCard, and table has no title.
- */
 export const EntityRelatedEntitiesCard = <T extends Entity>(
   props: EntityRelatedEntitiesCardProps<T>,
 ) => {
@@ -96,3 +81,4 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
     </InfoCard>
   );
 };
+      

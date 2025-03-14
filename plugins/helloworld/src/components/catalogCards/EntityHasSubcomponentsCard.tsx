@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Component that displays subcomponents of an entity, migrated to MUI 5.
-Removed title and variant usage, no table title.
-</ai_context> */
-
 import { ComponentEntity, RELATION_HAS_PART } from '@backstage/catalog-model';
 import {
   TableColumn,
@@ -16,15 +11,10 @@ import {
 } from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
-export interface EntityHasSubcomponentsCardProps {
+export function EntityHasSubcomponentsCard(props: {
   columns?: TableColumn<ComponentEntity>[];
   tableOptions?: TableOptions;
-}
-
-/**
- * Component showing subcomponents that are part of the entity
- */
-export function EntityHasSubcomponentsCard(props: EntityHasSubcomponentsCardProps) {
+}) {
   const {
     columns = componentEntityColumns,
     tableOptions = {},
@@ -42,3 +32,4 @@ export function EntityHasSubcomponentsCard(props: EntityHasSubcomponentsCardProp
     />
   );
 }
+      

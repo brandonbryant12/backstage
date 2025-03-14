@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Tests for the EntityConsumedApisCard component
-Removed checks for heading text, keep emptyMessage checks.
-</ai_context> */
-
 import { Entity, RELATION_CONSUMES_API } from '@backstage/catalog-model';
 import {
   catalogApiRef,
@@ -20,12 +15,6 @@ describe('<EntityConsumedApisCard />', () => {
     getEntitiesByRefs: jest.fn(),
   };
 
-  const Wrapper = ({ children }: { children?: React.ReactNode }) => (
-    <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
-      {children}
-    </TestApiProvider>
-  );
-
   afterEach(() => jest.resetAllMocks());
 
   it('should show empty list when no relations exist', async () => {
@@ -40,11 +29,11 @@ describe('<EntityConsumedApisCard />', () => {
     };
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityConsumedApisCard />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
@@ -87,11 +76,11 @@ describe('<EntityConsumedApisCard />', () => {
     });
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityConsumedApisCard />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
@@ -104,3 +93,4 @@ describe('<EntityConsumedApisCard />', () => {
     });
   });
 });
+      

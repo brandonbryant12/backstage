@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Generic card for API relationships, removing InfoCard title/variant usage, no table title.
-</ai_context> */
-
 import React from 'react';
 import { useEntity, useRelatedEntities } from '@backstage/plugin-catalog-react';
 import { ApiEntity } from '@backstage/catalog-model';
@@ -17,7 +13,7 @@ import {
 import { Typography } from '@mui/material';
 import { EntityTable } from './EntityTable';
 
-export interface EntityApiRelationshipCardProps {
+interface EntityApiRelationshipCardProps {
   relationType: string;
   columns: TableColumn<ApiEntity>[];
   emptyMessage?: string;
@@ -79,3 +75,4 @@ export function EntityApiRelationshipCard(props: EntityApiRelationshipCardProps)
     </InfoCard>
   );
 }
+      

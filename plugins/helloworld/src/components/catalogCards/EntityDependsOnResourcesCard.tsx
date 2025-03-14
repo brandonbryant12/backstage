@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Component that displays resources an entity depends on, migrated to MUI 5.
-Removed title and variant usage, no table title.
-</ai_context> */
-
 import { RELATION_DEPENDS_ON, ResourceEntity } from '@backstage/catalog-model';
 import {
   TableColumn,
@@ -17,15 +12,10 @@ import {
 } from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
-export interface EntityDependsOnResourcesCardProps {
+export function EntityDependsOnResourcesCard(props: {
   columns?: TableColumn<ResourceEntity>[];
   tableOptions?: TableOptions;
-}
-
-/**
- * Component showing resources that the entity depends on
- */
-export function EntityDependsOnResourcesCard(props: EntityDependsOnResourcesCardProps) {
+}) {
   const {
     columns = resourceEntityColumns,
     tableOptions = {},
@@ -43,3 +33,4 @@ export function EntityDependsOnResourcesCard(props: EntityDependsOnResourcesCard
     />
   );
 }
+      

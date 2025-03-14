@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Provides column factory functions for EntityTable, migrated to MUI 5.
-</ai_context> */
-
 import {
   Entity,
   CompoundEntityRef,

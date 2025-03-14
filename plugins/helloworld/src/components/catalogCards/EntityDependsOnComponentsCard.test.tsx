@@ -1,9 +1,4 @@
 
-/* <ai_context>
-Tests for the EntityDependsOnComponentsCard component.
-Removed checks for the heading text, keep emptyMessage checks.
-</ai_context> */
-
 import { Entity, RELATION_DEPENDS_ON } from '@backstage/catalog-model';
 import {
   catalogApiRef,
@@ -20,12 +15,6 @@ describe('<EntityDependsOnComponentsCard />', () => {
     getEntitiesByRefs: jest.fn(),
   };
 
-  const Wrapper = ({ children }: { children?: React.ReactNode }) => (
-    <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
-      {children}
-    </TestApiProvider>
-  );
-
   afterEach(() => jest.resetAllMocks());
 
   it('should show empty list if no dependencies', async () => {
@@ -40,19 +29,17 @@ describe('<EntityDependsOnComponentsCard />', () => {
     };
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityDependsOnComponentsCard />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
         },
       },
     );
-
-    // No heading check
     expect(
       screen.getByText(/No component is a dependency of this component/i),
     ).toBeInTheDocument();
@@ -88,11 +75,11 @@ describe('<EntityDependsOnComponentsCard />', () => {
     });
 
     await renderInTestApp(
-      <Wrapper>
+      <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityDependsOnComponentsCard />
         </EntityProvider>
-      </Wrapper>,
+      </TestApiProvider>,
       {
         mountedRoutes: {
           '/catalog/:namespace/:kind/:name': entityRouteRef,
@@ -101,8 +88,8 @@ describe('<EntityDependsOnComponentsCard />', () => {
     );
 
     await waitFor(() => {
-      // No heading check
       expect(screen.getByText(/dependency-component/i)).toBeInTheDocument();
     });
   });
 });
+      
