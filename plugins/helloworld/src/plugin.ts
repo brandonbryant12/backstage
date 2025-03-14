@@ -3,7 +3,7 @@ import {
   createPlugin,
   createRoutableExtension,
 } from '@backstage/core-plugin-api';
-import { rootRouteRef, catalogCardsRouteRef, apiCardsRouteRef } from './routes';
+import { rootRouteRef, catalogCardsRouteRef, apiCardsRouteRef, integrationsRouteRef } from './routes';
 
 // Import individual card components
 import { EntityConsumedApisCard } from './components/apiCards/EntityConsumedApisCard';
@@ -18,6 +18,7 @@ export const helloworldPlugin = createPlugin({
     root: rootRouteRef,
     catalogCards: catalogCardsRouteRef,
     apiCards: apiCardsRouteRef,
+    integrations: integrationsRouteRef,
   },
 });
 
@@ -27,6 +28,16 @@ export const HelloworldPage = helloworldPlugin.provide(
     component: () =>
       import('./components/ExampleComponent').then(m => m.ExampleComponent),
     mountPoint: rootRouteRef,
+  }),
+);
+
+// Export IntegrationsPage with lazy loading
+export const IntegrationsPage = helloworldPlugin.provide(
+  createRoutableExtension({
+    name: 'IntegrationsPage',
+    component: () =>
+      import('./components/IntegrationsPage').then(m => m.IntegrationsPage),
+    mountPoint: integrationsRouteRef,
   }),
 );
 

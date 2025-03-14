@@ -1,9 +1,4 @@
-
-/* <ai_context>
-A general entity table component migrated from Backstage to MUI 5.
-Used for composing more specific entity tables.
-</ai_context> */
-
+// Updates to plugins/helloworld/src/components/apiCards/EntityTable/EntityTable.tsx
 import { Entity } from '@backstage/catalog-model';
 import { styled } from '@mui/material/styles';
 import React, { ReactNode } from 'react';
@@ -67,10 +62,14 @@ export const EntityTable = <T extends Entity>(props: EntityTableProps<T>) => {
       }
       options={{
         search: false,
-        paging: false,
-        actionsColumnIndex: -1,
+        paging: true,
+        pageSize: 10,
         padding: 'dense',
         draggable: false,
+        headerStyle: {
+          borderTop: 'none',
+          borderBottom: 'none',
+        },
         ...tableOptions,
       }}
       data={entities}
@@ -81,4 +80,3 @@ export const EntityTable = <T extends Entity>(props: EntityTableProps<T>) => {
 EntityTable.columns = columnFactories;
 EntityTable.systemEntityColumns = systemEntityColumns;
 EntityTable.componentEntityColumns = componentEntityColumns;
-      
