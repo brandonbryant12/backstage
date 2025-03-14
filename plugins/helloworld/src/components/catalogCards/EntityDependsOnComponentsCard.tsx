@@ -1,23 +1,18 @@
 
-import { RELATION_DEPENDS_ON, ComponentEntity } from '@backstage/catalog-model';
+import { RELATION_DEPENDS_ON } from '@backstage/catalog-model';
 import {
   TableColumn,
   TableOptions,
 } from '@backstage/core-components';
 import React from 'react';
-import {
-  asComponentEntities,
-  componentEntityColumns,
-  componentEntityHelpLink,
-} from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
 export function EntityDependsOnComponentsCard(props: {
-  columns?: TableColumn<ComponentEntity>[];
+  columns?: TableColumn<any>[];
   tableOptions?: TableOptions;
 }) {
   const {
-    columns = componentEntityColumns,
+    columns,
     tableOptions = {},
   } = props;
   
@@ -27,8 +22,6 @@ export function EntityDependsOnComponentsCard(props: {
       relationType={RELATION_DEPENDS_ON}
       columns={columns}
       emptyMessage="No component is a dependency of this component"
-      emptyHelpLink={componentEntityHelpLink}
-      asRenderableEntities={asComponentEntities}
       tableOptions={tableOptions}
     />
   );

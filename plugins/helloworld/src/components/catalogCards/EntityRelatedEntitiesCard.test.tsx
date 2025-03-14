@@ -28,17 +28,13 @@ describe('<EntityRelatedEntitiesCard />', () => {
       relations: [],
     };
 
-    const renderEntities = (entities: Entity[]) => entities as Entity[];
-
     await renderInTestApp(
       <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
-            columns={[]}
             relationType="test"
+            entityKind="Component"
             emptyMessage="No related entities"
-            emptyHelpLink="https://example.com"
-            asRenderableEntities={renderEntities}
           />
         </EntityProvider>
       </TestApiProvider>,
@@ -49,7 +45,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
       },
     );
 
-    // Removed title expectation as the component no longer renders a title.
     expect(screen.getByText('No related entities')).toBeInTheDocument();
     expect(screen.getByText('Learn how to change this')).toBeInTheDocument();
   });
@@ -84,17 +79,13 @@ describe('<EntityRelatedEntitiesCard />', () => {
       ],
     });
 
-    const renderEntities = (entities: Entity[]) => entities as Entity[];
-
     await renderInTestApp(
       <TestApiProvider apis={[[catalogApiRef, catalogApi]]}>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
-            columns={[{ title: 'Name', field: 'metadata.name' }]}
             relationType="test"
+            entityKind="Component"
             emptyMessage="No related entities"
-            emptyHelpLink="https://example.com"
-            asRenderableEntities={renderEntities}
           />
         </EntityProvider>
       </TestApiProvider>,

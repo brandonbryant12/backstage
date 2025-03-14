@@ -1,5 +1,5 @@
 
-import { Entity } from '@backstage/catalog-model';
+import { Entity, ComponentEntity, ResourceEntity, SystemEntity } from '@backstage/catalog-model';
 import { Typography } from '@mui/material';
 import {
   useEntity,
@@ -19,11 +19,29 @@ import {
 interface EntityRelatedEntitiesCardProps<T extends Entity> {
   relationType: string;
   entityKind?: string;
-  columns: TableColumn<T>[];
+  columns?: TableColumn<T>[];
   emptyMessage: string;
-  emptyHelpLink: string;
-  asRenderableEntities: (entities: Entity[]) => T[];
+  emptyHelpLink?: string;
   tableOptions?: TableOptions;
+}
+
+function getColumnsForKind<T extends Entity>(kind: string | undefined): TableColumn<T>[] {
+  switch (kind) {
+    case 'Component':
+      return [
+        EntityTable.columns.createEntityRefColumn({ defaultKind: 'component' }),
+        EntityTable.columns.createOwnerColumn(),
+        EntityTable.columns.createSpecTypeColumn(),
+        EntityTable.columns.createSpecLifecycleColumn(),
+        EntityTable.columns.createMetadataDescriptionColumn(),
+      ] as TableColumn<T>[];
+    default:
+      return [
+        EntityTable.columns.createEntityRefColumn({ defaultKind: kind || 'entity' }),
+        EntityTable.columns.createOwnerColumn(),
+        EntityTable.columns.createMetadataDescriptionColumn(),
+      ] as TableColumn<T>[];
+  }
 }
 
 export const EntityRelatedEntitiesCard = <T extends Entity>(
@@ -32,10 +50,9 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
   const {
     relationType,
     entityKind,
-    columns,
+    columns = getColumnsForKind(entityKind) as TableColumn<T>[],
     emptyMessage,
-    emptyHelpLink,
-    asRenderableEntities,
+    emptyHelpLink = 'https://backstage.io/docs/features/software-catalog/descriptor-format',
     tableOptions = {},
   } = props;
   
@@ -61,10 +78,26 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
     );
   }
 
+  // Type assertion based on entityKind
+  let typedEntities: T[];
+  switch (entityKind) {
+    case 'Component':
+      typedEntities = (entities || []) as ComponentEntity[] as T[];
+      break;
+    case 'Resource':
+      typedEntities = (entities || []) as ResourceEntity[] as T[];
+      break;
+    case 'System':
+      typedEntities = (entities || []) as SystemEntity[] as T[];
+      break;
+    default:
+      typedEntities = (entities || []) as T[];
+  }
+
   return (
     <InfoCard>
       <EntityTable
-        entities={asRenderableEntities(entities || [])}
+        entities={typedEntities}
         emptyContent={
           <div style={{ textAlign: 'center' }}>
             <Typography variant="body1">{emptyMessage}</Typography>
