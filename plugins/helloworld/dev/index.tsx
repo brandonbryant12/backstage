@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
 import { helloworldPlugin } from '../src/plugin';
@@ -14,6 +15,7 @@ import {
 } from '@backstage/plugin-catalog-react';
 import { CatalogEntityPage, CatalogIndexPage } from '@backstage/plugin-catalog';
 import { Grid } from '@mui/material';
+import { IntegrationsPage } from '../src/components/IntegrationsPage';
 
 // Lorem ipsum description
 const loremDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
@@ -172,6 +174,15 @@ function createCardPage(card: JSX.Element) {
   );
 }
 
+// Create a page with EntityProvider for the IntegrationsPage
+function createIntegrationsPage() {
+  return (
+    <EntityProvider entity={mockEntity}>
+      <IntegrationsPage />
+    </EntityProvider>
+  );
+}
+
 // --- Create and render the dev app ---
 createDevApp()
   // Register the helloworld plugin
@@ -220,4 +231,11 @@ createDevApp()
     title: 'Has Subcomponents Card',
     path: '/helloworld/has-subcomponents',
   })
+  // Register Integrations page
+  .addPage({
+    element: createIntegrationsPage(),
+    title: 'Integrations Page',
+    path: '/helloworld/integrations',
+  })
   .render();
+      

@@ -1,28 +1,26 @@
 
 /* <ai_context>
-A generic component for displaying API relationships (both consumed and provided)
+Component that displays API entities related to an entity via a specified relationship
 </ai_context> */
 
 import { ApiEntity } from '@backstage/catalog-model';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Typography } from '@mui/material';
 import {
   useEntity,
   useRelatedEntities,
 } from '@backstage/plugin-catalog-react';
 import React from 'react';
-import { apiEntityColumns } from './presets';
 import { EntityTable } from './EntityTable';
 import {
-  CodeSnippet,
   InfoCard,
   InfoCardVariants,
   Link,
   Progress,
+  ResponseErrorPanel,
   TableColumn,
   TableOptions,
-  WarningPanel,
 } from '@backstage/core-components';
+import { apiEntityColumns } from './presets';
 
 /**
  * Props for EntityApiRelationshipCard
@@ -30,41 +28,28 @@ import {
 export interface EntityApiRelationshipCardProps {
   variant?: InfoCardVariants;
   title: string;
-  relationType: string;
   columns?: TableColumn<ApiEntity>[];
+  relationType: string;
   tableOptions?: TableOptions;
-  emptyMessage?: string;
-  emptyHelpLink?: string;
 }
 
 /**
- * Generic component for displaying API relationships
+ * A component for displaying APIs related to an entity
  */
 export const EntityApiRelationshipCard = (props: EntityApiRelationshipCardProps) => {
   const {
     variant = 'gridItem',
     title,
-    relationType,
     columns = apiEntityColumns,
+    relationType,
     tableOptions = {},
-    emptyMessage,
-    emptyHelpLink,
   } = props;
   
   const { entity } = useEntity();
   const { entities, loading, error } = useRelatedEntities(entity, {
     type: relationType,
+    kind: 'API',
   });
-
-  // Default empty state content based on entity kind and type
-  const defaultEmptyMessage = `This ${entity.kind.toLocaleLowerCase('en-US')} does not ${
-    relationType.includes('consumes') ? 'consume' : 'provide'
-  } any APIs.`;
-
-  // Default help link based on relation type
-  const defaultHelpLink = relationType.includes('consumes')
-    ? 'https://backstage.io/docs/features/software-catalog/descriptor-format#specconsumesapis-optional'
-    : 'https://backstage.io/docs/features/software-catalog/descriptor-format#specprovidesapis-optional';
 
   if (loading) {
     return (
@@ -74,40 +59,37 @@ export const EntityApiRelationshipCard = (props: EntityApiRelationshipCardProps)
     );
   }
 
-  if (error || !entities) {
+  if (error) {
     return (
       <InfoCard variant={variant} title={title}>
-        <WarningPanel
-          severity="error"
-          title="Could not load APIs"
-          message={<CodeSnippet text={`${error}`} language="text" />}
-        />
+        <ResponseErrorPanel error={error} />
       </InfoCard>
     );
   }
+
+  const apiEntities = (entities || []) as ApiEntity[];
+  const typeRelationship = relationType === 'providesApi' ? 'provide' : 'consume';
 
   return (
     <EntityTable
       title={title}
       variant={variant}
       emptyContent={
-        <Box style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
           <Typography variant="body1">
-            {emptyMessage || defaultEmptyMessage}
+            This entity does not {typeRelationship} any APIs
           </Typography>
           <Typography variant="body2">
-            <Link
-              to={emptyHelpLink || defaultHelpLink}
-              externalLinkIcon
-            >
+            <Link to="https://backstage.io/docs/features/software-catalog/descriptor-format#specprovidesapis-optional">
               Learn how to change this
             </Link>
           </Typography>
-        </Box>
+        </div>
       }
       columns={columns}
+      entities={apiEntities}
       tableOptions={tableOptions}
-      entities={entities as ApiEntity[]}
     />
   );
 };
+      
