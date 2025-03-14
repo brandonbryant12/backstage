@@ -3,7 +3,6 @@ import {
   Entity,
   CompoundEntityRef,
   RELATION_OWNED_BY,
-  RELATION_PART_OF,
 } from '@backstage/catalog-model';
 import { OverflowTooltip, TableColumn } from '@backstage/core-components';
 import React from 'react';
@@ -16,22 +15,9 @@ import {
 
 export const columnFactories = Object.freeze({
   createEntityRefColumn<T extends Entity>(): TableColumn<T> {
-    function formatContent(entity: T): string {
-      return (
-        entity.metadata?.title ||
-        humanizeEntityRef(entity)
-      );
-    }
-
     return {
       title: 'Name',
       highlight: true,
-      customFilterAndSearch(filter, entity) {
-        return formatContent(entity).includes(filter);
-      },
-      customSort(entity1, entity2) {
-        return formatContent(entity1).localeCompare(formatContent(entity2));
-      },
       render: entity => (
         <EntityRefLink
           entityRef={entity}
@@ -59,9 +45,6 @@ export const columnFactories = Object.freeze({
 
     return {
       title,
-      customFilterAndSearch(filter, entity) {
-        return formatContent(entity).includes(filter);
-      },
       customSort(entity1, entity2) {
         return formatContent(entity1).localeCompare(formatContent(entity2));
       },
@@ -76,21 +59,6 @@ export const columnFactories = Object.freeze({
     return this.createEntityRelationColumn({
       title: 'Owner',
       relation: RELATION_OWNED_BY,
-    });
-  },
-  createDomainColumn<T extends Entity>(): TableColumn<T> {
-    return this.createEntityRelationColumn({
-      title: 'Domain',
-      relation: RELATION_PART_OF,
-      filter: {
-        kind: 'domain',
-      },
-    });
-  },
-  createSystemColumn<T extends Entity>(): TableColumn<T> {
-    return this.createEntityRelationColumn({
-      title: 'System',
-      relation: RELATION_PART_OF,
     });
   },
   createMetadataDescriptionColumn<T extends Entity>(): TableColumn<T> {
