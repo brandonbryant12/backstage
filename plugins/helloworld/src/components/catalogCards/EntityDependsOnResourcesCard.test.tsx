@@ -1,6 +1,7 @@
 
 /* <ai_context>
-Tests for the EntityDependsOnResourcesCard component
+Tests for the EntityDependsOnResourcesCard component.
+Removed checks for heading text, keep emptyMessage checks.
 </ai_context> */
 
 import { Entity, RELATION_DEPENDS_ON } from '@backstage/catalog-model';
@@ -51,7 +52,6 @@ describe('<EntityDependsOnResourcesCard />', () => {
       },
     );
 
-    expect(screen.getByText('Depends on resources')).toBeInTheDocument();
     expect(
       screen.getByText(/No resource is a dependency of this component/i),
     ).toBeInTheDocument();
@@ -100,9 +100,7 @@ describe('<EntityDependsOnResourcesCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Depends on resources')).toBeInTheDocument();
       expect(screen.getByText(/dependency-resource/i)).toBeInTheDocument();
     });
   });
 });
-      

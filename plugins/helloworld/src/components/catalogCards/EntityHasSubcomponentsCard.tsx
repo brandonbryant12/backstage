@@ -1,11 +1,11 @@
 
 /* <ai_context>
 Component that displays subcomponents of an entity, migrated to MUI 5.
+Removed title and variant usage, no table title.
 </ai_context> */
 
 import { ComponentEntity, RELATION_HAS_PART } from '@backstage/catalog-model';
 import {
-  InfoCardVariants,
   TableColumn,
   TableOptions,
 } from '@backstage/core-components';
@@ -16,12 +16,7 @@ import {
 } from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
-/**
- * Props for EntityHasSubcomponentsCard
- */
 export interface EntityHasSubcomponentsCardProps {
-  variant?: InfoCardVariants;
-  title?: string;
   columns?: TableColumn<ComponentEntity>[];
   tableOptions?: TableOptions;
 }
@@ -31,16 +26,12 @@ export interface EntityHasSubcomponentsCardProps {
  */
 export function EntityHasSubcomponentsCard(props: EntityHasSubcomponentsCardProps) {
   const {
-    variant = 'gridItem',
-    title = 'Has subcomponents',
     columns = componentEntityColumns,
     tableOptions = {},
   } = props;
   
   return (
     <EntityRelatedEntitiesCard
-      variant={variant}
-      title={title}
       entityKind="Component"
       relationType={RELATION_HAS_PART}
       columns={columns}
@@ -51,4 +42,3 @@ export function EntityHasSubcomponentsCard(props: EntityHasSubcomponentsCardProp
     />
   );
 }
-      

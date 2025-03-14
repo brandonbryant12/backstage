@@ -1,85 +1,75 @@
 
+/* <ai_context>
+Helloworld plugin main file. Removed IntegrationsPage route, replaced each card's createRoutableExtension with createComponentExtension for lazy loading, removed usage of routeRefs for them.
+</ai_context> */
+
 import {
   createPlugin,
-  createRoutableExtension,
+  createComponentExtension,
 } from '@backstage/core-plugin-api';
-import { rootRouteRef, catalogCardsRouteRef, apiCardsRouteRef, integrationsRouteRef } from './routes';
 
-// Import individual card components
-import { EntityConsumedApisCard } from './components/apiCards/EntityConsumedApisCard';
-import { EntityProvidedApisCard } from './components/apiCards/EntityProvidedApisCard';
-import { EntityDependsOnComponentsCard } from './components/catalogCards/EntityDependsOnComponentsCard';
-import { EntityDependsOnResourcesCard } from './components/catalogCards/EntityDependsOnResourcesCard';
-import { EntityHasSubcomponentsCard } from './components/catalogCards/EntityHasSubcomponentsCard';
-
+// Import individual card components lazy
 export const helloworldPlugin = createPlugin({
   id: 'helloworld',
-  routes: {
-    root: rootRouteRef,
-    catalogCards: catalogCardsRouteRef,
-    apiCards: apiCardsRouteRef,
-    integrations: integrationsRouteRef,
-  },
 });
 
-export const HelloworldPage = helloworldPlugin.provide(
-  createRoutableExtension({
-    name: 'HelloworldPage',
-    component: () =>
-      import('./components/ExampleComponent').then(m => m.ExampleComponent),
-    mountPoint: rootRouteRef,
-  }),
-);
 
-// Export IntegrationsPage with lazy loading
-export const IntegrationsPage = helloworldPlugin.provide(
-  createRoutableExtension({
-    name: 'IntegrationsPage',
-    component: () =>
-      import('./components/IntegrationsPage').then(m => m.IntegrationsPage),
-    mountPoint: integrationsRouteRef,
-  }),
-);
-
-// Export individual API cards
 export const EntityConsumedApisCardExtension = helloworldPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'EntityConsumedApisCard',
-    component: () => Promise.resolve(EntityConsumedApisCard),
-    mountPoint: apiCardsRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/apiCards/EntityConsumedApisCard').then(
+          m => m.EntityConsumedApisCard,
+        ),
+    },
   }),
 );
 
 export const EntityProvidedApisCardExtension = helloworldPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'EntityProvidedApisCard',
-    component: () => Promise.resolve(EntityProvidedApisCard),
-    mountPoint: apiCardsRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/apiCards/EntityProvidedApisCard').then(
+          m => m.EntityProvidedApisCard,
+        ),
+    },
   }),
 );
 
-// Export individual catalog cards
 export const EntityDependsOnComponentsCardExtension = helloworldPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'EntityDependsOnComponentsCard',
-    component: () => Promise.resolve(EntityDependsOnComponentsCard),
-    mountPoint: catalogCardsRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/catalogCards/EntityDependsOnComponentsCard').then(
+          m => m.EntityDependsOnComponentsCard,
+        ),
+    },
   }),
 );
 
 export const EntityDependsOnResourcesCardExtension = helloworldPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'EntityDependsOnResourcesCard',
-    component: () => Promise.resolve(EntityDependsOnResourcesCard),
-    mountPoint: catalogCardsRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/catalogCards/EntityDependsOnResourcesCard').then(
+          m => m.EntityDependsOnResourcesCard,
+        ),
+    },
   }),
 );
 
 export const EntityHasSubcomponentsCardExtension = helloworldPlugin.provide(
-  createRoutableExtension({
+  createComponentExtension({
     name: 'EntityHasSubcomponentsCard',
-    component: () => Promise.resolve(EntityHasSubcomponentsCard),
-    mountPoint: catalogCardsRouteRef,
+    component: {
+      lazy: () =>
+        import('./components/catalogCards/EntityHasSubcomponentsCard').then(
+          m => m.EntityHasSubcomponentsCard,
+        ),
+    },
   }),
 );
-      

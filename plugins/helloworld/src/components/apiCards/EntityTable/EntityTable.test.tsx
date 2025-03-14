@@ -1,6 +1,6 @@
 
 /* <ai_context>
-Tests for the EntityTable component
+Tests for the EntityTable component. Removed checks for table title, as the table no longer has one.
 </ai_context> */
 
 import { Entity } from '@backstage/catalog-model';
@@ -13,14 +13,13 @@ describe('<EntityTable />', () => {
   it('renders empty table with message', async () => {
     await renderInTestApp(
       <EntityTable
-        title="Test Entities"
         entities={[]}
         emptyContent={<div>Empty state</div>}
         columns={[]}
       />,
     );
 
-    expect(screen.getByText('Test Entities')).toBeInTheDocument();
+    // No longer checking for table title. Just check empty state
     expect(screen.getByText('Empty state')).toBeInTheDocument();
   });
 
@@ -39,7 +38,6 @@ describe('<EntityTable />', () => {
 
     await renderInTestApp(
       <EntityTable
-        title="Test Entities"
         entities={entities}
         emptyContent={<div>Empty state</div>}
         columns={[
@@ -52,9 +50,7 @@ describe('<EntityTable />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Test Entities')).toBeInTheDocument();
       expect(screen.getByText('test-entity')).toBeInTheDocument();
     });
   });
 });
-      

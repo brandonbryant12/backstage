@@ -1,6 +1,7 @@
 
 /* <ai_context>
-Base component for various entity relationship cards, migrated to MUI 5.
+Base component for various entity relationship cards, migrated to MUI 5. 
+Now removing InfoCard title, variant usage, and not passing any title to the table.
 </ai_context> */
 
 import { Entity } from '@backstage/catalog-model';
@@ -13,34 +14,23 @@ import React from 'react';
 import { EntityTable } from '../apiCards/EntityTable';
 import {
   InfoCard,
-  InfoCardVariants,
   Link,
   Progress,
   ResponseErrorPanel,
   TableColumn,
   TableOptions,
 } from '@backstage/core-components';
-import {
-  asComponentEntities,
-  asResourceEntities,
-  asSystemEntities,
-  componentEntityColumns,
-  componentEntityHelpLink,
-  resourceEntityColumns,
-  resourceEntityHelpLink,
-  systemEntityColumns,
-  systemEntityHelpLink,
-} from './presets';
 
 /**
  * Props for EntityRelatedEntitiesCard
  */
 export interface EntityRelatedEntitiesCardProps<T extends Entity> {
-  variant?: InfoCardVariants;
-  title: string;
-  columns: TableColumn<T>[];
-  entityKind?: string;
+  /**
+   * (Removed the usage of title for the table.)
+   */
   relationType: string;
+  entityKind?: string;
+  columns: TableColumn<T>[];
   emptyMessage: string;
   emptyHelpLink: string;
   asRenderableEntities: (entities: Entity[]) => T[];
@@ -49,16 +39,15 @@ export interface EntityRelatedEntitiesCardProps<T extends Entity> {
 
 /**
  * A low level card component for building entity relationship cards
+ * No longer displays a title or variant on the InfoCard, and table has no title.
  */
 export const EntityRelatedEntitiesCard = <T extends Entity>(
   props: EntityRelatedEntitiesCardProps<T>,
 ) => {
   const {
-    variant = 'gridItem',
-    title,
-    columns,
-    entityKind,
     relationType,
+    entityKind,
+    columns,
     emptyMessage,
     emptyHelpLink,
     asRenderableEntities,
@@ -73,7 +62,7 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
 
   if (loading) {
     return (
-      <InfoCard variant={variant} title={title}>
+      <InfoCard>
         <Progress />
       </InfoCard>
     );
@@ -81,41 +70,29 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
 
   if (error) {
     return (
-      <InfoCard variant={variant} title={title}>
+      <InfoCard>
         <ResponseErrorPanel error={error} />
       </InfoCard>
     );
   }
 
   return (
-    <EntityTable
-      title={title}
-      variant={variant}
-      emptyContent={
-        <div style={{ textAlign: 'center' }}>
-          <Typography variant="body1">{emptyMessage}</Typography>
-          <Typography variant="body2">
-            <Link to={emptyHelpLink} externalLinkIcon>
-              Learn how to change this
-            </Link>
-          </Typography>
-        </div>
-      }
-      columns={columns}
-      entities={asRenderableEntities(entities || [])}
-      tableOptions={tableOptions}
-    />
+    <InfoCard>
+      <EntityTable
+        entities={asRenderableEntities(entities || [])}
+        emptyContent={
+          <div style={{ textAlign: 'center' }}>
+            <Typography variant="body1">{emptyMessage}</Typography>
+            <Typography variant="body2">
+              <Link to={emptyHelpLink} externalLinkIcon>
+                Learn how to change this
+              </Link>
+            </Typography>
+          </div>
+        }
+        columns={columns}
+        tableOptions={tableOptions}
+      />
+    </InfoCard>
   );
 };
-
-// Static properties for ease of use
-EntityRelatedEntitiesCard.componentEntityColumns = componentEntityColumns;
-EntityRelatedEntitiesCard.componentEntityHelpLink = componentEntityHelpLink;
-EntityRelatedEntitiesCard.asComponentEntities = asComponentEntities;
-EntityRelatedEntitiesCard.resourceEntityColumns = resourceEntityColumns;
-EntityRelatedEntitiesCard.resourceEntityHelpLink = resourceEntityHelpLink;
-EntityRelatedEntitiesCard.asResourceEntities = asResourceEntities;
-EntityRelatedEntitiesCard.systemEntityColumns = systemEntityColumns;
-EntityRelatedEntitiesCard.systemEntityHelpLink = systemEntityHelpLink;
-EntityRelatedEntitiesCard.asSystemEntities = asSystemEntities;
-      

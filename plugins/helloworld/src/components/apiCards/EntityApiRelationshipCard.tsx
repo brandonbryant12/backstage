@@ -1,50 +1,43 @@
 
 /* <ai_context>
-Component that displays API entities related to an entity via a specified relationship
+Generic card for API relationships, removing InfoCard title/variant usage, no table title.
 </ai_context> */
 
-import { ApiEntity } from '@backstage/catalog-model';
-import { Typography } from '@mui/material';
-import {
-  useEntity,
-  useRelatedEntities,
-} from '@backstage/plugin-catalog-react';
 import React from 'react';
-import { EntityTable } from './EntityTable';
+import { useEntity, useRelatedEntities } from '@backstage/plugin-catalog-react';
+import { ApiEntity } from '@backstage/catalog-model';
 import {
   InfoCard,
-  InfoCardVariants,
   Link,
   Progress,
   ResponseErrorPanel,
   TableColumn,
   TableOptions,
 } from '@backstage/core-components';
-import { apiEntityColumns } from './presets';
+import { Typography } from '@mui/material';
+import { EntityTable } from './EntityTable';
 
-/**
- * Props for EntityApiRelationshipCard
- */
 export interface EntityApiRelationshipCardProps {
-  variant?: InfoCardVariants;
-  title: string;
-  columns?: TableColumn<ApiEntity>[];
   relationType: string;
+  columns: TableColumn<ApiEntity>[];
+  emptyMessage?: string;
+  emptyHelpLink?: string;
   tableOptions?: TableOptions;
 }
 
 /**
- * A component for displaying APIs related to an entity
+ * Generic card to display either consumed or provided APIs for an entity.
+ * Removed InfoCard title and variant. No table title is used.
  */
-export const EntityApiRelationshipCard = (props: EntityApiRelationshipCardProps) => {
+export function EntityApiRelationshipCard(props: EntityApiRelationshipCardProps) {
   const {
-    variant = 'gridItem',
-    title,
-    columns = apiEntityColumns,
     relationType,
+    columns,
+    emptyMessage = 'No APIs found for this relationship',
+    emptyHelpLink = 'https://backstage.io',
     tableOptions = {},
   } = props;
-  
+
   const { entity } = useEntity();
   const { entities, loading, error } = useRelatedEntities(entity, {
     type: relationType,
@@ -53,43 +46,36 @@ export const EntityApiRelationshipCard = (props: EntityApiRelationshipCardProps)
 
   if (loading) {
     return (
-      <InfoCard variant={variant} title={title}>
+      <InfoCard>
         <Progress />
       </InfoCard>
     );
   }
-
   if (error) {
     return (
-      <InfoCard variant={variant} title={title}>
+      <InfoCard>
         <ResponseErrorPanel error={error} />
       </InfoCard>
     );
   }
 
-  const apiEntities = (entities || []) as ApiEntity[];
-  const typeRelationship = relationType === 'providesApi' ? 'provide' : 'consume';
-
   return (
-    <EntityTable
-      title={title}
-      variant={variant}
-      emptyContent={
-        <div style={{ textAlign: 'center' }}>
-          <Typography variant="body1">
-            This entity does not {typeRelationship} any APIs
-          </Typography>
-          <Typography variant="body2">
-            <Link to="https://backstage.io/docs/features/software-catalog/descriptor-format#specprovidesapis-optional">
-              Learn how to change this
-            </Link>
-          </Typography>
-        </div>
-      }
-      columns={columns}
-      entities={apiEntities}
-      tableOptions={tableOptions}
-    />
+    <InfoCard>
+      <EntityTable
+        entities={entities as ApiEntity[]}
+        columns={columns}
+        emptyContent={
+          <div style={{ textAlign: 'center' }}>
+            <Typography variant="body1">{emptyMessage}</Typography>
+            <Typography variant="body2">
+              <Link to={emptyHelpLink} externalLinkIcon>
+                Learn how to change this
+              </Link>
+            </Typography>
+          </div>
+        }
+        tableOptions={tableOptions}
+      />
+    </InfoCard>
   );
-};
-      
+}

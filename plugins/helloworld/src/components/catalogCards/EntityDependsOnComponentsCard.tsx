@@ -1,11 +1,11 @@
 
 /* <ai_context>
 Component that displays components an entity depends on, migrated to MUI 5.
+Removed title and variant usage, no table title.
 </ai_context> */
 
 import { RELATION_DEPENDS_ON, ComponentEntity } from '@backstage/catalog-model';
 import {
-  InfoCardVariants,
   TableColumn,
   TableOptions,
 } from '@backstage/core-components';
@@ -17,12 +17,7 @@ import {
 } from './presets';
 import { EntityRelatedEntitiesCard } from './EntityRelatedEntitiesCard';
 
-/**
- * Props for EntityDependsOnComponentsCard
- */
 export interface EntityDependsOnComponentsCardProps {
-  variant?: InfoCardVariants;
-  title?: string;
   columns?: TableColumn<ComponentEntity>[];
   tableOptions?: TableOptions;
 }
@@ -32,16 +27,12 @@ export interface EntityDependsOnComponentsCardProps {
  */
 export function EntityDependsOnComponentsCard(props: EntityDependsOnComponentsCardProps) {
   const {
-    variant = 'gridItem',
-    title = 'Depends on components',
     columns = componentEntityColumns,
     tableOptions = {},
   } = props;
   
   return (
     <EntityRelatedEntitiesCard
-      variant={variant}
-      title={title}
       entityKind="Component"
       relationType={RELATION_DEPENDS_ON}
       columns={columns}
@@ -52,4 +43,3 @@ export function EntityDependsOnComponentsCard(props: EntityDependsOnComponentsCa
     />
   );
 }
-      

@@ -1,6 +1,7 @@
 
 /* <ai_context>
 Tests for the EntityConsumedApisCard component
+Removed checks for heading text, keep emptyMessage checks.
 </ai_context> */
 
 import { Entity, RELATION_CONSUMES_API } from '@backstage/catalog-model';
@@ -51,7 +52,6 @@ describe('<EntityConsumedApisCard />', () => {
       },
     );
 
-    expect(screen.getByText('Consumed APIs')).toBeInTheDocument();
     expect(screen.getByText(/does not consume any APIs/i)).toBeInTheDocument();
     expect(screen.getByText('Learn how to change this')).toBeInTheDocument();
   });
@@ -100,9 +100,7 @@ describe('<EntityConsumedApisCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Consumed APIs')).toBeInTheDocument();
       expect(screen.getByText(/test-api/i)).toBeInTheDocument();
     });
   });
 });
-      

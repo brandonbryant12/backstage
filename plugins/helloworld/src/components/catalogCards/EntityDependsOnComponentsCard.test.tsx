@@ -1,6 +1,7 @@
 
 /* <ai_context>
-Tests for the EntityDependsOnComponentsCard component
+Tests for the EntityDependsOnComponentsCard component.
+Removed checks for the heading text, keep emptyMessage checks.
 </ai_context> */
 
 import { Entity, RELATION_DEPENDS_ON } from '@backstage/catalog-model';
@@ -51,7 +52,7 @@ describe('<EntityDependsOnComponentsCard />', () => {
       },
     );
 
-    expect(screen.getByText('Depends on components')).toBeInTheDocument();
+    // No heading check
     expect(
       screen.getByText(/No component is a dependency of this component/i),
     ).toBeInTheDocument();
@@ -100,9 +101,8 @@ describe('<EntityDependsOnComponentsCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Depends on components')).toBeInTheDocument();
+      // No heading check
       expect(screen.getByText(/dependency-component/i)).toBeInTheDocument();
     });
   });
 });
-      

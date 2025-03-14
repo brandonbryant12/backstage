@@ -44,7 +44,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
       <Wrapper>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
-            title="Test Related Entities"
             columns={[]}
             relationType="test"
             emptyMessage="No related entities"
@@ -101,7 +100,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
       <Wrapper>
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
-            title="Test Related Entities"
             columns={[{ title: 'Name', field: 'metadata.name' }]}
             relationType="test"
             emptyMessage="No related entities"

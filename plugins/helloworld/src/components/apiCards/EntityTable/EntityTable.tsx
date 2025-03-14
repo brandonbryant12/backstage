@@ -1,11 +1,10 @@
-// Updates to plugins/helloworld/src/components/apiCards/EntityTable/EntityTable.tsx
+
 import { Entity } from '@backstage/catalog-model';
 import { styled } from '@mui/material/styles';
 import React, { ReactNode } from 'react';
 import { columnFactories } from './columns';
 import { componentEntityColumns, systemEntityColumns } from './presets';
 import {
-  InfoCardVariants,
   Table,
   TableColumn,
   TableOptions,
@@ -15,8 +14,6 @@ import {
  * Props for EntityTable.
  */
 export interface EntityTableProps<T extends Entity> {
-  title: string;
-  variant?: InfoCardVariants;
   entities: T[];
   emptyContent?: ReactNode;
   columns: TableColumn<T>[];
@@ -31,41 +28,33 @@ const EmptyContent = styled('div')(({ theme }) => ({
 
 /**
  * A general entity table component, that can be used for composing more
- * specific entity tables.
+ * specific entity tables. No title. Paging is conditionally used.
+ * Now also disabling the default toolbar to remove top padding.
  */
 export const EntityTable = <T extends Entity>(props: EntityTableProps<T>) => {
   const {
     entities,
-    title,
     emptyContent,
-    variant = 'gridItem',
     columns,
     tableOptions = {},
   } = props;
 
-  const tableStyle: React.CSSProperties = {
-    minWidth: '0',
-    width: '100%',
-  };
-
-  if (variant === 'gridItem') {
-    tableStyle.height = 'calc(100% - 10px)';
-  }
+  // If there's no data, we'll disable paging controls
+  const hasData = entities && entities.length > 0;
+  const paging = hasData ? true : false;
 
   return (
     <Table<T>
       columns={columns}
-      title={title}
-      style={tableStyle}
-      emptyContent={
-        emptyContent && <EmptyContent>{emptyContent}</EmptyContent>
-      }
+      style={{ width: '100%' }}
+      emptyContent={emptyContent && <EmptyContent>{emptyContent}</EmptyContent>}
       options={{
         search: false,
-        paging: true,
+        paging,
         pageSize: 10,
         padding: 'dense',
         draggable: false,
+        toolbar: false, // Disable the toolbar to remove top padding
         headerStyle: {
           borderTop: 'none',
           borderBottom: 'none',

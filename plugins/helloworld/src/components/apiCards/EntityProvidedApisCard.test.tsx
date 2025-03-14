@@ -1,6 +1,7 @@
 
 /* <ai_context>
 Tests for the EntityProvidedApisCard component
+Removed checks for heading text, keep emptyMessage checks.
 </ai_context> */
 
 import { Entity, RELATION_PROVIDES_API } from '@backstage/catalog-model';
@@ -51,7 +52,6 @@ describe('<EntityProvidedApisCard />', () => {
       },
     );
 
-    expect(screen.getByText('Provided APIs')).toBeInTheDocument();
     expect(screen.getByText(/does not provide any APIs/i)).toBeInTheDocument();
     expect(screen.getByText('Learn how to change this')).toBeInTheDocument();
   });
@@ -100,9 +100,7 @@ describe('<EntityProvidedApisCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Provided APIs')).toBeInTheDocument();
       expect(screen.getByText(/test-api/i)).toBeInTheDocument();
     });
   });
 });
-      

@@ -1,6 +1,7 @@
 
 /* <ai_context>
 Tests for the EntityHasSubcomponentsCard component
+Removed checks for heading text, keep emptyMessage checks.
 </ai_context> */
 
 import { Entity, RELATION_HAS_PART } from '@backstage/catalog-model';
@@ -51,7 +52,6 @@ describe('<EntityHasSubcomponentsCard />', () => {
       },
     );
 
-    expect(screen.getByText('Has subcomponents')).toBeInTheDocument();
     expect(
       screen.getByText(/No subcomponent is part of this component/i),
     ).toBeInTheDocument();
@@ -100,9 +100,7 @@ describe('<EntityHasSubcomponentsCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Has subcomponents')).toBeInTheDocument();
       expect(screen.getByText(/subcomponent/i)).toBeInTheDocument();
     });
   });
 });
-      
