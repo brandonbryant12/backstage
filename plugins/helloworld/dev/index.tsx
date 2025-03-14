@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createDevApp } from '@backstage/dev-utils';
 import { helloworldPlugin } from '../src/plugin';
@@ -16,160 +15,109 @@ import {
 import { CatalogEntityPage, CatalogIndexPage } from '@backstage/plugin-catalog';
 import { Grid } from '@mui/material';
 
-// Lorem ipsum description
-const loremDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-
-// --- Mock Entities and API ---
-// Define mock entity with relations for all cards
 const mockEntity: Entity = {
   apiVersion: 'backstage.io/v1alpha1',
   kind: 'Component',
   metadata: {
     name: 'test-component',
     namespace: 'default',
-    description: loremDescription,
+    description: 'A simple test component',
   },
   relations: [
-    // Create 15 consumed API relations to test pagination
-    ...Array.from({ length: 15 }, (_, i) => ({
-      type: RELATION_CONSUMES_API,
-      targetRef: `api:default/consumed-api-${i + 1}`,
-    })),
-    // Create 15 provided API relations to test pagination
-    ...Array.from({ length: 15 }, (_, i) => ({
-      type: RELATION_PROVIDES_API,
-      targetRef: `api:default/provided-api-${i + 1}`,
-    })),
-    // Create 15 depends-on component relations
-    ...Array.from({ length: 15 }, (_, i) => ({
-      type: 'dependsOn',
-      targetRef: `component:default/dependency-component-${i + 1}`,
-    })),
-    // Create 15 depends-on resource relations
-    ...Array.from({ length: 15 }, (_, i) => ({
-      type: 'dependsOn',
-      targetRef: `resource:default/dependency-resource-${i + 1}`,
-    })),
-    // Create 15 hasPart (subcomponent) relations
-    ...Array.from({ length: 15 }, (_, i) => ({
-      type: 'hasPart',
-      targetRef: `component:default/subcomponent-${i + 1}`,
-    })),
+    { type: RELATION_CONSUMES_API, targetRef: 'api:default/consumed-api' },
+    { type: RELATION_PROVIDES_API, targetRef: 'api:default/provided-api' },
+    { type: 'dependsOn', targetRef: 'component:default/dependency-component' },
+    { type: 'dependsOn', targetRef: 'resource:default/dependency-resource' },
+    { type: 'hasPart', targetRef: 'component:default/subcomponent' },
   ],
 };
 
-// Define mock entity with no relations
 const mockEmptyEntity: Entity = {
   apiVersion: 'backstage.io/v1alpha1',
   kind: 'Component',
   metadata: {
     name: 'empty-component',
     namespace: 'default',
-    description: loremDescription,
+    description: 'An empty test component',
   },
   relations: [],
 };
 
-// Create a map of all mock entities
-const mockEntitiesMap: Record<string, Entity> = {};
-
-// Define arrays for types and lifecycles
-const apiTypes = ['openapi', 'graphql', 'grpc'];
-const lifecycles = ['production', 'experimental', 'deprecated', 'development'];
-const componentTypes = ['service', 'website', 'library'];
-const resourceTypes = ['database', 'queue', 'storage'];
-const subcomponentTypes = ['library', 'module', 'service'];
-
-// Generate mock entities
-Array.from({ length: 15 }, (_, i) => {
-  const typeIndex = i % 3;
-  const lifecycleIndex = i % 4;
-
-  // Consumed APIs
-  mockEntitiesMap[`api:default/consumed-api-${i + 1}`] = {
+const mockEntitiesMap: Record<string, Entity> = {
+  'api:default/consumed-api': {
     apiVersion: 'backstage.io/v1alpha1',
     kind: 'API',
     metadata: {
-      name: `consumed-api-${i + 1}`,
+      name: 'consumed-api',
       namespace: 'default',
-      description: `${loremDescription} This is consumed API #${i + 1}.`,
+      description: 'A consumed API',
     },
     spec: {
-      type: apiTypes[typeIndex],
-      lifecycle: lifecycles[lifecycleIndex],
+      type: 'openapi',
+      lifecycle: 'production',
     },
-  };
-
-  // Provided APIs
-  mockEntitiesMap[`api:default/provided-api-${i + 1}`] = {
+  },
+  'api:default/provided-api': {
     apiVersion: 'backstage.io/v1alpha1',
     kind: 'API',
     metadata: {
-      name: `provided-api-${i + 1}`,
+      name: 'provided-api',
       namespace: 'default',
-      description: `${loremDescription} This is provided API #${i + 1}.`,
+      description: 'A provided API',
     },
     spec: {
-      type: apiTypes[typeIndex],
-      lifecycle: lifecycles[lifecycleIndex],
+      type: 'graphql',
+      lifecycle: 'experimental',
     },
-  };
-
-  // Dependency Components
-  mockEntitiesMap[`component:default/dependency-component-${i + 1}`] = {
+  },
+  'component:default/dependency-component': {
     apiVersion: 'backstage.io/v1alpha1',
     kind: 'Component',
     metadata: {
-      name: `dependency-component-${i + 1}`,
+      name: 'dependency-component',
       namespace: 'default',
-      description: `${loremDescription} This is dependency component #${i + 1}.`,
+      description: 'A dependency component',
     },
     spec: {
-      type: componentTypes[typeIndex],
-      lifecycle: lifecycles[lifecycleIndex],
+      type: 'service',
+      lifecycle: 'production',
     },
-  };
-
-  // Dependency Resources
-  mockEntitiesMap[`resource:default/dependency-resource-${i + 1}`] = {
+  },
+  'resource:default/dependency-resource': {
     apiVersion: 'backstage.io/v1alpha1',
     kind: 'Resource',
     metadata: {
-      name: `dependency-resource-${i + 1}`,
+      name: 'dependency-resource',
       namespace: 'default',
-      description: `${loremDescription} This is dependency resource #${i + 1}.`,
+      description: 'A dependency resource',
     },
     spec: {
-      type: resourceTypes[typeIndex],
-      lifecycle: lifecycles[lifecycleIndex],
+      type: 'database',
+      lifecycle: 'production',
     },
-  };
-
-  // Subcomponents
-  mockEntitiesMap[`component:default/subcomponent-${i + 1}`] = {
+  },
+  'component:default/subcomponent': {
     apiVersion: 'backstage.io/v1alpha1',
     kind: 'Component',
     metadata: {
-      name: `subcomponent-${i + 1}`,
+      name: 'subcomponent',
       namespace: 'default',
-      description: `${loremDescription} This is subcomponent #${i + 1}.`,
+      description: 'A subcomponent',
     },
     spec: {
-      type: subcomponentTypes[typeIndex],
-      lifecycle: lifecycles[lifecycleIndex],
+      type: 'library',
+      lifecycle: 'development',
     },
-  };
-});
-
-// Define mock catalog API
-const mockCatalogApi = {
-  getEntitiesByRefs: async ({ entityRefs }: { entityRefs: string[] }) => {
-    const items = entityRefs.map(ref => mockEntitiesMap[ref]).filter(Boolean);
-    return { items };
   },
 };
 
-// Helper to create a page with two EntityProviders (one with an entity and one empty)
+const mockCatalogApi = {
+  getEntitiesByRefs: async ({ entityRefs }) => {
+    const items = entityRefs.map(ref => mockEntitiesMap[ref]).filter(Boolean);
+    return { items };
+  },
+} as CatalogApi;
+
 function createCardPage(card: JSX.Element) {
   return (
     <Grid container spacing={2} padding={2}>
@@ -184,26 +132,18 @@ function createCardPage(card: JSX.Element) {
 }
 
 createDevApp()
-  // Register the helloworld plugin
   .registerPlugin(helloworldPlugin)
-  // Register the mock catalog API
   .registerApi({
     api: catalogApiRef,
     deps: {},
-    factory: () => mockCatalogApi as CatalogApi,
+    factory: () => mockCatalogApi,
   })
-  // Register Catalog pages to bind the route refs
-  .addPage({
-    element: <CatalogIndexPage />,
-    title: 'Catalog',
-    path: '/catalog',
-  })
+  .addPage({ element: <CatalogIndexPage />, title: 'Catalog', path: '/catalog' })
   .addPage({
     element: <CatalogEntityPage />,
     title: 'Catalog Entity Page',
     path: '/catalog/:namespace/:kind/:name/*',
   })
-  // Register API Card pages
   .addPage({
     element: createCardPage(<EntityConsumedApisCard />),
     title: 'Consumed APIs Card',
@@ -214,7 +154,6 @@ createDevApp()
     title: 'Provided APIs Card',
     path: '/helloworld/provided-apis',
   })
-  // Register Catalog Card pages
   .addPage({
     element: createCardPage(<EntityDependsOnComponentsCard />),
     title: 'Depends On Components Card',
@@ -231,4 +170,3 @@ createDevApp()
     path: '/helloworld/has-subcomponents',
   })
   .render();
-      

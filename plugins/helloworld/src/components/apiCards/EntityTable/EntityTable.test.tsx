@@ -14,8 +14,6 @@ describe('<EntityTable />', () => {
         columns={[]}
       />,
     );
-
-    // No longer checking for table title. Just check empty state
     expect(screen.getByText('Empty state')).toBeInTheDocument();
   });
 

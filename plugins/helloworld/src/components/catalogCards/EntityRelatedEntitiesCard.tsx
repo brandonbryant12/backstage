@@ -1,4 +1,3 @@
-
 import { ComponentEntity } from '@backstage/catalog-model';
 import { Typography } from '@mui/material';
 import {
@@ -12,41 +11,33 @@ import {
   Link,
   Progress,
   ResponseErrorPanel,
-  TableColumn,
-  TableOptions,
 } from '@backstage/core-components';
 
-interface EntityRelatedEntitiesCardProps {
+export const EntityRelatedEntitiesCard = (props: {
   relationType: string;
-  columns?: TableColumn<ComponentEntity>[];
+  entityKind?: string;
   emptyMessage: string;
-  emptyHelpLink?: string;
-  tableOptions?: TableOptions;
-}
+}) => {
+  const {
+    relationType,
+    entityKind,
+    emptyMessage,
+  } = props;
 
-function getColumnsForComponent(): TableColumn<ComponentEntity>[] {
-  return [
-    EntityTable.columns.createEntityRefColumn({ defaultKind: 'component' }),
+  const columns = [
+    EntityTable.columns.createEntityRefColumn(),
     EntityTable.columns.createOwnerColumn(),
     EntityTable.columns.createSpecTypeColumn(),
     EntityTable.columns.createSpecLifecycleColumn(),
     EntityTable.columns.createMetadataDescriptionColumn(),
   ];
-}
 
-export const EntityRelatedEntitiesCard = (props: EntityRelatedEntitiesCardProps) => {
-  const {
-    relationType,
-    columns = getColumnsForComponent(),
-    emptyMessage,
-    emptyHelpLink = 'https://backstage.io/docs/features/software-catalog/descriptor-format',
-    tableOptions = {},
-  } = props;
+  const emptyHelpLink =  'https://backstage.io/docs/features/software-catalog/descriptor-format';
   
   const { entity } = useEntity();
   const { entities, loading, error } = useRelatedEntities(entity, {
     type: relationType,
-    kind: 'Component',
+    kind: entityKind,
   });
 
   if (loading) {
@@ -82,9 +73,7 @@ export const EntityRelatedEntitiesCard = (props: EntityRelatedEntitiesCardProps)
           </div>
         }
         columns={columns}
-        tableOptions={tableOptions}
       />
     </InfoCard>
   );
 };
-      

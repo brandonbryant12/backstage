@@ -15,16 +15,11 @@ import {
 } from '@backstage/plugin-catalog-react';
 
 export const columnFactories = Object.freeze({
-  createEntityRefColumn<T extends Entity>(options: {
-    defaultKind?: string;
-  }): TableColumn<T> {
-    const { defaultKind } = options;
+  createEntityRefColumn<T extends Entity>(): TableColumn<T> {
     function formatContent(entity: T): string {
       return (
         entity.metadata?.title ||
-        humanizeEntityRef(entity, {
-          defaultKind,
-        })
+        humanizeEntityRef(entity)
       );
     }
 
@@ -40,7 +35,6 @@ export const columnFactories = Object.freeze({
       render: entity => (
         <EntityRefLink
           entityRef={entity}
-          defaultKind={defaultKind}
           title={entity.metadata?.title}
         />
       ),
@@ -49,10 +43,9 @@ export const columnFactories = Object.freeze({
   createEntityRelationColumn<T extends Entity>(options: {
     title: string;
     relation: string;
-    defaultKind?: string;
     filter?: { kind: string };
   }): TableColumn<T> {
-    const { title, relation, defaultKind, filter: entityFilter } = options;
+    const { title, relation, filter: entityFilter } = options;
 
     function getRelations(entity: T): CompoundEntityRef[] {
       return getEntityRelations(entity, relation, entityFilter);
@@ -60,7 +53,7 @@ export const columnFactories = Object.freeze({
 
     function formatContent(entity: T): string {
       return getRelations(entity)
-        .map(r => humanizeEntityRef(r, { defaultKind }))
+        .map(r => humanizeEntityRef(r))
         .join(', ');
     }
 
@@ -75,7 +68,6 @@ export const columnFactories = Object.freeze({
       render: entity => (
         <EntityRefLinks
           entityRefs={getRelations(entity)}
-          defaultKind={defaultKind}
         />
       ),
     };
@@ -84,14 +76,12 @@ export const columnFactories = Object.freeze({
     return this.createEntityRelationColumn({
       title: 'Owner',
       relation: RELATION_OWNED_BY,
-      defaultKind: 'group',
     });
   },
   createDomainColumn<T extends Entity>(): TableColumn<T> {
     return this.createEntityRelationColumn({
       title: 'Domain',
       relation: RELATION_PART_OF,
-      defaultKind: 'domain',
       filter: {
         kind: 'domain',
       },
@@ -101,10 +91,6 @@ export const columnFactories = Object.freeze({
     return this.createEntityRelationColumn({
       title: 'System',
       relation: RELATION_PART_OF,
-      defaultKind: 'system',
-      filter: {
-        kind: 'system',
-      },
     });
   },
   createMetadataDescriptionColumn<T extends Entity>(): TableColumn<T> {

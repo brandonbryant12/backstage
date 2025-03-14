@@ -7,38 +7,33 @@ import {
   Link,
   Progress,
   ResponseErrorPanel,
-  TableColumn,
-  TableOptions,
 } from '@backstage/core-components';
 import { Typography } from '@mui/material';
 import { EntityTable } from './EntityTable';
 
-interface EntityApiRelationshipCardProps {
+export function EntityApiRelationshipCard(props: {
   relationType: string;
-  columns: TableColumn<ApiEntity>[];
   emptyMessage?: string;
-  emptyHelpLink?: string;
-  tableOptions?: TableOptions;
-}
-
-/**
- * Generic card to display either consumed or provided APIs for an entity.
- * Removed InfoCard title and variant. No table title is used.
- */
-export function EntityApiRelationshipCard(props: EntityApiRelationshipCardProps) {
+}) {
   const {
     relationType,
-    columns,
     emptyMessage = 'No APIs found for this relationship',
-    emptyHelpLink = 'https://backstage.io',
-    tableOptions = {},
   } = props;
 
+  const emptyHelpLink = "https://backstage.io/docs/features/software-catalog/descriptor-format"
   const { entity } = useEntity();
   const { entities, loading, error } = useRelatedEntities(entity, {
     type: relationType,
     kind: 'API',
   });
+
+  const columns = [
+    EntityTable.columns.createEntityRefColumn(),
+    EntityTable.columns.createOwnerColumn(),
+    EntityTable.columns.createSpecTypeColumn(),
+    EntityTable.columns.createSpecLifecycleColumn(),
+    EntityTable.columns.createMetadataDescriptionColumn(),
+  ];
 
   if (loading) {
     return (
@@ -70,7 +65,6 @@ export function EntityApiRelationshipCard(props: EntityApiRelationshipCardProps)
             </Typography>
           </div>
         }
-        tableOptions={tableOptions}
       />
     </InfoCard>
   );
