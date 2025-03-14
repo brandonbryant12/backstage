@@ -1,5 +1,5 @@
 
-import { Entity, ComponentEntity, ResourceEntity, SystemEntity } from '@backstage/catalog-model';
+import { ComponentEntity } from '@backstage/catalog-model';
 import { Typography } from '@mui/material';
 import {
   useEntity,
@@ -16,41 +16,28 @@ import {
   TableOptions,
 } from '@backstage/core-components';
 
-interface EntityRelatedEntitiesCardProps<T extends Entity> {
+interface EntityRelatedEntitiesCardProps {
   relationType: string;
-  entityKind?: string;
-  columns?: TableColumn<T>[];
+  columns?: TableColumn<ComponentEntity>[];
   emptyMessage: string;
   emptyHelpLink?: string;
   tableOptions?: TableOptions;
 }
 
-function getColumnsForKind<T extends Entity>(kind: string | undefined): TableColumn<T>[] {
-  switch (kind) {
-    case 'Component':
-      return [
-        EntityTable.columns.createEntityRefColumn({ defaultKind: 'component' }),
-        EntityTable.columns.createOwnerColumn(),
-        EntityTable.columns.createSpecTypeColumn(),
-        EntityTable.columns.createSpecLifecycleColumn(),
-        EntityTable.columns.createMetadataDescriptionColumn(),
-      ] as TableColumn<T>[];
-    default:
-      return [
-        EntityTable.columns.createEntityRefColumn({ defaultKind: kind || 'entity' }),
-        EntityTable.columns.createOwnerColumn(),
-        EntityTable.columns.createMetadataDescriptionColumn(),
-      ] as TableColumn<T>[];
-  }
+function getColumnsForComponent(): TableColumn<ComponentEntity>[] {
+  return [
+    EntityTable.columns.createEntityRefColumn({ defaultKind: 'component' }),
+    EntityTable.columns.createOwnerColumn(),
+    EntityTable.columns.createSpecTypeColumn(),
+    EntityTable.columns.createSpecLifecycleColumn(),
+    EntityTable.columns.createMetadataDescriptionColumn(),
+  ];
 }
 
-export const EntityRelatedEntitiesCard = <T extends Entity>(
-  props: EntityRelatedEntitiesCardProps<T>,
-) => {
+export const EntityRelatedEntitiesCard = (props: EntityRelatedEntitiesCardProps) => {
   const {
     relationType,
-    entityKind,
-    columns = getColumnsForKind(entityKind) as TableColumn<T>[],
+    columns = getColumnsForComponent(),
     emptyMessage,
     emptyHelpLink = 'https://backstage.io/docs/features/software-catalog/descriptor-format',
     tableOptions = {},
@@ -59,7 +46,7 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
   const { entity } = useEntity();
   const { entities, loading, error } = useRelatedEntities(entity, {
     type: relationType,
-    kind: entityKind,
+    kind: 'Component',
   });
 
   if (loading) {
@@ -78,21 +65,7 @@ export const EntityRelatedEntitiesCard = <T extends Entity>(
     );
   }
 
-  // Type assertion based on entityKind
-  let typedEntities: T[];
-  switch (entityKind) {
-    case 'Component':
-      typedEntities = (entities || []) as ComponentEntity[] as T[];
-      break;
-    case 'Resource':
-      typedEntities = (entities || []) as ResourceEntity[] as T[];
-      break;
-    case 'System':
-      typedEntities = (entities || []) as SystemEntity[] as T[];
-      break;
-    default:
-      typedEntities = (entities || []) as T[];
-  }
+  const typedEntities = (entities || []) as ComponentEntity[];
 
   return (
     <InfoCard>

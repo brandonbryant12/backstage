@@ -18,7 +18,6 @@ export function EntityHasSubcomponentsCard(props: {
   
   return (
     <EntityRelatedEntitiesCard
-      entityKind="Component"
       relationType={RELATION_HAS_PART}
       columns={columns}
       emptyMessage="No subcomponent is part of this component"

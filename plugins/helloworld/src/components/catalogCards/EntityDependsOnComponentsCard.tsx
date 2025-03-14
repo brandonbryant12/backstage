@@ -18,7 +18,6 @@ export function EntityDependsOnComponentsCard(props: {
   
   return (
     <EntityRelatedEntitiesCard
-      entityKind="Component"
       relationType={RELATION_DEPENDS_ON}
       columns={columns}
       emptyMessage="No component is a dependency of this component"

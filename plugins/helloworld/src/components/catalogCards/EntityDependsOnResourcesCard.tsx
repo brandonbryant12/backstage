@@ -18,7 +18,6 @@ export function EntityDependsOnResourcesCard(props: {
   
   return (
     <EntityRelatedEntitiesCard
-      entityKind="Resource"
       relationType={RELATION_DEPENDS_ON}
       columns={columns}
       emptyMessage="No resource is a dependency of this component"

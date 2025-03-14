@@ -33,7 +33,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
             relationType="test"
-            entityKind="Component"
             emptyMessage="No related entities"
           />
         </EntityProvider>
@@ -84,7 +83,6 @@ describe('<EntityRelatedEntitiesCard />', () => {
         <EntityProvider entity={entity}>
           <EntityRelatedEntitiesCard
             relationType="test"
-            entityKind="Component"
             emptyMessage="No related entities"
           />
         </EntityProvider>
