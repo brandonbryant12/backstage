@@ -1,27 +1,17 @@
 
 /* <ai_context>
-Component that displays APIs provided by an entity, migrated to MUI 5.
+Component that displays APIs provided by an entity, using the generic EntityApiRelationshipCard
 </ai_context> */
 
 import { ApiEntity, RELATION_PROVIDES_API } from '@backstage/catalog-model';
-import { Typography } from '@mui/material';
-import {
-  useEntity,
-  useRelatedEntities,
-} from '@backstage/plugin-catalog-react';
 import React from 'react';
-import { apiEntityColumns } from './presets';
-import { EntityTable } from './EntityTable';
+import { EntityApiRelationshipCard } from './EntityApiRelationshipCard';
 import {
-  CodeSnippet,
-  InfoCard,
   InfoCardVariants,
-  Link,
-  Progress,
   TableColumn,
   TableOptions,
-  WarningPanel,
 } from '@backstage/core-components';
+import { apiEntityColumns } from './presets';
 
 /**
  * Props for EntityProvidedApisCard
@@ -38,60 +28,19 @@ export interface EntityProvidedApisCardProps {
  */
 export const EntityProvidedApisCard = (props: EntityProvidedApisCardProps) => {
   const {
-    variant = 'gridItem',
+    variant,
     title = 'Provided APIs',
     columns = apiEntityColumns,
     tableOptions = {},
   } = props;
-  const { entity } = useEntity();
-  const { entities, loading, error } = useRelatedEntities(entity, {
-    type: RELATION_PROVIDES_API,
-  });
-
-  if (loading) {
-    return (
-      <InfoCard variant={variant} title={title}>
-        <Progress />
-      </InfoCard>
-    );
-  }
-
-  if (error || !entities) {
-    return (
-      <InfoCard variant={variant} title={title}>
-        <WarningPanel
-          severity="error"
-          title="Could not load APIs"
-          message={<CodeSnippet text={`${error}`} language="text" />}
-        />
-      </InfoCard>
-    );
-  }
-
+  
   return (
-    <EntityTable
-      title={title}
+    <EntityApiRelationshipCard
       variant={variant}
-      emptyContent={
-        <div style={{ textAlign: 'center' }}>
-          <Typography variant="body1">
-            This {entity.kind.toLocaleLowerCase('en-US')} does not provide any
-            APIs.
-          </Typography>
-          <Typography variant="body2">
-            <Link
-              to="https://backstage.io/docs/features/software-catalog/descriptor-format#specprovidesapis-optional"
-              externalLinkIcon
-            >
-              Learn how to change this
-            </Link>
-          </Typography>
-        </div>
-      }
+      title={title}
+      relationType={RELATION_PROVIDES_API}
       columns={columns}
       tableOptions={tableOptions}
-      entities={entities as ApiEntity[]}
     />
   );
 };
-      
