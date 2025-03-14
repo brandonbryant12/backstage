@@ -266,3 +266,75 @@ sequenceDiagram
         AP->>EM: confirmExpiredRemoval()
         EM->>DB: Delete expired records
     end
+
+    ---
+# Backstage E2E Testing Strategy: Phased Recommendations
+
+## Problem Statement
+
+Currently, our end-to-end (E2E) tests do not fully validate the complete data flow, as the EntityAggregatorProvider is not populating the catalog during testing. This creates gaps in test coverage, potentially hiding integration issues and reducing overall test reliability.
+
+## Summary of Recommendations
+
+We recommend quickly improving test reliability by introducing representative static test data that reflects production scenarios. Integrating tests with the development environment is also recommended to validate realistic scenarios further. At this time, we do not recommend implementing a full end-to-end integration with the EntityAggregatorProvider due to its significant complexity and maintenance overhead, which would slow down tests considerably.
+
+## Evaluation Criteria
+
+We evaluated potential solutions based on:
+
+- **Test Reliability**: Consistency and stability of test outcomes.
+- **Maintenance Effort**: Resources required to maintain tests.
+- **Coverage Completeness**: Extent to which the system is fully tested.
+- **Implementation Complexity**: Effort needed for initial implementation.
+- **Execution Time**: Time required to run tests.
+- **Developer Experience**: Impact on daily development workflows.
+
+## Recommended Phases
+
+### Phase 1: Representative Test Data
+
+**Approach:**
+
+- Implement representative, production-like static test data.
+- Regularly update fixtures to align with production scenarios.
+- Adjust existing tests to use improved fixtures.
+
+**Trade-offs:**
+
+- **Pros:** Immediate improvement, minimal complexity, quick execution.
+- **Cons:** Doesn't test actual aggregation logic, manual updates required.
+
+### Phase 2: Integration with Development Environment
+
+**Approach:**
+
+- Allow tests to optionally run against a real development environment.
+
+**Trade-offs:**
+
+- **Pros:** More realistic tests, less reliance on mocks, improved overall test coverage.
+- **Cons:** Increased complexity, potentially slower test execution, moderate maintenance overhead.
+
+### Phase 3: Direct Aggregation Testing (Optional)
+
+**Approach:**
+
+- Develop a dedicated test mode within the E2E tests that loads catalog data directly from the entity aggregation system.
+- Introduce controlled mock data sources to validate aggregation directly.
+
+**Trade-offs:**
+
+- **Pros:** Explicit testing of aggregation logic, high coverage completeness.
+- **Cons:** Significant complexity, slower execution speed, substantial maintenance.
+
+## Decision Matrix
+
+| Factor                    | Phase 1  | Phase 2  | Phase 3   |
+| ------------------------- | -------- | -------- | --------- |
+| Implementation Complexity | Low      | Medium   | High      |
+| Maintenance Effort        | Low      | Medium   | High      |
+| Test Coverage             | Moderate | Good     | Excellent |
+| Execution Speed           | Fast     | Medium   | Slow      |
+| Developer Experience      | Simple   | Moderate | Complex   |
+| Infrastructure Needs      | Minimal  | Medium   | High      |
+
