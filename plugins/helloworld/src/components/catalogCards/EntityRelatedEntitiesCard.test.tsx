@@ -1,8 +1,4 @@
 
-/* <ai_context>
-Tests for the EntityRelatedEntitiesCard component
-</ai_context> */
-
 import { Entity } from '@backstage/catalog-model';
 import {
   catalogApiRef,
@@ -59,7 +55,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
       },
     );
 
-    expect(screen.getByText('Test Related Entities')).toBeInTheDocument();
+    // Removed title expectation as the component no longer renders a title.
     expect(screen.getByText('No related entities')).toBeInTheDocument();
     expect(screen.getByText('Learn how to change this')).toBeInTheDocument();
   });
@@ -116,9 +112,7 @@ describe('<EntityRelatedEntitiesCard />', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Test Related Entities')).toBeInTheDocument();
       expect(screen.getByText('related-entity')).toBeInTheDocument();
     });
   });
 });
-      
