@@ -1,5 +1,5 @@
 import { renderInTestApp } from '@backstage/test-utils';
-import '@testing-library/jest-dom';
+import { screen } from '@testing-library/react';
 import { Entity, RELATION_OWNED_BY } from '@backstage/catalog-model';
 import { columnFactories } from './columns';
 import { entityRouteRef } from '@backstage/plugin-catalog-react';
@@ -25,46 +25,68 @@ describe('columnFactories', () => {
     ],
   };
 
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('renders Name column correctly', async () => {
     const NameColumn = columnFactories.createEntityRefColumn<Entity>();
-
-    const { getByText } = await renderInTestApp(
-      NameColumn.render!(mockEntity, 0),
-      {
-        mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
-      },
-    );
-
-    expect(getByText('Test Entity')).toBeInTheDocument();
+    await renderInTestApp(NameColumn.render!(mockEntity, 0), {
+      mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
+    });
+    expect(screen.getByText('Test Entity')).toBeInTheDocument();
   });
 
   it('renders Owner column correctly', async () => {
     const OwnerColumn = columnFactories.createOwnerColumn<Entity>();
-
-    const { getByText } = await renderInTestApp(
-      OwnerColumn.render!(mockEntity, 0),
-      {
-        mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
-      },
-    );
-
-    expect(getByText('team-a')).toBeInTheDocument();
+    await renderInTestApp(OwnerColumn.render!(mockEntity, 'row'), {
+      mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
+    });
+    expect(screen.getByText('team-a')).toBeInTheDocument();
   });
 
   it('renders Metadata Description column correctly', async () => {
     const DescriptionColumn = columnFactories.createMetadataDescriptionColumn<Entity>();
-
-    const { getByText } = await renderInTestApp(
-      DescriptionColumn.render!(mockEntity, 0),
-    );
-
-    expect(getByText('This is a test entity')).toBeInTheDocument();
+    await renderInTestApp(DescriptionColumn.render!(mockEntity, 'row'));
+    expect(screen.getByText('This is a test entity')).toBeInTheDocument();
   });
 
   it('renders Lifecycle column correctly', () => {
     const LifecycleColumn = columnFactories.createSpecLifecycleColumn<Entity>();
-
     expect(LifecycleColumn.field).toBe('spec.lifecycle');
     expect(LifecycleColumn.title).toBe('Lifecycle');
+  });
+
+  it('renders Type column correctly', () => {
+    const TypeColumn = columnFactories.createSpecTypeColumn<Entity>();
+    expect(TypeColumn.field).toBe('spec.type');
+    expect(TypeColumn.title).toBe('Type');
+  });
+
+  it('sorts entities correctly in Owner column customSort', () => {
+    const OwnerColumn = columnFactories.createOwnerColumn<Entity>();
+
+    const entityA: Entity = {
+      ...mockEntity,
+      relations: [
+        {
+          type: RELATION_OWNED_BY,
+          targetRef: 'group:default/team-a',
+        },
+      ],
+    };
+
+    const entityB: Entity = {
+      ...mockEntity,
+      relations: [
+        {
+          type: RELATION_OWNED_BY,
+          targetRef: 'group:default/team-z',
+        },
+      ],
+    };
+
+    const sortResult = OwnerColumn.customSort!(entityA, entityB, 'row');
+    expect(sortResult).toBeLessThan(0);
   });
 });
