@@ -1,8 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { renderInTestApp } from '@backstage/test-utils';
 import '@testing-library/jest-dom';
 import { Entity, RELATION_OWNED_BY } from '@backstage/catalog-model';
 import { columnFactories } from './columns';
-import { wrapInTestApp } from '@backstage/test-utils';
 import { entityRouteRef } from '@backstage/plugin-catalog-react';
 
 describe('columnFactories', () => {
@@ -26,36 +25,40 @@ describe('columnFactories', () => {
     ],
   };
 
-  it('renders Name column correctly', () => {
+  it('renders Name column correctly', async () => {
     const NameColumn = columnFactories.createEntityRefColumn<Entity>();
 
-    render(
-      wrapInTestApp(NameColumn.render!(mockEntity, 0), {
+    const { getByText } = await renderInTestApp(
+      NameColumn.render!(mockEntity, 0),
+      {
         mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
-      }),
+      },
     );
 
-    expect(screen.getByText('Test Entity')).toBeInTheDocument();
+    expect(getByText('Test Entity')).toBeInTheDocument();
   });
 
-  it('renders Owner column correctly', () => {
+  it('renders Owner column correctly', async () => {
     const OwnerColumn = columnFactories.createOwnerColumn<Entity>();
 
-    render(
-      wrapInTestApp(OwnerColumn.render!(mockEntity, 0), {
+    const { getByText } = await renderInTestApp(
+      OwnerColumn.render!(mockEntity, 0),
+      {
         mountedRoutes: { '/catalog/:namespace/:kind/:name': entityRouteRef },
-      }),
+      },
     );
 
-    expect(screen.getByText('team-a')).toBeInTheDocument();
+    expect(getByText('team-a')).toBeInTheDocument();
   });
 
-  it('renders Metadata Description column correctly', () => {
+  it('renders Metadata Description column correctly', async () => {
     const DescriptionColumn = columnFactories.createMetadataDescriptionColumn<Entity>();
 
-    render(DescriptionColumn.render!(mockEntity, 0));
+    const { getByText } = await renderInTestApp(
+      DescriptionColumn.render!(mockEntity, 0),
+    );
 
-    expect(screen.getByText('This is a test entity')).toBeInTheDocument();
+    expect(getByText('This is a test entity')).toBeInTheDocument();
   });
 
   it('renders Lifecycle column correctly', () => {
