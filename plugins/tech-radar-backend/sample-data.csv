@@ -1,0 +1,16 @@
+key,id,title,quadrant,ring,description,date,moved,timeline_description,link_title_1,link_url_1,link_title_2,link_url_2
+react,react-id,React,solutions,approved,"A JavaScript library for building user interfaces.",2023-10-26,0,"Approved for general use.","React Docs","https://react.dev/","Community","https://react.dev/community"
+vue,vue-id,Vue.js,solutions,emerging,"The Progressive JavaScript Framework.",2024-01-15,1,"Emerging as a strong alternative.","Homepage","https://vuejs.org/","Docs","https://vuejs.org/guide/introduction.html"
+backstage,backstage-id,Backstage,patterns,approved,"Platform for building developer portals.",2023-05-01,0,"Our standard platform.","Backstage.io","https://backstage.io"
+# Entry with missing optional fields
+angular,angular-id,Angular,solutions,restricted,,,2022-08-01,-1,"Restricted use",,,
+# Entry with minimal required fields only
+minimal,minimal-key,Minimal Entry,guidelines,submitted,,2024-02-28,0,,,,
+# Entry with invalid date (should be skipped by service)
+invalid-date,,Invalid Date Entry,standards,approved,,invalid-date,0,,,,
+# Entry with invalid moved value (should default to 0)
+invalid-moved,invalid-moved-id,Invalid Moved,patterns,emerging,"Test invalid moved",2024-03-10,5,"Moved value is 5",,,
+# Entry with only key, title, quadrant, ring, date
+only-required,only-required-key,Only Required,solutions,approved,,2024-01-01,,,,,,
+# Entry to test link processing fully
+full-links,fl-id,Full Links,guidelines,approved,"Has two links",2023-12-01,0,"Approved Dec 2023","Link 1","http://example.com/1","Link 2","http://example.com/2"
