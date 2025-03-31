@@ -2755,6 +2755,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@backstage-community/plugin-tech-radar-common@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@backstage-community/plugin-tech-radar-common@npm:1.4.0"
+  dependencies:
+    zod: "npm:^3.20.0"
+  checksum: 10c0/71defdee02c5993231adc48633bafbedc72e507afd8d74defa411ea7c678c5f53c258fc49284267c6743f76cdd511421e01155669384ab37f903f5d29b0e7356
+  languageName: node
+  linkType: hard
+
 "@backstage/app-defaults@npm:^1.5.17":
   version: 1.5.17
   resolution: "@backstage/app-defaults@npm:1.5.17"
@@ -7016,6 +7025,33 @@ __metadata:
     "@backstage/cli": "npm:^0.30.0"
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "npm:^0.1.0"
     lodash: "npm:^4.17.21"
+  languageName: unknown
+  linkType: soft
+
+"@internal/plugin-tech-radar-backend@workspace:^, @internal/plugin-tech-radar-backend@workspace:plugins/tech-radar-backend":
+  version: 0.0.0-use.local
+  resolution: "@internal/plugin-tech-radar-backend@workspace:plugins/tech-radar-backend"
+  dependencies:
+    "@backstage-community/plugin-tech-radar-common": "npm:^1.4.0"
+    "@backstage/backend-common": "npm:^0.25.0"
+    "@backstage/backend-defaults": "npm:^0.8.0"
+    "@backstage/backend-plugin-api": "npm:^1.2.0"
+    "@backstage/backend-test-utils": "npm:^1.3.0"
+    "@backstage/catalog-client": "npm:^1.9.1"
+    "@backstage/cli": "npm:^0.30.0"
+    "@backstage/config": "npm:^1.3.2"
+    "@backstage/errors": "npm:^1.2.7"
+    "@backstage/plugin-catalog-node": "npm:^1.16.0"
+    "@types/express": "npm:^4.17.6"
+    "@types/luxon": "npm:^3"
+    "@types/supertest": "npm:^2.0.12"
+    csv-parse: "npm:^5.6.0"
+    express: "npm:^4.17.1"
+    express-promise-router: "npm:^4.1.0"
+    knex: "npm:^3.1.0"
+    luxon: "npm:^3.6.0"
+    supertest: "npm:^6.2.4"
+    zod: "npm:^3.22.4"
   languageName: unknown
   linkType: soft
 
@@ -12832,7 +12868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:^3.0.0, @types/luxon@npm:~3.4.0":
+"@types/luxon@npm:^3, @types/luxon@npm:^3.0.0, @types/luxon@npm:~3.4.0":
   version: 3.4.2
   resolution: "@types/luxon@npm:3.4.2"
   checksum: 10c0/d835467de3daf7e17ba78b50bb5a14efd94272439ca067990d71332a54b311544459c69623eddd243b511b28d70194c9591a9ee8cf9c038962c965f991affd7e
@@ -13199,7 +13235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/superagent@npm:^8.1.0":
+"@types/superagent@npm:*, @types/superagent@npm:^8.1.0":
   version: 8.1.9
   resolution: "@types/superagent@npm:8.1.9"
   dependencies:
@@ -13208,6 +13244,15 @@ __metadata:
     "@types/node": "npm:*"
     form-data: "npm:^4.0.0"
   checksum: 10c0/12631f1d8b3a62e1f435bc885f6d64d1a2d1ae82b80f0c6d63d4d6372c40b6f1fee6b3da59ac18bb86250b1eb73583bf2d4b1f7882048c32468791c560c69b7c
+  languageName: node
+  linkType: hard
+
+"@types/supertest@npm:^2.0.12":
+  version: 2.0.16
+  resolution: "@types/supertest@npm:2.0.16"
+  dependencies:
+    "@types/superagent": "npm:*"
+  checksum: 10c0/e1b4a4d788c19cd92a3f2e6d0979fb0f679c49aefae2011895a4d9c35aa960d43463aca8783a0b3382bbf0b4eb7ceaf8752d7dc80b8f5a9644fa14e1b1bdbc90
   languageName: node
   linkType: hard
 
@@ -14856,6 +14901,7 @@ __metadata:
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^"
     "@core/plugin-catalog-backend-module-aggregator-entity-provider": "workspace:^"
     "@internal/backstage-plugin-catalog-backend-module-template-processor": "npm:^0.1.0"
+    "@internal/plugin-tech-radar-backend": "workspace:^"
     app: "link:../app"
     backstage-plugin-catalog-backend-module-example-fragment-provider: "npm:^0.1.0"
     better-sqlite3: "npm:^11.0.0"
@@ -16959,6 +17005,13 @@ __metadata:
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: 10c0/80c089d6f7e0c5b2bd83cf0539ab41474198579584fa10d86d0cafe0642202343cbc119e076a0b1aece191989477081415d66c9fefbf3c957fc2fc4b7009f248
+  languageName: node
+  linkType: hard
+
+"csv-parse@npm:^5.6.0":
+  version: 5.6.0
+  resolution: "csv-parse@npm:5.6.0"
+  checksum: 10c0/52f5e6c45359902e0c8e57fc2eeed41366dc6b6d283b495b538dd50c8e8510413d6f924096ea056319cbbb8ed26e111c3a3485d7985c021bcf5abaa9e92425c7
   languageName: node
   linkType: hard
 
@@ -23199,7 +23252,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knex@npm:3, knex@npm:^3.0.0":
+"knex@npm:3, knex@npm:^3.0.0, knex@npm:^3.1.0":
   version: 3.1.0
   resolution: "knex@npm:3.1.0"
   dependencies:
@@ -23850,6 +23903,13 @@ __metadata:
   version: 3.5.0
   resolution: "luxon@npm:3.5.0"
   checksum: 10c0/335789bba95077db831ef99894edadeb23023b3eb2137a1b56acd0d290082b691cf793143d69e30bc069ec95f0b49f36419f48e951c68014f19ffe12045e3494
+  languageName: node
+  linkType: hard
+
+"luxon@npm:^3.6.0":
+  version: 3.6.0
+  resolution: "luxon@npm:3.6.0"
+  checksum: 10c0/60cc3fe8f7dce51f0e406529b80eec815b335a7202d5c41e210a8acc8e698d8be797f3c77ed60efe581af07f2a88defbe7a77e506121e2f460a667690e71c0d1
   languageName: node
   linkType: hard
 
@@ -33460,6 +33520,13 @@ __metadata:
   peerDependencies:
     zod: ^3.18.0
   checksum: 10c0/aaadb0e65c834aacb12fa088663d52d9f4224b5fe6958f09b039f4ab74145fda381c8a7d470bfddf7ddd9bbb5fdfbb52739cd66958ce6d388c256a44094d1fba
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.20.0":
+  version: 3.24.2
+  resolution: "zod@npm:3.24.2"
+  checksum: 10c0/c638c7220150847f13ad90635b3e7d0321b36cce36f3fc6050ed960689594c949c326dfe2c6fa87c14b126ee5d370ccdebd6efb304f41ef5557a4aaca2824565
   languageName: node
   linkType: hard
 

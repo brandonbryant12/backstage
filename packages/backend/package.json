@@ -42,6 +42,7 @@
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "workspace:^",
     "@core/plugin-catalog-backend-module-aggregator-entity-provider": "workspace:^",
     "@internal/backstage-plugin-catalog-backend-module-template-processor": "^0.1.0",
+    "@internal/plugin-tech-radar-backend": "workspace:^",
     "app": "link:../app",
     "backstage-plugin-catalog-backend-module-example-fragment-provider": "^0.1.0",
     "better-sqlite3": "^11.0.0",
