@@ -1,0 +1,45 @@
+[
+  {
+    "entry_id": "react",
+    "title": "React",
+    "description": "A JavaScript library for building user interfaces.",
+    "quadrant_name": "Solutions",
+    "disposition_name": "Approved",
+    "url": "https://reactjs.org/",
+    "date": "2023-01-15T00:00:00.000Z"
+  },
+  {
+    "entry_id": "typescript",
+    "title": "TypeScript",
+    "description": "Strongly typed programming language that builds on JavaScript.",
+    "quadrant_name": "Standards",
+    "disposition_name": "Approved",
+    "url": "https://www.typescriptlang.org/",
+    "date": "2022-11-20T00:00:00.000Z"
+  },
+  {
+    "entry_id": "graphql",
+    "title": "GraphQL",
+    "description": "A query language for APIs and a runtime for fulfilling those queries with your existing data.",
+    "quadrant_name": "Patterns",
+    "disposition_name": "Emerging",
+    "url": "https://graphql.org/",
+    "date": "2023-05-10T00:00:00.000Z"
+  },
+  {
+    "entry_id": "cicd_pipelines",
+    "title": "CI/CD Pipelines",
+    "description": "Automated pipelines for building, testing, and deploying applications.",
+    "quadrant_name": "Guidelines",
+    "disposition_name": "Approved",
+    "date": "2023-03-01T00:00:00.000Z"
+  },
+  {
+    "entry_id": "legacy_system_x",
+    "title": "Legacy System X",
+    "description": "An old system planned for deprecation.",
+    "quadrant_name": "Solutions",
+    "disposition_name": "Restricted",
+    "date": "2023-06-30T00:00:00.000Z"
+  }
+]

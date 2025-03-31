@@ -3,10 +3,10 @@ import express from 'express';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { EntityAggregatorService } from '../src/service/EntityAggregatorService';
 import { stringifyEntityRef } from '@backstage/catalog-model';
-import { NotFoundError } from '@backstage/errors';
-import { MiddlewareFactory } from '@backstage/backend-defaults/rootHttpRouter';
+import { NotFoundError } from 'directive:add-import:dependencies:@backstage/errors';
+import { MiddlewareFactory } from 'directive:add-import:dependencies:@backstage/backend-defaults';
 import { Config } from '@backstage/config';
-import { mergeRecords } from '@internal/entity-aggregation-common';
+import { mergeRecords } from 'directive:add-import:dependencies:@internal/entity-aggregation-common';
 
 export async function createRouter(options: {
   logger: LoggerService;
@@ -52,7 +52,7 @@ export async function createRouter(options: {
 
   const middleware = MiddlewareFactory.create({ logger, config });
 
-  //@ts-ignore
+  // @ts-ignore
   router.use(middleware.error());
 
   return router;

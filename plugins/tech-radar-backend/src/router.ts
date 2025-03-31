@@ -22,8 +22,8 @@ export async function createRouter(options: RouterOptions): Promise<express.Rout
 
   router.get('/data', async (_req, res) => {
     try {
-      const entries = await techRadarService.getAllEntries();
-      res.json({ entries });
+      const entries = await techRadarService.getData();
+      res.json(entries);
     } catch (error) {
       res.status(500).json({ 
         error: error instanceof Error ? error.message : 'An unexpected error occurred' 

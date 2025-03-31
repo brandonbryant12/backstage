@@ -3,7 +3,7 @@ import {
   createBackendPlugin,
 } from '@backstage/backend-plugin-api';
 import { createRouter } from './router';
-import { TechRadarCSVDataService } from './services/techRadarCSVDataService';
+import { TechRadarDataService } from './services/dataService/techRadarDataService';
 import { EntriesRepository } from './repository/entriesRepository';
 /**
  * techRadarPlugin backend plugin
@@ -21,12 +21,10 @@ export const techRadarPlugin = createBackendPlugin({
         httpRouter: coreServices.httpRouter,
         scheduler: coreServices.scheduler,
         database: coreServices.database,
-        
       },
       async init({ logger, httpAuth, httpRouter, scheduler, database}) {
         const entriesRepository = await EntriesRepository.create(database);
-        const csvPath = '';
-        const techRadarService = new TechRadarCSVDataService(csvPath, {
+        const techRadarService = new TechRadarDataService({
           logger,
           repository: entriesRepository,
           scheduler,

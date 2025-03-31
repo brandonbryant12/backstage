@@ -1,33 +1,36 @@
 import { LoggerService, SchedulerService } from '@backstage/backend-plugin-api';
-import { EntriesRepository, TechRadarEntry } from '../repository/entriesRepository';
+import { EntriesRepository, TechRadarEntry } from '../../repository/entriesRepository';
+import sampleData from './sample-data.json';
 
-export interface AbstractTechRadarDataServiceOptions {
+export interface TechRadarDataServiceOptions {
   logger: LoggerService;
   repository: EntriesRepository;
   scheduler: SchedulerService;
 }
 
-export abstract class AbstractTechRadarDataService {
+export class TechRadarDataService {
   protected readonly logger: LoggerService;
   protected readonly repository: EntriesRepository;
   protected readonly scheduler: SchedulerService;
   private readonly taskId: string = 'tech-radar-data-refresh';
   private readonly taskFrequency = { days: 1 };
 
-  protected constructor(options: AbstractTechRadarDataServiceOptions) {
+  public constructor(options: TechRadarDataServiceOptions) {
     this.logger = options.logger.child({ service: this.constructor.name });
     this.repository = options.repository;
     this.scheduler = options.scheduler;
   }
 
-  /**
-   * Abstract method to be implemented by concrete subclasses.
-   * This method is responsible for fetching the Tech Radar entries
-   * from the specific data source (e.g., a file, an API).
-   *
-   * @returns A promise that resolves to an array of TechRadarEntry objects.
-   */
-  abstract read(): Promise<TechRadarEntry[]>;
+  async read(): Promise<TechRadarEntry[]> {
+    this.logger.info('Reading sample Tech Radar data...');
+    const entries: TechRadarEntry[] = sampleData.map(entry => ({
+      ...entry,
+      date: entry.date ? new Date(entry.date) : undefined,
+      description: entry.description ?? '', 
+      url: entry.url ?? undefined, 
+    }));
+    return Promise.resolve(entries);
+  }
 
   scheduleUpdateTask(): void {
     this.logger.info(
