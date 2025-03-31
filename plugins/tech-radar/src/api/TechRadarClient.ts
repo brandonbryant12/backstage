@@ -1,4 +1,4 @@
-import { createApiRef, DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
+import { DiscoveryApi, FetchApi } from '@backstage/core-plugin-api';
 import { TechRadarApi } from '@backstage-community/plugin-tech-radar';
 import {
   TechRadarLoaderResponse,
