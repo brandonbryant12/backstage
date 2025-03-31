@@ -1,0 +1,1 @@
+export { TechRadarClient } from './TechRadarClient';
