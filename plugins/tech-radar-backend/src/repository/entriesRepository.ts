@@ -21,7 +21,7 @@ export class EntriesRepository {
   static async create(db: DatabaseService): Promise<EntriesRepository> {
     const knex = await db.getClient();
     const migrationsDir = resolvePackagePath(
-        'tech-radar-backend',
+        '@internal/plugin-tech-radar-backend',
         'migrations',
     );
     await knex.migrate.latest({
@@ -42,7 +42,7 @@ export class EntriesRepository {
       await tx(TABLE_NAME).del();
       if (entries && entries.length > 0) {
         const entriesToInsert = entries.map(entry => ({
-          id: entry.entry_id,
+          entry_id: entry.entry_id,
           title: entry.title,
           quadrant_name: entry.quadrant_name,
           disposition_name: entry.disposition_name,

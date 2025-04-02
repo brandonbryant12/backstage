@@ -8,7 +8,7 @@ exports.up = async function up(knex) {
     table.comment(
       'The table for tech radar entries'
     );
-    table.uuid('entry_id').primary().defaultTo(knex.raw('uuid_generate_v4()')).comment('UUID entry ID');
+    table.uuid('entry_id').defaultTo(knex.fn.uuid()).primary().comment('UUID entry ID');
     table.string('title').notNullable().comment('The title of the entry');
     table.text('description').comment('A longer description of the entry');
     table.string('url').comment('A relevant URL for the entry');
