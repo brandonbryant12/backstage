@@ -6,8 +6,8 @@ import {
 } from '@backstage/core-plugin-api';
 
 import { rootRouteRef } from './routes';
-import { TechRadarClient } from './api/TechRadarClient';
 import { techRadarApiRef as communityTechRadarApiRef } from '@backstage-community/plugin-tech-radar';
+import { mockApiClient } from './api/mockClient';
 
 export const techRadarPlugin = createPlugin({
   id: 'tech-radar',
@@ -21,8 +21,8 @@ export const techRadarPlugin = createPlugin({
         discoveryApi: discoveryApiRef,
         fetchApi: fetchApiRef
       },
-      factory: ({ discoveryApi, fetchApi }) => {
-        return new TechRadarClient({ discoveryApi, fetchApi });
+      factory: () => {
+        return mockApiClient;
       }
     }),
   ]
