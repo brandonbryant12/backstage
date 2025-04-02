@@ -90,7 +90,10 @@ export class TechRadarService {
         url: repoEntry.url, 
       };
     });
-    const entries = mappedEntries.filter(entry => entry.quadrant !== 'unknown');
+    
+    // Filter based on known quadrant IDs
+    const knownQuadrantIds = new Set(quadrants.map(q => q.id));
+    const entries = mappedEntries.filter(entry => knownQuadrantIds.has(entry.quadrant));
 
     return {
       quadrants,

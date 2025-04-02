@@ -35,7 +35,51 @@ const mockRepoEntries: TechRadarEntry[] = [
   },
 ];
 
-const expectedRadarResponse: TechRadarLoaderResponse = {"quadrants":[{"id":"solutions","name":"Solutions"},{"id":"guidelines","name":"Guidelines"},{"id":"patterns","name":"Patterns"},{"id":"standards","name":"Standards"}],"rings":[{"id":"submitted","name":"Submitted","color":"#9e9e9e"},{"id":"emerging","name":"Emerging","color":"#8bc34a"},{"id":"approved","name":"Approved","color":"#4caf50"},{"id":"restricted","name":"Restricted","color":"#ff9800"}],"entries":[{"key":"entry1","id":"entry1","quadrant":"solutions","title":"Entry One","description":"Description for entry 1","timeline":[{"date":"2024-01-15T00:00:00.000Z","ringId":"approved","moved":0}],"links":[{"url":"http://example.com/entry1","title":"Learn More"}],"url":"http://example.com/entry1"},{"key":"entry2","id":"entry2","quadrant":"patterns","title":"Entry Two","timeline":[{"date":"2024-02-20T00:00:00.000Z","ringId":"emerging","moved":0}]},{"key":"entry3","id":"entry3","quadrant":"bad quadrant","title":"Entry Three","timeline":[{"date":"2024-03-10T00:00:00.000Z","ringId":"submitted","moved":0}]}]}
+const expectedRadarResponse: TechRadarLoaderResponse = {
+  quadrants: [
+    { id: 'solutions', name: 'Solutions' },
+    { id: 'guidelines', name: 'Guidelines' },
+    { id: 'patterns', name: 'Patterns' },
+    { id: 'standards', name: 'Standards' },
+  ],
+  rings: [
+    { id: 'submitted', name: 'Submitted', color: '#9e9e9e' },
+    { id: 'emerging', name: 'Emerging', color: '#8bc34a' },
+    { id: 'approved', name: 'Approved', color: '#4caf50' },
+    { id: 'restricted', name: 'Restricted', color: '#ff9800' },
+  ],
+  entries: [
+    {
+      key: 'entry1',
+      id: 'entry1',
+      quadrant: 'solutions',
+      title: 'Entry One',
+      description: 'Description for entry 1',
+      timeline: [
+        {
+          date: new Date('2024-01-15T00:00:00.000Z'),
+          ringId: 'approved',
+          moved: 0 as MovedState,
+        },
+      ],
+      links: [{ url: 'http://example.com/entry1', title: 'Learn More' }],
+      url: 'http://example.com/entry1',
+    },
+    {
+      key: 'entry2',
+      id: 'entry2',
+      quadrant: 'patterns',
+      title: 'Entry Two',
+      timeline: [
+        {
+          date: new Date('2024-02-20T00:00:00.000Z'),
+          ringId: 'emerging',
+          moved: 0 as MovedState,
+        },
+      ],
+    },
+  ],
+};
 
 describe('createRouter', () => {
   let app: express.Express;
