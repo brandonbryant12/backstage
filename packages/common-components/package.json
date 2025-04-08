@@ -25,7 +25,7 @@
     "dev": "backstage-cli package dev"
   },
   "devDependencies": {
-    "@backstage/cli": "^0.30.0",
+    "@backstage/cli": "^0.31.0",
     "@backstage/test-utils": "^1.7.5",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^16.2.0",
