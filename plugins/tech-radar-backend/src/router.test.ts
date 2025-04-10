@@ -7,7 +7,7 @@ import request from 'supertest';
 
 import { createRouter } from './router';
 import { EntriesRepository, TechRadarEntry } from './repository/entriesRepository';
-import { TechRadarLoaderResponse } from '@backstage-community/plugin-tech-radar-common';
+import { TechRadarLoaderResponse, MovedState } from '@backstage-community/plugin-tech-radar-common';
 
 const mockRepoEntries: TechRadarEntry[] = [
   {
