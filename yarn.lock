@@ -6085,7 +6085,7 @@ __metadata:
     knex: "npm:^2.4.2"
     lodash: "npm:^4.17.21"
     msw: "npm:^1.0.0"
-    node-fetch: "npm:^2.6.7"
+    node-fetch: "npm:^3.0.0"
     p-limit: "npm:^6.2.0"
     supertest: "npm:^6.2.4"
     winston: "npm:^3.2.1"
@@ -25949,7 +25949,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^3.3.2":
+"node-fetch@npm:^3.0.0, node-fetch@npm:^3.3.2":
   version: 3.3.2
   resolution: "node-fetch@npm:3.3.2"
   dependencies:
