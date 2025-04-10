@@ -6082,7 +6082,7 @@ __metadata:
     "@types/supertest": "npm:^6.0.0"
     express: "npm:^4.21.2"
     express-promise-router: "npm:^4.1.1"
-    knex: "npm:^2.4.2"
+    knex: "npm:^3.0.0"
     lodash: "npm:^4.17.21"
     msw: "npm:^1.0.0"
     node-fetch: "npm:^3.0.0"
@@ -6107,7 +6107,7 @@ __metadata:
     "@core/plugin-catalog-backend-module-aggregator-entity-manager": "npm:^0.1.0"
     "@internal/entity-aggregation-common": "npm:^0.1.0"
     "@types/jest": "npm:^29.0.0"
-    knex: "npm:^2.4.2"
+    knex: "npm:^3.0.0"
   languageName: unknown
   linkType: soft
 
@@ -23751,45 +23751,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"knex@npm:^2.4.2":
-  version: 2.5.1
-  resolution: "knex@npm:2.5.1"
-  dependencies:
-    colorette: "npm:2.0.19"
-    commander: "npm:^10.0.0"
-    debug: "npm:4.3.4"
-    escalade: "npm:^3.1.1"
-    esm: "npm:^3.2.25"
-    get-package-type: "npm:^0.1.0"
-    getopts: "npm:2.3.0"
-    interpret: "npm:^2.2.0"
-    lodash: "npm:^4.17.21"
-    pg-connection-string: "npm:2.6.1"
-    rechoir: "npm:^0.8.0"
-    resolve-from: "npm:^5.0.0"
-    tarn: "npm:^3.0.2"
-    tildify: "npm:2.0.0"
-  peerDependenciesMeta:
-    better-sqlite3:
-      optional: true
-    mysql:
-      optional: true
-    mysql2:
-      optional: true
-    pg:
-      optional: true
-    pg-native:
-      optional: true
-    sqlite3:
-      optional: true
-    tedious:
-      optional: true
-  bin:
-    knex: bin/cli.js
-  checksum: 10c0/33580641feaa93074bdc10e78f06382e5017d46a3cd22821c09057e7da303c35772add39a110fffe685c2f438a78751a0eb6f50aad1c4bdb032e8ec9b7879b69
-  languageName: node
-  linkType: hard
-
 "koa-compose@npm:^4.1.0":
   version: 4.1.0
   resolution: "koa-compose@npm:4.1.0"
@@ -27159,13 +27120,6 @@ __metadata:
   version: 1.1.1
   resolution: "pg-cloudflare@npm:1.1.1"
   checksum: 10c0/a68b957f755be6af813d68ccaf4c906a000fd2ecb362cd281220052cc9e2f6c26da3b88792742387008c30b3bf0d2fa3a0eff04aeb8af4414023c99ae78e07bd
-  languageName: node
-  linkType: hard
-
-"pg-connection-string@npm:2.6.1":
-  version: 2.6.1
-  resolution: "pg-connection-string@npm:2.6.1"
-  checksum: 10c0/e5a71a2da143b8dc17143a9db7737679b210643771aa678d3bc60c7bc70da11bbb8e2d531be91c8c4eddd6ac6046307811e793f5850b9ba595a11785c948a417
   languageName: node
   linkType: hard
 

@@ -35,7 +35,7 @@
     "@internal/entity-aggregation-common": "^0.1.0",
     "express": "^4.21.2",
     "express-promise-router": "^4.1.1",
-    "knex": "^2.4.2",
+    "knex": "^3.0.0",
     "lodash": "^4.17.21",
     "node-fetch": "^3.0.0",
     "p-limit": "^6.2.0",
