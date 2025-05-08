@@ -51,7 +51,6 @@ import {
   RELATION_PART_OF,
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
-import { MissingAnnotationsCard } from 'common-components';
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
@@ -133,16 +132,10 @@ const overviewContent = (
       <EntityHasSubcomponentsCard variant="gridItem" />
     </Grid>
     <Grid item md={6} xs={12}>
-      <MissingAnnotationsCard
-        title="Example Single Annotation"
-        annotation="my/annotation"
-      />
+
     </Grid>
     <Grid item md={6} xs={12}>
-      <MissingAnnotationsCard
-        title="Example Multiple Annotations"
-        annotation={["ann1", "ann2"]}
-      />
+
     </Grid>
   </Grid>
 );

@@ -1,1 +1,1 @@
-export { techRadarPlugin, TechRadarPage } from './plugin';
+export { techRadarPlugin } from './plugin';

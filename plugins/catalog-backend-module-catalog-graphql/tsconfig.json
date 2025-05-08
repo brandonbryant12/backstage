@@ -1,0 +1,12 @@
+// plugins/catalog-backend-module-catalog-graphql/tsconfig.json
+{
+  "extends": "@backstage/cli/config/tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ES2022",
+    "useDefineForClassFields": false,
+    "esModuleInterop": true, // Add this
+    "skipLibCheck": true    // Often helpful
+  }
+}

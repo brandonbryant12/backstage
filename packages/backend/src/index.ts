@@ -6,6 +6,8 @@
  * Happy hacking!
  */
 
+import 'reflect-metadata';
+
 import { createBackend } from '@backstage/backend-defaults';
 
 const backend = createBackend();
@@ -31,4 +33,5 @@ backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
 backend.add(import('backstage-plugin-catalog-backend-module-example-fragment-provider'));
 backend.add(import('@internal/backstage-plugin-catalog-backend-module-template-processor'));
 backend.add(import('@internal/plugin-tech-radar-backend'));
+backend.add(import('@internal/plugin-catalog-backend-module-catalog-graphql'));
 backend.start();

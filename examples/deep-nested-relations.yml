@@ -1,0 +1,120 @@
+# Backstage Catalog Entities for Testing Nested Relations
+# CORRECTED: Removed top-level 'relations:' blocks
+
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: org-example
+  description: The top-level example organization
+spec:
+  type: organization
+  children: [team-a, team-b] # Processors derive 'parentOf' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-a
+  description: Team A within the Org
+spec:
+  type: team
+  parent: org-example # Processors derive 'childOf' from this
+  children: [squad-x, squad-y] # Processors derive 'parentOf' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-b
+  description: Team B within the Org
+spec:
+  type: team
+  parent: org-example # Processors derive 'childOf' from this
+  children: []
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: squad-x
+  description: Squad X within Team A
+spec:
+  type: squad
+  parent: team-a # Processors derive 'childOf' from this
+  children: []
+  # Processors derive 'hasMember' from User's spec.memberOf
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: squad-y
+  description: Squad Y within Team A
+spec:
+  type: squad
+  parent: team-a # Processors derive 'childOf' from this
+  children: []
+  # Processors derive 'hasMember' from User's spec.memberOf
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user-1
+spec:
+  profile:
+    displayName: User One
+  memberOf: [squad-x] # Processors derive 'memberOf' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user-2
+spec:
+  profile:
+    displayName: User Two
+  memberOf: [squad-x, team-b] # Processors derive 'memberOf' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: user-3
+spec:
+  profile:
+    displayName: User Three
+  memberOf: [squad-y] # Processors derive 'memberOf' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: service-alpha
+  description: Critical Service Alpha
+spec:
+  type: service
+  lifecycle: production
+  owner: squad-x # Processors derive 'ownedBy' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: library-beta
+  description: Shared Library Beta
+spec:
+  type: library
+  lifecycle: experimental
+  owner: team-a # Processors derive 'ownedBy' from this
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: website-gamma
+  description: Public Website Gamma
+spec:
+  type: website
+  lifecycle: production
+  owner: user-2

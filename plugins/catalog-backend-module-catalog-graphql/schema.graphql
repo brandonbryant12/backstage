@@ -1,0 +1,9 @@
+type Query {
+    applicationById(id: ID): Application
+}
+
+type Application {
+    id: ID! ## Backstage entity - metadata.name
+    name: String
+    description: String
+}

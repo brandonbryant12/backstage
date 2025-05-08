@@ -12,7 +12,7 @@ export async function createRouter(options: {
   entityAggregator: EntityAggregatorService;
   config: Config;
 }): Promise<express.Router> {
-  const { entityAggregator, logger, config } = options;
+  const { entityAggregator } = options;
 
   const router = Router();
   router.use(express.json());
