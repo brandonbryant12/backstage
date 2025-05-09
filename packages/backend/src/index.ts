@@ -6,7 +6,6 @@
  * Happy hacking!
  */
 
-import 'reflect-metadata';
 
 import { createBackend } from '@backstage/backend-defaults';
 

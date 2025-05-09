@@ -1,9 +1,13 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.7", import: ["@key"])
+
 type Query {
-    applicationById(id: ID): Application
+  applicationById(id: ID!): Application
 }
 
-type Application {
-    id: ID! ## Backstage entity - metadata.name
-    name: String
-    description: String
+type Application @key(fields: "id") {
+  id: ID!
+  name: String
+  description: String
+  agileEntityName: String
 }

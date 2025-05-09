@@ -2,7 +2,7 @@ import { TemplateTimestampProcessor } from './processor';
 import { Entity } from '@backstage/catalog-model';
 import { CatalogClient } from '@backstage/catalog-client';
 import { mockServices } from '@backstage/backend-test-utils';
-import { LoggerService } from '@backstage/backend-plugin-api/index';
+import { LoggerService } from '@backstage/backend-plugin-api';
 
 describe('TemplateTimestampProcessor', () => {
   const mockGetEntityByRef = jest.fn();

@@ -1,29 +1,21 @@
-import { Resolver, Query, Args, ResolveField, Parent } from '@nestjs/graphql';
-import { ApplicationService } from '../services/application.service';
+import { GraphQLContext } from '../types';
 
-@Resolver('Application')
-export class ApplicationResolver {
-  constructor(private readonly applicationService: ApplicationService) {}
-
-  @Query('applicationById')
-  async getApplicationById(@Args('id') id: string) {
-    return this.applicationService.findById(id);
-  }
-
-  // ── Field resolvers (one per field) ────────────────────────────────
-
-  @ResolveField()
-  id(@Parent() root: any) {
-    return root.id;
-  }
-
-  @ResolveField()
-  name(@Parent() root: any) {
-    return root.name;
-  }
-
-  @ResolveField()
-  description(@Parent() root: any) {
-    return root.description;
-  }
-}
+export const applicationResolvers = {
+  Query: {
+    applicationById: async (
+      _parent: unknown,
+      { id }: { id: string },
+      context: GraphQLContext,
+    ) => context.applicationService.findById(id),
+  },
+  Application: {
+    __resolveReference: async (
+      reference: { id: string },
+      context: GraphQLContext,
+    ) => context.applicationService.findById(reference.id),
+    id: (root: any) => root.id,
+    name: (root: any) => root.name,
+    description: (root: any) => root.description,
+    agileEntityName: (root: any) => root.agileEntityName,
+  },
+};
