@@ -25,6 +25,7 @@ import { apis } from './apis';
 import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
+import { GraphQLProvider } from '@internal/graphql';
 
 import {
   AlertDisplay,
@@ -104,8 +105,10 @@ export default app.createRoot(
   <>
     <AlertDisplay />
     <OAuthRequestDialog />
+    <GraphQLProvider>
     <AppRouter>
       <Root>{routes}</Root>
     </AppRouter>
+    </GraphQLProvider>
   </>,
 );

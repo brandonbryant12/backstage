@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client/core';
 
-const SUPERGRAPH_URI = 'http://localhost:4000/graphql';
+const SUPERGRAPH_URI = 'http://127.0.0.1:4000/graphql';
 
 export const apolloClient = new ApolloClient({
   link: new HttpLink({

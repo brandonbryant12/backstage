@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Grid } from '@material-ui/core';
+import { useEntity } from '@backstage/plugin-catalog-react';
 import {
   EntityApiDefinitionCard,
   EntityConsumedApisCard,
@@ -58,6 +59,7 @@ import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
+import { useApplication } from '@internal/graphql';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -116,8 +118,20 @@ const entityWarningContent = (
   </>
 );
 
+// New component to fetch and log GraphQL data
+const EntityGraphQLFetcher: React.FC = () => {
+  const { entity } = useEntity();
+
+  const entityId = entity?.metadata?.name ?? '';
+  const { application, loading, error } = useApplication(entityId);
+  console.log({ application, loading, error })
+
+  return null; 
+};
+
 const overviewContent = (
   <Grid container spacing={3} alignItems="stretch">
+    <EntityGraphQLFetcher /> {/* Add the data fetcher component here */}
     {entityWarningContent}
     <Grid item md={6}>
       <EntityAboutCard variant="gridItem" />
@@ -131,12 +145,8 @@ const overviewContent = (
     <Grid item md={8} xs={12}>
       <EntityHasSubcomponentsCard variant="gridItem" />
     </Grid>
-    <Grid item md={6} xs={12}>
-
-    </Grid>
-    <Grid item md={6} xs={12}>
-
-    </Grid>
+    <Grid item md={6} xs={12} />
+    <Grid item md={6} xs={12} />
   </Grid>
 );
 
