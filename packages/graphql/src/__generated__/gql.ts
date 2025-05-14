@@ -14,10 +14,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    agileEntityName\n    backlog {\n      id\n      issueSummaries {\n        issueName\n        issueIconUrl\n        activeIssueCount\n      }\n    }\n    name\n    description\n    team {\n      id\n      teamMembers {\n        name\n        role\n      }\n    }\n  }\n}": typeof types.GetApplicationDocument,
+    "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    name\n    description\n    backlog {\n      backlogUrl\n      id\n      issueSummaries {\n        name\n        iconUrl\n        count\n      }\n    }\n    team {\n      name\n      associates {\n        name\n        description\n        email\n        role\n        imageUrl\n        link\n      }\n    }\n  }\n}": typeof types.GetApplicationDocument,
 };
 const documents: Documents = {
-    "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    agileEntityName\n    backlog {\n      id\n      issueSummaries {\n        issueName\n        issueIconUrl\n        activeIssueCount\n      }\n    }\n    name\n    description\n    team {\n      id\n      teamMembers {\n        name\n        role\n      }\n    }\n  }\n}": types.GetApplicationDocument,
+    "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    name\n    description\n    backlog {\n      backlogUrl\n      id\n      issueSummaries {\n        name\n        iconUrl\n        count\n      }\n    }\n    team {\n      name\n      associates {\n        name\n        description\n        email\n        role\n        imageUrl\n        link\n      }\n    }\n  }\n}": types.GetApplicationDocument,
 };
 
 /**
@@ -37,7 +37,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    agileEntityName\n    backlog {\n      id\n      issueSummaries {\n        issueName\n        issueIconUrl\n        activeIssueCount\n      }\n    }\n    name\n    description\n    team {\n      id\n      teamMembers {\n        name\n        role\n      }\n    }\n  }\n}"): (typeof documents)["query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    agileEntityName\n    backlog {\n      id\n      issueSummaries {\n        issueName\n        issueIconUrl\n        activeIssueCount\n      }\n    }\n    name\n    description\n    team {\n      id\n      teamMembers {\n        name\n        role\n      }\n    }\n  }\n}"];
+export function graphql(source: "query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    name\n    description\n    backlog {\n      backlogUrl\n      id\n      issueSummaries {\n        name\n        iconUrl\n        count\n      }\n    }\n    team {\n      name\n      associates {\n        name\n        description\n        email\n        role\n        imageUrl\n        link\n      }\n    }\n  }\n}"): (typeof documents)["query GetApplication($id: ID!) {\n  applicationById(id: $id) {\n    id\n    name\n    description\n    backlog {\n      backlogUrl\n      id\n      issueSummaries {\n        name\n        iconUrl\n        count\n      }\n    }\n    team {\n      name\n      associates {\n        name\n        description\n        email\n        role\n        imageUrl\n        link\n      }\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

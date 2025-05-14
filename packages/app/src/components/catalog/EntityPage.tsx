@@ -124,7 +124,6 @@ const EntityGraphQLFetcher: React.FC = () => {
 
   const entityId = entity?.metadata?.name ?? '';
   const { application, loading, error } = useApplication(entityId);
-  console.log({ application, loading, error })
 
   return null; 
 };

@@ -1,22 +1,26 @@
 query GetApplication($id: ID!) {
   applicationById(id: $id) {
-    id
-    agileEntityName
-    backlog {
-      id
-      issueSummaries {
-        issueName
-        issueIconUrl
-        activeIssueCount
-      }
-    }
+ id
     name
     description
-    team {
+    backlog {
+      backlogUrl
       id
-      teamMembers {
+      issueSummaries {
         name
+        iconUrl
+        count
+      }
+    }
+    team {
+      name
+      associates {
+        name
+        description
+        email
         role
+        imageUrl
+        link
       }
     }
   }

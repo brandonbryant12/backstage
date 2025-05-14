@@ -13,6 +13,7 @@ import { applicationResolvers } from './resolvers/application.resolver';
 import { buildSubgraphSchema } from '@apollo/subgraph'
 import gql from 'graphql-tag';
 import { GraphQLContext } from './types';
+import { ApplicationDAO } from './dal/applicationDAO';
 
 export const catalogModuleCatalogApiExtension = createBackendModule({
   pluginId: 'catalog',
@@ -63,9 +64,8 @@ export const catalogModuleCatalogApiExtension = createBackendModule({
               return {
                 logger,
                 backstageUser,
-                applicationService: await ApplicationService.create(
-                  database,
-                  logger,
+                applicationService: new ApplicationService(
+                  await ApplicationDAO.create(database, logger),
                 ),
               } as GraphQLContext;
             },

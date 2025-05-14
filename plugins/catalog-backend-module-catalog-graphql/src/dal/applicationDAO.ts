@@ -4,7 +4,7 @@ import { LoggerService, DatabaseService } from '@backstage/backend-plugin-api';
 
 const TABLE_NAME = 'final_entities';
 
-export class CatalogRepository {
+export class ApplicationDAO {
   private constructor(
     private readonly knex: Knex,
     private readonly logger: LoggerService,
@@ -12,7 +12,7 @@ export class CatalogRepository {
 
   static async create(db: DatabaseService, logger: LoggerService): Promise<CatalogRepository> {
     const knex = await db.getClient();
-    const repo = new CatalogRepository(knex, logger);
+    const repo = new ApplicationDAO(knex, logger);
     return repo;
   }
 

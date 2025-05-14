@@ -1,18 +1,12 @@
-import { DatabaseService, LoggerService } from '@backstage/backend-plugin-api';
-import { CatalogRepository } from '../dal/catalogRepository';
+import { ApplicationDAO } from '../dal/applicationDAO';
 
 export class ApplicationService {
   constructor(
-    private readonly db: DatabaseService,
-    private readonly logger: LoggerService,
+    private readonly applicationDao: ApplicationDAO,
   ) {}
 
-  static async create(db: DatabaseService, logger: LoggerService) {
-    return new ApplicationService(db, logger);
-  }
 
   async findById(id: string) {
-    const repo = await CatalogRepository.create(this.db, this.logger);
-    return repo.findApplication(id);
+    return this.applicationDao.findApplication(id);
   }
 }

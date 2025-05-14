@@ -23,27 +23,45 @@ export type Application = {
   description: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Maybe<Scalars['String']['output']>;
-  team: Maybe<TeamStructure>;
+  team: Maybe<ApplicationTeam>;
+};
+
+export type ApplicationTeam = {
+  __typename?: 'ApplicationTeam';
+  associates: Array<Associate>;
+  id: Scalars['ID']['output'];
+  name: Maybe<Scalars['String']['output']>;
+};
+
+export type Associate = {
+  __typename?: 'Associate';
+  description: Maybe<Scalars['String']['output']>;
+  email: Maybe<Scalars['String']['output']>;
+  imageUrl: Maybe<Scalars['String']['output']>;
+  link: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  role: Maybe<Scalars['String']['output']>;
 };
 
 export type Backlog = {
   __typename?: 'Backlog';
+  backlogUrl: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  issueSummaries: Maybe<Array<Maybe<IssueSummary>>>;
+  issueSummaries: Array<IssueSummary>;
 };
 
 export type IssueSummary = {
   __typename?: 'IssueSummary';
-  activeIssueCount: Maybe<Scalars['String']['output']>;
-  issueIconUrl: Maybe<Scalars['String']['output']>;
-  issueName: Maybe<Scalars['String']['output']>;
+  count: Scalars['String']['output'];
+  iconUrl: Scalars['String']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
   applicationById: Maybe<Application>;
+  applicationTeam: Maybe<ApplicationTeam>;
   backlog: Maybe<Backlog>;
-  team: Maybe<TeamStructure>;
 };
 
 
@@ -52,25 +70,13 @@ export type QueryApplicationByIdArgs = {
 };
 
 
+export type QueryApplicationTeamArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type QueryBacklogArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryTeamArgs = {
-  id: Scalars['ID']['input'];
-};
-
-export type TeamMember = {
-  __typename?: 'TeamMember';
-  name: Maybe<Scalars['String']['output']>;
-  role: Maybe<Scalars['String']['output']>;
-};
-
-export type TeamStructure = {
-  __typename?: 'TeamStructure';
-  id: Scalars['ID']['output'];
-  teamMembers: Maybe<Array<Maybe<TeamMember>>>;
 };
 
 export type GetApplicationQueryVariables = Exact<{
@@ -78,7 +84,7 @@ export type GetApplicationQueryVariables = Exact<{
 }>;
 
 
-export type GetApplicationQuery = { __typename?: 'Query', applicationById: { __typename?: 'Application', id: string, agileEntityName: string | null, name: string | null, description: string | null, backlog: { __typename?: 'Backlog', id: string, issueSummaries: Array<{ __typename?: 'IssueSummary', issueName: string | null, issueIconUrl: string | null, activeIssueCount: string | null } | null> | null } | null, team: { __typename?: 'TeamStructure', id: string, teamMembers: Array<{ __typename?: 'TeamMember', name: string | null, role: string | null } | null> | null } | null } | null };
+export type GetApplicationQuery = { __typename?: 'Query', applicationById: { __typename?: 'Application', id: string, name: string | null, description: string | null, backlog: { __typename?: 'Backlog', backlogUrl: string, id: string, issueSummaries: Array<{ __typename?: 'IssueSummary', name: string, iconUrl: string, count: string }> } | null, team: { __typename?: 'ApplicationTeam', name: string | null, associates: Array<{ __typename?: 'Associate', name: string, description: string | null, email: string | null, role: string | null, imageUrl: string | null, link: string | null }> } | null } | null };
 
 
-export const GetApplicationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetApplication"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"agileEntityName"}},{"kind":"Field","name":{"kind":"Name","value":"backlog"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"issueSummaries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"issueName"}},{"kind":"Field","name":{"kind":"Name","value":"issueIconUrl"}},{"kind":"Field","name":{"kind":"Name","value":"activeIssueCount"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"teamMembers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetApplicationQuery, GetApplicationQueryVariables>;
+export const GetApplicationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetApplication"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"applicationById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"backlog"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"backlogUrl"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"issueSummaries"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"iconUrl"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"associates"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"link"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetApplicationQuery, GetApplicationQueryVariables>;
