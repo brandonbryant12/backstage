@@ -1,10 +1,14 @@
 import * as React from 'react';
-import MuiAccordion, { AccordionProps as MuiAccordionPropsM } from '@mui/material/Accordion';
-import MuiAccordionSummary, { AccordionSummaryProps as MuiAccordionSummaryPropsM } from '@mui/material/AccordionSummary';
+import { styled } from '@mui/material/styles';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import MuiAccordion, { AccordionProps as MuiAccordionComponentProps } from '@mui/material/Accordion';
+import MuiAccordionSummary, {
+  AccordionSummaryProps as MuiAccordionSummaryComponentProps,
+} from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
+// --- API Interfaces ---
 export interface AccordionItem {
   id: string | number;
   header: string;
@@ -13,107 +17,95 @@ export interface AccordionItem {
 
 export interface AccordionProps {
   items: AccordionItem[];
-  exclusive?: boolean;
-  defaultExpandedId?: string | number | (string | number)[];
+  /**
+    * If true, only one panel may stay open at a time.
+    * Note: With the current simplified state management, the accordion will always behave exclusively.
+    * This prop is kept for API consistency but does not alter the single-expansion behavior.
+    */
+  exclusive?: boolean; // Kept for API consistency, but behavior is always exclusive
+  /** Specify the default expanded panel by id. */
+  defaultExpandedId?: string | number | (string | number)[]; // Can still set initial panel
 }
 
+// --- Styled Components (from your provided code, renamed for clarity) ---
+const StyledAppAccordion = styled((props: MuiAccordionComponentProps) => (
+  <MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  '&:not(:last-child)': {
+    borderBottom: 0,
+  },
+  '&::before': {
+    display: 'none',
+  },
+}));
+
+const StyledAppAccordionSummary = styled((props: MuiAccordionSummaryComponentProps) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, .05)'
+      : 'rgba(0, 0, 0, .03)',
+  flexDirection: 'row-reverse',
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(90deg)', // Make sure this overrides MUI default (may need !important if issues persist)
+  },
+  '& .MuiAccordionSummary-content': {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+const StyledAppAccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
+}));
+
+
+// --- Main Accordion Component implementing the API with simplified state ---
 const Accordion: React.FC<AccordionProps> = ({ items, exclusive = false, defaultExpandedId }) => {
-  const [expanded, setExpanded] = React.useState<Set<string | number> | string | number | false>(() => {
-    if (exclusive) {
-      return Array.isArray(defaultExpandedId) && defaultExpandedId.length > 0
-        ? defaultExpandedId[0]
-        : (!Array.isArray(defaultExpandedId) && defaultExpandedId !== undefined ? defaultExpandedId : false);
+  // Simplified state: stores the ID of the currently expanded panel, or false if none.
+  const [expandedPanelId, setExpandedPanelId] = React.useState<string | number | false>(() => {
+    if (Array.isArray(defaultExpandedId) && defaultExpandedId.length > 0) {
+      return defaultExpandedId[0]; // Take the first ID if an array is provided
     }
-    let idsToExpand: (string | number)[] = [];
-    if (Array.isArray(defaultExpandedId)) {
-      idsToExpand = defaultExpandedId;
-    } else if (defaultExpandedId !== undefined) {
-      idsToExpand = [defaultExpandedId];
+    if (!Array.isArray(defaultExpandedId) && defaultExpandedId !== undefined) {
+      return defaultExpandedId; // Use the ID if it's a single value
     }
-    return new Set<string | number>(idsToExpand);
+    return false; // No panel expanded by default
   });
 
-  const handleChange = (panelId: string | number) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-    if (exclusive) {
-      setExpanded(isExpanded ? panelId : false);
-    } else {
-      setExpanded(currentExpanded => {
-        const newExpandedSet = new Set(currentExpanded as Set<string | number>);
-        if (isExpanded) {
-          newExpandedSet.add(panelId);
-        } else {
-          newExpandedSet.delete(panelId);
-        }
-        return newExpandedSet;
-      });
-    }
-  };
+  // Simplified handleChange for exclusive behavior
+  const handleChange =
+    (panelId: string | number) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedPanelId(isExpanded ? panelId : false);
+    };
 
   return (
-    <>
-      {items.map(({ id, header, body }, index) => {
-        const isCurrentlyExpanded = exclusive
-          ? expanded === id
-          : (expanded instanceof Set && expanded.has(id));
-
-        return (
-          <MuiAccordion
-            key={id}
-            disableGutters
-            elevation={0}
-            square
-            expanded={isCurrentlyExpanded}
-            onChange={handleChange(id)}
-            sx={(theme) => ({
-              border: `1px solid ${theme.palette.divider}`,
-              '&:not(:last-child)': {
-                borderBottom: 0,
-              },
-              '&:before': { display: 'none' },
-              backgroundColor:
-                index % 2
-                  ? theme.palette.action.hover
-                  : theme.palette.background.paper,
-            })}
+    <div>
+      {items.map(({ id, header, body }) => (
+        <StyledAppAccordion
+          key={id}
+          expanded={expandedPanelId === id} // Check if this panel is the one stored in state
+          onChange={handleChange(id)}       // Use the simplified handler
+        >
+          <StyledAppAccordionSummary
+            aria-controls={`${id}-content`}
+            id={`${id}-header`}
           >
-            <MuiAccordionSummary
-              expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} data-testid={`chevron-${id}`} />}
-              aria-controls={`${id}-content`}
-              id={`${id}-header`}
-              sx={(theme) => ({
-                flexDirection: 'row-reverse',
-                '& .MuiAccordionSummary-expandIconWrapper': {
-                  transform: 'rotate(0deg)', // Explicitly set initial rotation
-                  transition: theme.transitions.create('transform', {
-                    duration: theme.transitions.duration.shortest,
-                  }),
-                },
-                '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-                  transform: 'rotate(90deg) !important', // Ensure this overrides MUI's default 180deg rotation
-                },
-                '& .MuiAccordionSummary-content': {
-                  marginLeft: theme.spacing(1),
-                },
-              })}
-            >
-              <Typography fontWeight={600}>{header}</Typography>
-            </MuiAccordionSummary>
-
-            <MuiAccordionDetails
-              sx={(theme) => ({
-                padding: theme.spacing(2),
-                borderTop: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.background.paper,
-              })}
-            >
-              <Typography variant="body2" color="text.secondary">
-                {body}
-              </Typography>
-            </MuiAccordionDetails>
-          </MuiAccordion>
-        );
-      })}
-    </>
+            <Typography>{header}</Typography>
+          </StyledAppAccordionSummary>
+          <StyledAppAccordionDetails>
+            <Typography>
+              {body}
+            </Typography>
+          </StyledAppAccordionDetails>
+        </StyledAppAccordion>
+      ))}
+    </div>
   );
 };
 
