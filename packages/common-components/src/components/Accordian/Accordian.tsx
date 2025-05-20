@@ -1,24 +1,17 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme, alpha } from '@mui/material/styles';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
-import MuiAccordionSummary, {
-  AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
+import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 
-// Styled components
-const Accordion = styled((props: AccordionProps) => (
+const StyledAccordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
-  '&:not(:last-child)': {
-    borderBottom: 0,
-  },
-  '&::before': {
-    display: 'none',
-  },
+  '&:not(:last-child)': { borderBottom: 0 },
+  '&::before': { display: 'none' },
 }));
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
@@ -26,63 +19,105 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
     {...props}
   />
-))(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, .05)'
-      : 'rgba(0, 0, 0, .03)',
+))(() => ({
   flexDirection: 'row-reverse',
   '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
     transform: 'rotate(90deg)',
   },
-  '& .MuiAccordionSummary-content': {
-    marginLeft: theme.spacing(1),
-  },
+  '& .MuiAccordionSummary-content': { marginLeft: 8 },
 }));
 
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   padding: theme.spacing(2),
-  borderTop: '1px solid rgba(0, 0, 0, .125)',
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-// Define item prop types
-interface AccordionItem {
-  title: string;
-  content: string;
+export interface AccordionItem {
+  /**
+   * Unique panel id.
+   * If omitted, defaults to `panel${index}` (e.g. `panel0`, `panel1`, …).
+   */
+  id?: string;
+  header: string;
+  body: string;
 }
 
-interface CustomizedAccordionsProps {
+interface Props {
   items: AccordionItem[];
+  /** Only one panel open at once if true */
+  exclusive?: boolean;
+  /** Which panel(s) to open by default */
+  defaultExpandedId?: string | string[];
 }
 
-export default function CustomizedAccordions({ items }: CustomizedAccordionsProps) {
-  const [expanded, setExpanded] = React.useState<string | false>('panel0');
+export default function Accordion({
+  items,
+  exclusive = false,
+  defaultExpandedId,
+}: Props) {
+  const theme = useTheme();
+  type ExpandedState = string | string[] | false;
+
+  const initialExpanded: ExpandedState = React.useMemo(() => {
+    if (defaultExpandedId !== undefined) {
+      // user supplied defaults
+      if (exclusive) {
+        if (typeof defaultExpandedId === 'string') return defaultExpandedId;
+        if (Array.isArray(defaultExpandedId) && defaultExpandedId.length)
+          return defaultExpandedId[0];
+        return false;
+      } 
+        if (Array.isArray(defaultExpandedId)) return defaultExpandedId;
+        if (typeof defaultExpandedId === 'string') return [defaultExpandedId];
+        return [];
+      
+    }
+    // no defaultExpandedId: start closed
+    return exclusive ? false : [];
+  }, [exclusive, defaultExpandedId]);
+
+  const [expanded, setExpanded] = React.useState<ExpandedState>(initialExpanded);
 
   const handleChange =
-    (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-      setExpanded(newExpanded ? panel : false);
+    (panelId: string) =>
+    (_: React.SyntheticEvent, isExpanded: boolean) => {
+      if (exclusive) {
+        setExpanded(isExpanded ? panelId : false);
+      } else {
+        setExpanded((prev) => {
+          const list = Array.isArray(prev) ? prev : [];
+          return isExpanded
+            ? [...list, panelId]
+            : list.filter((id) => id !== panelId);
+        });
+      }
     };
 
   return (
     <div>
-      {items.map((item, index) => {
-        const panelId = `panel${index}`;
+      {items.map((item, idx) => {
+        const panelId = item.id ?? `panel${idx}`;
+        const isOpen = exclusive
+          ? expanded === panelId
+          : Array.isArray(expanded) && expanded.includes(panelId);
+        const bg =
+          idx % 2 === 0
+            ? theme.palette.action.hover
+            : alpha(theme.palette.action.hover, 0.6);
+
         return (
-          <Accordion
+          <StyledAccordion
             key={panelId}
-            expanded={expanded === panelId}
+            expanded={isOpen}
             onChange={handleChange(panelId)}
           >
-            <AccordionSummary
-              aria-controls={`${panelId}d-content`}
-              id={`${panelId}d-header`}
-            >
-              <Typography>{item.title}</Typography>
+            <AccordionSummary sx={{ backgroundColor: bg }}>
+              <Typography>{item.header}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>{item.content}</Typography>
+              <Typography>{item.body}</Typography>
             </AccordionDetails>
-          </Accordion>
+          </StyledAccordion>
         );
       })}
     </div>
