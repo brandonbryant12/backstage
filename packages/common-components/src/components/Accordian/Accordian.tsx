@@ -1,9 +1,9 @@
 import * as React from 'react';
-import MuiAccordion, { AccordionProps as MuiAccordionPropsM } from '@mui/material/Accordion'; // Aliased to avoid conflict
-import MuiAccordionSummary, { AccordionSummaryProps as MuiAccordionSummaryPropsM } from '@mui/material/AccordionSummary'; // Aliased
+import MuiAccordion, { AccordionProps as MuiAccordionPropsM } from '@mui/material/Accordion';
+import MuiAccordionSummary, { AccordionSummaryProps as MuiAccordionSummaryPropsM } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp'; // Changed Icon
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
 export interface AccordionItem {
   id: string | number;
@@ -13,15 +13,10 @@ export interface AccordionItem {
 
 export interface AccordionProps {
   items: AccordionItem[];
-  /** If true → only one panel may stay open at a time. Defaults to false if not provided. */
   exclusive?: boolean;
-  /** Specify default expanded panel(s) by id. */
   defaultExpandedId?: string | number | (string | number)[];
 }
 
-/**
- * Theme-aware accordion list with left-hand chevron ▸ / ▾ and striped rows.
- */
 const Accordion: React.FC<AccordionProps> = ({ items, exclusive = false, defaultExpandedId }) => {
   const [expanded, setExpanded] = React.useState<Set<string | number> | string | number | false>(() => {
     if (exclusive) {
@@ -43,7 +38,7 @@ const Accordion: React.FC<AccordionProps> = ({ items, exclusive = false, default
       setExpanded(isExpanded ? panelId : false);
     } else {
       setExpanded(currentExpanded => {
-        const newExpandedSet = new Set(currentExpanded as Set<string | number>); // Type assertion
+        const newExpandedSet = new Set(currentExpanded as Set<string | number>);
         if (isExpanded) {
           newExpandedSet.add(panelId);
         } else {
@@ -66,42 +61,39 @@ const Accordion: React.FC<AccordionProps> = ({ items, exclusive = false, default
             key={id}
             disableGutters
             elevation={0}
-            square // Added for consistency with the styled example's appearance
+            square
             expanded={isCurrentlyExpanded}
-            onChange={handleChange(id)} // Works for both exclusive and non-exclusive due to handler logic
+            onChange={handleChange(id)}
             sx={(theme) => ({
-              border: `1px solid ${theme.palette.divider}`, // From styled Accordion
-              '&:not(:last-child)': { // From styled Accordion
+              border: `1px solid ${theme.palette.divider}`,
+              '&:not(:last-child)': {
                 borderBottom: 0,
               },
-              '&:before': { display: 'none' }, // remove default Mui divider line
-              backgroundColor: // Striping logic
+              '&:before': { display: 'none' },
+              backgroundColor:
                 index % 2
-                  ? theme.palette.action.hover // Odd rows
-                  : theme.palette.background.paper, // Even rows
+                  ? theme.palette.action.hover
+                  : theme.palette.background.paper,
             })}
           >
             <MuiAccordionSummary
               expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} data-testid={`chevron-${id}`} />}
               aria-controls={`${id}-content`}
               id={`${id}-header`}
-              sx={(theme) => ({ // Combined styles from both examples
-                flexDirection: 'row-reverse', // Icon on the left
+              sx={(theme) => ({
+                flexDirection: 'row-reverse',
                 '& .MuiAccordionSummary-expandIconWrapper': {
-                  transition: theme.transitions.create('transform', { // Smoother transition
+                  transform: 'rotate(0deg)', // Explicitly set initial rotation
+                  transition: theme.transitions.create('transform', {
                     duration: theme.transitions.duration.shortest,
                   }),
-                  // No specific color for icon wrapper needed, inherits
                 },
                 '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-                  transform: 'rotate(90deg)', // ▸ → ▾
+                  transform: 'rotate(90deg) !important', // Ensure this overrides MUI's default 180deg rotation
                 },
-                '& .MuiAccordionSummary-content': { // Spacing from styled AccordionSummary
+                '& .MuiAccordionSummary-content': {
                   marginLeft: theme.spacing(1),
                 },
-                // The Accordion's sx handles the summary background via striping.
-                // If you wanted the summary to have its own distinct background from the accordion item itself,
-                // you would set it here, but it would override the striping on MuiAccordion.
               })}
             >
               <Typography fontWeight={600}>{header}</Typography>
@@ -109,10 +101,9 @@ const Accordion: React.FC<AccordionProps> = ({ items, exclusive = false, default
 
             <MuiAccordionDetails
               sx={(theme) => ({
-                padding: theme.spacing(2), // From styled AccordionDetails
-                borderTop: `1px solid ${theme.palette.divider}`, // From styled AccordionDetails, using theme.palette.divider
-                // To ensure detail's background matches the even row color if desired, or a neutral paper
-                backgroundColor: theme.palette.background.paper, // Explicitly set for consistency
+                padding: theme.spacing(2),
+                borderTop: `1px solid ${theme.palette.divider}`,
+                backgroundColor: theme.palette.background.paper,
               })}
             >
               <Typography variant="body2" color="text.secondary">
