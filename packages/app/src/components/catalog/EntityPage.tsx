@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button, Grid } from '@material-ui/core';
 import {
@@ -59,6 +58,7 @@ import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
+import Accordion from 'common-components/src/components/Accordian/Accordian';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -142,6 +142,27 @@ const overviewContent = (
       <MissingAnnotationsCard
         title="Example Multiple Annotations"
         annotation={["ann1", "ann2"]}
+      />
+    </Grid>
+    <Grid item md={6} xs={12}>
+      <Accordion
+        items={[
+          {
+            id: '1',
+            header: 'What is Lorem Ipsum?',
+            body: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+          },
+          {
+            id: '2',
+            header: 'Why do we use it?',
+            body: 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.',
+          },
+          {
+            id: '3',
+            header: 'Where does it come from?',
+            body: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC.',
+          },
+        ]}
       />
     </Grid>
   </Grid>
