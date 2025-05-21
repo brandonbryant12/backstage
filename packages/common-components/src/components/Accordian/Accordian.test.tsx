@@ -1,25 +1,21 @@
 import * as React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import Typography from '@mui/material/Typography';
 import Accordion from './Accordian';
 
 const items = [
-  { header: 'Item 1', body: 'Body 1' },
-  { header: 'Item 2', body: 'Body 2' },
-  { header: 'Item 3', body: 'Body 3' },
+  { header: <Typography>Item 1</Typography>, body: <Typography>Body 1</Typography> },
+  { header: <Typography>Item 2</Typography>, body: <Typography>Body 2</Typography> },
+  { header: <Typography>Item 3</Typography>, body: <Typography>Body 3</Typography> },
 ];
 
-describe('<Accordion /> – non-exclusive (default)', () => {
+describe('<Accordion /> non-exclusive (default)', () => {
   test('renders headers and keeps bodies hidden initially', () => {
     render(<Accordion items={items} />);
     items.forEach(({ header, body }) => {
-      expect(screen.getByText(header)).toBeInTheDocument();
-      expect(screen.getByText(body)).not.toBeVisible();
+      expect(screen.getByText((header as any).props.children)).toBeInTheDocument();
+      expect(screen.getByText((body as any).props.children)).not.toBeVisible();
     });
   });
 
@@ -50,7 +46,7 @@ describe('<Accordion /> – non-exclusive (default)', () => {
   });
 });
 
-describe('<Accordion /> – exclusive mode', () => {
+describe('<Accordion /> exclusive mode', () => {
   test('keeps only one panel open', async () => {
     render(<Accordion items={items} exclusive />);
 
@@ -81,7 +77,7 @@ describe('<Accordion /> – exclusive mode', () => {
   });
 });
 
-describe('<Accordion /> – defaultExpandedId support', () => {
+describe('<Accordion /> defaultExpandedId support', () => {
   test('non-exclusive: string defaultExpandedId opens that single panel', () => {
     render(<Accordion items={items} defaultExpandedId="panel1" />);
     expect(screen.getByText('Body 2')).toBeVisible();
@@ -121,17 +117,17 @@ describe('<Accordion /> – defaultExpandedId support', () => {
   });
 });
 
-describe('<Accordion /> – custom item `id` support', () => {
+describe('<Accordion /> custom item `id` support', () => {
   const customItems = [
-    { id: 'first', header: 'A', body: 'Alpha' },
-    { header: 'B', body: 'Bravo' },      // falls back to panel1
-    { id: 'third', header: 'C', body: 'Charlie' },
+    { id: 'first', header: <Typography>A</Typography>, body: <Typography>Alpha</Typography> },
+    { header: <Typography>B</Typography>, body: <Typography>Bravo</Typography> },
+    { id: 'third', header: <Typography>C</Typography>, body: <Typography>Charlie</Typography> },
   ];
 
   test('renders with mix of custom and default IDs without expanded', () => {
     render(<Accordion items={customItems} />);
     customItems.forEach(({ body }) => {
-      expect(screen.getByText(body)).not.toBeVisible();
+      expect(screen.getByText((body as any).props.children)).not.toBeVisible();
     });
   });
 
