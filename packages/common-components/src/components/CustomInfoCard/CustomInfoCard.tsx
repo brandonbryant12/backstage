@@ -188,7 +188,9 @@ export const CustomInfoCard = ({
   skimContent,
 }: CustomInfoCardProps) => {
   const [expanded, setExpanded] = useState(true);
-  const handleExpandClick = () => setExpanded(prev => !prev);
+  const handleExpandClick = () => {
+    setExpanded(prev => !prev);
+  };
 
   return (
     <StyledCard hasFooter={!!footerButtons} className={classes.cardWrapper}>
