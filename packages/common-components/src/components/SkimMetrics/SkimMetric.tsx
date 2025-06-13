@@ -16,10 +16,9 @@ export const SkimMetric = ({
   align = 'left',
 }: SkimMetricProps) => {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
 
-  const bgColor = isDark ? theme.palette.grey[800] : theme.palette.grey[100];
-  const valueColor = isDark ? theme.palette.common.white : theme.palette.text.primary;
+  const bgColor = theme.palette.background.paper;
+  const valueColor = theme.palette.text.primary;
 
   return (
     <Box
