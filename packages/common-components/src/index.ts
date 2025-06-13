@@ -13,3 +13,5 @@ export * from './components/ConditionalOwnership/ConditionalOwnership';
 export * from './components/MissingAnnotationsCard/MissingAnnotationsCard';
 export * from './components/CustomInfoCard/CustomInfoCard';
 export * from './components/PreuseCard/PreuseCard';
+export * from './components/Accordian/Accordian';
+export * from './components/SkimMetrics'
