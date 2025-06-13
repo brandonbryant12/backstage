@@ -30,7 +30,7 @@ export function PreuseCard({
   const toggle = () => setExpanded(prev => !prev);
 
   const header = (
-    <Box display="flex" alignItems="center" flexWrap="wrap">
+    <Box display="flex" alignItems="center" sx={{ flexGrow: 1 }}>
       <IconButton size="small" onClick={toggle} data-testid="toggle-button">
         {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
       </IconButton>
@@ -38,7 +38,7 @@ export function PreuseCard({
         {title}
       </Typography>
       {!expanded && skimContent && (
-        <Box sx={{ ml: 1 }}>{skimContent}</Box>
+        <Box sx={{ ml: 1, flexGrow: 1 }}>{skimContent}</Box>
       )}
     </Box>
   );
@@ -46,7 +46,7 @@ export function PreuseCard({
   return (
     <CustomInfoCard
       title={header}
-      dataSources={dataSources}
+      dataSources={expanded ? dataSources : undefined}
       footerButtons={footerButtons}
     >
       {expanded && children}

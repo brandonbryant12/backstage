@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid } from '@material-ui/core';
+import { Box, Button, Grid, Typography } from '@material-ui/core';
 import {
   EntityApiDefinitionCard,
   EntityConsumedApisCard,
@@ -51,6 +51,7 @@ import {
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
 import { MissingAnnotationsCard } from 'common-components';
+import { PreuseCard } from 'common-components';
 
 import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
@@ -165,6 +166,95 @@ const overviewContent = (
         ]}
       />
     </Grid>
+    <Grid item xs={12}>
+  <PreuseCard
+    title="Service Metrics"
+    dataSources={['Prometheus', 'CloudWatch']}
+    skimContent={
+      <Box display="flex" gap={1} sx={{ width: '100%' }}>
+        <Box sx={{
+          backgroundColor: '#000',
+          padding: 2,
+          borderRadius: 1,
+          textAlign: 'center',
+          color: '#fff',
+          flex: 1
+        }}>
+          <Typography variant="caption" sx={{ color: '#888' }}>Uptime</Typography>
+          <Typography variant="caption" display="block" sx={{ color: '#666', mb: 0.5 }}>Last 30 days</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#4caf50' }}>99.9%</Typography>
+        </Box>
+        <Box sx={{ 
+          backgroundColor: '#000', 
+          padding: 2, 
+          borderRadius: 1,
+          textAlign: 'center',
+          color: '#fff',
+          flex: 1
+        }}>
+          <Typography variant="caption" sx={{ color: '#888' }}>Response Time</Typography>
+          <Typography variant="caption" display="block" sx={{ color: '#666', mb: 0.5 }}>Average</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2196f3' }}>142ms</Typography>
+        </Box>
+        <Box sx={{ 
+          backgroundColor: '#000', 
+          padding: 2, 
+          borderRadius: 1,
+          textAlign: 'center',
+          color: '#fff',
+          flex: 1
+        }}>
+          <Typography variant="caption" sx={{ color: '#888' }}>Error Rate</Typography>
+          <Typography variant="caption" display="block" sx={{ color: '#666', mb: 0.5 }}>Per 1000 requests</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#ff9800' }}>0.02%</Typography>
+        </Box>
+        <Box sx={{ 
+          backgroundColor: '#000', 
+          padding: 2, 
+          borderRadius: 1,
+          textAlign: 'center',
+          color: '#fff',
+          flex: 1
+        }}>
+          <Typography variant="caption" sx={{ color: '#888' }}>Active Users</Typography>
+          <Typography variant="caption" display="block" sx={{ color: '#666', mb: 0.5 }}>Current</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>1,247</Typography>
+        </Box>
+      </Box>
+    }
+  >
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <h3>Detailed Metrics Overview</h3>
+        <p>This section would contain detailed charts, graphs, and additional metrics when expanded.</p>
+      </Grid>
+      <Grid item md={6}>
+        <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '4px' }}>
+          <h4>Performance Metrics</h4>
+          <ul>
+            <li>P95 Latency: 250ms</li>
+            <li>P99 Latency: 450ms</li>
+            <li>Throughput: 1.2k req/s</li>
+            <li>CPU Usage: 45%</li>
+            <li>Memory Usage: 2.1GB / 4GB</li>
+          </ul>
+        </div>
+      </Grid>
+      <Grid item md={6}>
+        <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '4px' }}>
+          <h4>Error Breakdown</h4>
+          <ul>
+            <li>4xx Errors: 0.01%</li>
+            <li>5xx Errors: 0.01%</li>
+            <li>Timeout Errors: 0.005%</li>
+            <li>Network Errors: 0.002%</li>
+            <li>Database Errors: 0.003%</li>
+          </ul>
+        </div>
+      </Grid>
+    </Grid>
+  </PreuseCard>
+</Grid>
   </Grid>
 );
 
@@ -426,4 +516,3 @@ export const entityPage = (
     <EntitySwitch.Case>{defaultEntityPage}</EntitySwitch.Case>
   </EntitySwitch>
 );
-      

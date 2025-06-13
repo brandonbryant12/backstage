@@ -24,7 +24,11 @@ export function CustomInfoCard(props: CustomInfoCardProps) {
 
   const header = (
     <Box display="flex" alignItems="center">
-      <Typography variant="h6">{title}</Typography>
+      {React.isValidElement(title) ? (
+        title
+      ) : (
+        <Typography variant="h6">{title}</Typography>
+      )}
       {dataSourceText && (
         <Typography
           variant="subtitle2"
