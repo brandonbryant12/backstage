@@ -24,6 +24,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { CustomInfoCardButtonGroup } from './CustomInfoCardFooterButtons/CustomInfoCardButtonGroup';
 import { CustomInfoCardDropdownButton } from './CustomInfoCardFooterButtons/CustomInfoCardDropdownButton';
 import { CustomInfoCardButtonGroupWithDropdown } from './CustomInfoCardFooterButtons/CustomInfoCardButtonGroupWithDropdown';
+import { SkimContentErrorState } from './SkimContentErrorState';
 
 const PREFIX = 'CustomInfoCard';
 
@@ -112,6 +113,7 @@ export interface CustomInfoCardProps {
   dataSources?: string[];
   menuActions?: MenuAction[];
   skimContent?: ReactNode;
+  skimContentError?: boolean;
 }
 
 const MenuDropdown = ({ menuActions }: { menuActions: MenuAction[] }) => {
@@ -186,6 +188,7 @@ export const CustomInfoCard = ({
   footerButtonsComponent: footerButtons,
   menuActions = [],
   skimContent,
+  skimContentError = false,
 }: CustomInfoCardProps) => {
   const [expanded, setExpanded] = useState(true);
   const handleExpandClick = () => {
@@ -221,8 +224,10 @@ export const CustomInfoCard = ({
           ) : null
         }
       />
-      {!expanded && skimContent && (
-        <Box className={classes.cardSkimContent}>{skimContent}</Box>
+      {!expanded && (skimContent || skimContentError) && (
+        <Box className={classes.cardSkimContent}>
+          {skimContentError ? <SkimContentErrorState /> : skimContent}
+        </Box>
       )}
       <Divider />
       <Collapse in={expanded} timeout="auto" unmountOnExit>

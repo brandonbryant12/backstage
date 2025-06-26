@@ -175,6 +175,7 @@ const overviewContent = (
       title="Service Performance Stats"
       subheader="Real-time metrics and insights"
       dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+      skimContentError
       skimContent={
         <SkimStats
           metrics={[
