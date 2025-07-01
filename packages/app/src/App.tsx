@@ -37,6 +37,7 @@ import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { RadarPage } from '@backstage-community/plugin-tech-radar'
+import { EntityTechRadarDeepDivePage } from '@internal/plugin-tech-radar';
 
 const app = createApp({
   apis,
@@ -97,6 +98,10 @@ const routes = (
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
     <Route path="/tech-radar" element={<RadarPage height={1000} width={1600} />} />
+    <Route
+      path="/catalog/:namespace/:kind/:name/tech-radar/*"
+      element={<EntityTechRadarDeepDivePage />}
+    />
   </FlatRoutes>
 );
 

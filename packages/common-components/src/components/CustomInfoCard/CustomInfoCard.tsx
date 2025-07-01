@@ -20,6 +20,8 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Link as RouterLink } from 'react-router-dom';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import { CustomInfoCardButtonGroup } from './CustomInfoCardFooterButtons/CustomInfoCardButtonGroup';
 import { CustomInfoCardDropdownButton } from './CustomInfoCardFooterButtons/CustomInfoCardDropdownButton';
@@ -114,6 +116,8 @@ export interface CustomInfoCardProps {
   menuActions?: MenuAction[];
   skimContent?: ReactNode;
   skimContentError?: boolean;
+  /** Optional path to a "deep-dive" page */
+  deepDivePath?: string;
 }
 
 const MenuDropdown = ({ menuActions }: { menuActions: MenuAction[] }) => {
@@ -189,6 +193,7 @@ export const CustomInfoCard = ({
   menuActions = [],
   skimContent,
   skimContentError = false,
+  deepDivePath,
 }: CustomInfoCardProps) => {
   const [expanded, setExpanded] = useState(true);
   const handleExpandClick = () => {
@@ -217,11 +222,18 @@ export const CustomInfoCard = ({
           </Box>
         }
         action={
-          menuActions.length > 0 ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <MenuDropdown {...{ menuActions }} />
-            </Box>
-          ) : null
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {deepDivePath && (
+              <IconButton
+                component={RouterLink}
+                to={deepDivePath}
+                aria-label="deep-dive"
+              >
+                <OpenInNewIcon fontSize="small" />
+              </IconButton>
+            )}
+            {menuActions.length > 0 && <MenuDropdown {...{ menuActions }} />}
+          </Box>
         }
       />
       {!expanded && (skimContent || skimContentError) && (

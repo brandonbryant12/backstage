@@ -1,4 +1,3 @@
-
 /*
 <ai_context>
 Main export file for the common-components package.
@@ -15,3 +14,5 @@ export * from './components/CustomInfoCard/CustomInfoCard';
 export * from './components/PreuseCard/PreuseCard';
 export * from './components/Accordian/Accordian';
 export * from './components/SkimMetrics'
+export * from './components/EntityHeader/EntityHeader'
+export * from './components/DeepDivePage/DeepDivePage';

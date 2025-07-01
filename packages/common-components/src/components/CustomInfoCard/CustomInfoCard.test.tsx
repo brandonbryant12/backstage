@@ -73,4 +73,18 @@ fireEvent.click(screen.getByLabelText('settings'));
 fireEvent.click(screen.getByText('A'));
 expect(spy).toHaveBeenCalled();
 });
+
+it('renders deep-dive link when deepDivePath provided', () => {
+  renderCard(
+    <CustomInfoCard
+      title="t"
+      deepDivePath="/deep"
+    >
+      <span>c</span>
+    </CustomInfoCard>,
+  );
+  const link = screen.getByLabelText('deep-dive');
+  expect(link).toBeInTheDocument();
+  expect(link.getAttribute('href')).toBe('/deep');
+});
 });
