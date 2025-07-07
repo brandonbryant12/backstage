@@ -38,6 +38,7 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { RadarPage } from '@backstage-community/plugin-tech-radar'
 import { EntityTechRadarDeepDivePage } from '@internal/plugin-tech-radar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const app = createApp({
   apis,
@@ -105,12 +106,14 @@ const routes = (
   </FlatRoutes>
 );
 
+const queryClient = new QueryClient();
+
 export default app.createRoot(
-  <>
+  <QueryClientProvider client={queryClient}>
     <AlertDisplay />
     <OAuthRequestDialog />
     <AppRouter>
       <Root>{routes}</Root>
     </AppRouter>
-  </>,
+  </QueryClientProvider>
 );
