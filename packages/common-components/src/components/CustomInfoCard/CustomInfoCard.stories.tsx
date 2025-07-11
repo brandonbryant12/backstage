@@ -44,3 +44,55 @@ Default.args = {
   ),
   children: <div>Expandable card body content goes here.</div>,
 };
+
+export const WithError = Template.bind({});
+WithError.args = {
+  ...Default.args,
+  skimContent: (
+    <SkimStats
+      metrics={[
+        { label: 'Uptime', isError: true },
+        { label: 'Errors', value: '0.1%' },
+      ]}
+    />
+  ),
+};
+
+export const WithNA = Template.bind({});
+WithNA.args = {
+  ...Default.args,
+  skimContent: (
+    <SkimStats
+      metrics={[
+        { label: 'Uptime' },
+        { label: 'Errors', value: '0.1%' },
+      ]}
+    />
+  ),
+};
+
+export const MixedStates = Template.bind({});
+MixedStates.args = {
+  ...Default.args,
+  skimContent: (
+    <SkimStats
+      metrics={[
+        { label: 'Uptime', isError: true },
+        { label: 'Errors' },
+        { label: 'Latency', value: '24 ms' },
+      ]}
+    />
+  ),
+};
+
+export const WithErrorIcon = Template.bind({});
+WithErrorIcon.args = {
+  ...Default.args,
+  errorMessage: 'Critical error occurred',
+};
+
+export const WithWarningIcon = Template.bind({});
+WithWarningIcon.args = {
+  ...Default.args,
+  warningMessage: 'Potential issue detected',
+};

@@ -175,7 +175,6 @@ const overviewContent = (
       title="Service Performance Stats"
       subheader="Real-time metrics and insights"
       dataSources={['Prometheus', 'Grafana', 'Jaeger']}
-      skimContentError
       skimContent={
         <SkimStats
           metrics={[
@@ -186,16 +185,11 @@ const overviewContent = (
         />
       }
       footerButtonsComponent={
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex'}}>
           <Button variant="outlined" size="small">View Details</Button>
           <Button variant="contained" size="small">Refresh</Button>
         </Box>
       }
-      menuActions={[
-        { label: 'Export Data', onClick: () => console.log('Export') },
-        { label: 'Configure Alerts', onClick: () => console.log('Configure') },
-        { label: 'Historical View', onClick: () => console.log('History') },
-      ]}
     >
       {/* ------------- same detailed content ------------- */}
       {/* Response Time */}
@@ -249,36 +243,299 @@ const overviewContent = (
       </Box>
     </CustomInfoCard>
   </Grid>
-
-  {/* ─────────────── HALF-WIDTH CARD ─────────────── */}
-  <Grid item md={6} xs={12}>
+  <Grid item md={12} xs={12}>
     <CustomInfoCard
-      title="Service Performance Stats"
+      title="Performance Stats with Error"
       subheader="Real-time metrics and insights"
       dataSources={['Prometheus', 'Grafana', 'Jaeger']}
       skimContent={
         <SkimStats
           metrics={[
-            { label: 'Uptime', value: '99.9%' },
+            { label: 'Uptime', isError: true },
             { label: 'Errors', value: '0.1%' },
             { label: 'Avg Latency', value: '24 ms' },
           ]}
         />
       }
       footerButtonsComponent={
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex'}}>
           <Button variant="outlined" size="small">View Details</Button>
           <Button variant="contained" size="small">Refresh</Button>
         </Box>
       }
-      menuActions={[
-        { label: 'Export Data', onClick: () => console.log('Export') },
-        { label: 'Configure Alerts', onClick: () => console.log('Configure') },
-        { label: 'Historical View', onClick: () => console.log('History') },
-      ]}
     >
-      {/* identical detailed content as above */}
-      {/* …(copy the same inner <Box> block used in the full-width card)… */}
+      {/* ------------- same detailed content ------------- */}
+      {/* Response Time */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+            <Chip label="24 ms" color="primary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Uptime */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+            <Chip label="99.9%" color="success" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Error Rate */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+            <Chip label="0.1%" color="error" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Throughput */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Requests/min</Typography>
+            <Chip label="1 234" color="info" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Resource Usage */}
+        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
+            <Typography variant="h6" color="primary">34%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
+            <Typography variant="h6" color="warning.main">78%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
+            <Typography variant="h6" color="success.main">45%</Typography>
+          </Card>
+        </Box>
+      </Box>
+    </CustomInfoCard>
+  </Grid>
+  <Grid item md={12} xs={12}>
+    <CustomInfoCard
+      title="Performance Stats with N/A"
+      subheader="Real-time metrics and insights"
+      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+      skimContent={
+        <SkimStats
+          metrics={[
+            { label: 'Uptime' },
+            { label: 'Errors', value: '0.1%' },
+            { label: 'Avg Latency', value: '24 ms' },
+          ]}
+        />
+      }
+      footerButtonsComponent={
+        <Box sx={{ display: 'flex'}}>
+          <Button variant="outlined" size="small">View Details</Button>
+          <Button variant="contained" size="small">Refresh</Button>
+        </Box>
+      }
+    >
+      {/* ------------- same detailed content ------------- */}
+      {/* Response Time */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+            <Chip label="24 ms" color="primary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Uptime */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+            <Chip label="99.9%" color="success" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Error Rate */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+            <Chip label="0.1%" color="error" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Throughput */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Requests/min</Typography>
+            <Chip label="1 234" color="info" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Resource Usage */}
+        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
+            <Typography variant="h6" color="primary">34%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
+            <Typography variant="h6" color="warning.main">78%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
+            <Typography variant="h6" color="success.main">45%</Typography>
+          </Card>
+        </Box>
+      </Box>
+    </CustomInfoCard>
+  </Grid>
+  <Grid item md={12} xs={12}>
+    <CustomInfoCard
+      title="Performance Stats Mixed"
+      subheader="Real-time metrics and insights"
+      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+      skimContent={
+        <SkimStats
+          metrics={[
+            { label: 'Avg Latency', color: 'success', value: '24 ms' },
+          ]}
+        />
+      }
+      footerButtonsComponent={
+        <Box sx={{ display: 'flex'}}>
+          <Button variant="outlined" size="small">View Details</Button>
+          <Button variant="contained" size="small">Refresh</Button>
+        </Box>
+      }
+    >
+      {/* ------------- same detailed content ------------- */}
+      {/* Response Time */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+            <Chip label="24 ms" color="primary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Uptime */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+            <Chip label="99.9%" color="success" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Error Rate */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+            <Chip label="0.1%" color="error" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Throughput */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Requests/min</Typography>
+            <Chip label="1 234" color="info" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Resource Usage */}
+        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
+            <Typography variant="h6" color="primary">34%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
+            <Typography variant="h6" color="warning.main">78%</Typography>
+          </Card>
+          <Card sx={{ flex: 1, p: 1.5 }}>
+            <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
+            <Typography variant="h6" color="success.main">45%</Typography>
+          </Card>
+        </Box>
+      </Box>
+    </CustomInfoCard>
+  </Grid>
+  <Grid item md={12} xs={12}>
+    <CustomInfoCard
+      title="Performance Stats (Error Example)"
+      subheader="Real-time metrics and insights"
+      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+      errorMessage="Failed to fetch metrics from Prometheus. Please check your connection."
+      skimContent={
+        <SkimStats
+          metrics={[
+            { label: 'Uptime', isError: true },
+            { label: 'Errors', value: 'N/A' },
+            { label: 'Avg Latency', value: 'N/A' },
+          ]}
+        />
+      }
+      footerButtonsComponent={
+        <Box sx={{ display: 'flex'}}>
+          <Button variant="outlined" size="small">View Details</Button>
+          <Button variant="contained" size="small">Refresh</Button>
+        </Box>
+      }
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 2 }}>
+        <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+          Unable to display metrics due to a connection error.
+        </Typography>
+      </Box>
+    </CustomInfoCard>
+  </Grid>
+  <Grid item md={12} xs={12}>
+    <CustomInfoCard
+      title="Performance Stats (Unhealthy Warning)"
+      subheader="Real-time metrics and insights"
+      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+      warningMessage="Warning: Application health is degraded. Error rate is above threshold."
+      skimContent={
+        <SkimStats
+          metrics={[
+            { label: 'Uptime', value: '97.2%' },
+            { label: 'Errors', value: '3.5%', isError: true },
+            { label: 'Avg Latency', value: '120 ms' },
+          ]}
+        />
+      }
+      footerButtonsComponent={
+        <Box sx={{ display: 'flex'}}>
+          <Button variant="outlined" size="small">View Details</Button>
+          <Button variant="contained" size="small">Refresh</Button>
+        </Box>
+      }
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 2 }}>
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+            <Chip label="120 ms" color="primary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={60} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Uptime */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+            <Chip label="97.2%" color="primary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={97.2} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+        {/* Error Rate */}
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+            <Chip label="3.5%" color="secondary" size="small" />
+          </Box>
+          <LinearProgress variant="determinate" value={3.5} sx={{ height: 8, borderRadius: 4 }} />
+        </Box>
+      </Box>
     </CustomInfoCard>
   </Grid>
 </Grid>

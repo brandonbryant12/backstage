@@ -25,3 +25,12 @@ Default.args = {
     { label: 'Latency', value: '24 ms' },
   ],
 };
+
+export const Colored = Template.bind({});
+Colored.args = {
+  metrics: [
+    { label: 'Uptime', value: '99.9%', color: 'success' },
+    { label: 'Errors', value: '0.1%', color: 'error' },
+    { label: 'Latency', value: '24 ms', color: 'warning' },
+  ],
+};

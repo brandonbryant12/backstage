@@ -23,6 +23,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link as RouterLink } from 'react-router-dom';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
+import ErrorIcon from '@mui/icons-material/Error';
+import WarningIcon from '@mui/icons-material/Warning';
+import Tooltip from '@mui/material/Tooltip';
+
 import { CustomInfoCardButtonGroup } from './CustomInfoCardFooterButtons/CustomInfoCardButtonGroup';
 import { CustomInfoCardDropdownButton } from './CustomInfoCardFooterButtons/CustomInfoCardDropdownButton';
 import { CustomInfoCardButtonGroupWithDropdown } from './CustomInfoCardFooterButtons/CustomInfoCardButtonGroupWithDropdown';
@@ -58,22 +62,23 @@ const StyledCard = styled(({ hasFooter, ...otherProps }: StyledCardProps) => (
   [`& .${classes.titleWrapper}`]: {
     display: 'flex',
     alignItems: 'center',
+    gap: theme.spacing(1),
+    padding: '8px 16px', // Added padding around title wrapper
   },
   [`& .${classes.titleText}`]: {
     whiteSpace: 'nowrap',
     fontSize: '1.5rem',
     fontWeight: 700,
-    padding: '0 32px',
+    padding: 0,
   },
   [`& .${classes.cardHeader}`]: {
-    height: `${cardHeaderFooterHeight}px`,
-    padding: '20px',
+    padding: '8px 16px',
     '& .MuiCardHeader-content': {
       overflow: 'hidden',
     },
   },
   [`& .${classes.cardContent}`]: {
-    padding: '20px',
+    padding: '24px 20px', // Increased padding for content
   },
   [`& .${classes.cardSources}`]: {
     display: 'flex',
@@ -81,19 +86,20 @@ const StyledCard = styled(({ hasFooter, ...otherProps }: StyledCardProps) => (
     fontSize: '1.125rem',
     fontWeight: 'normal',
     color: theme.palette.text.secondary,
+    padding: '0 8px', // Added padding for data sources
   },
   [`& .${classes.cardSubHeader}`]: {
-    padding: '20px 20px 0 20px',
+    padding: '16px 20px 0 20px', // Adjusted subheader padding
     fontSize: '1.125rem',
     color: theme.palette.text.secondary,
   },
   [`& .${classes.cardFooter}`]: {
     height: `${cardHeaderFooterHeight}px`,
-    padding: '20px',
+    padding: '16px 20px', // Adjusted footer padding
     justifyContent: 'flex-end',
   },
   [`& .${classes.cardSkimContent}`]: {
-    padding: '0 20px 8px 20px',
+    padding: '8px 20px', // Adjusted skim content padding
   },
 }));
 
@@ -118,6 +124,8 @@ export interface CustomInfoCardProps {
   skimContentError?: boolean;
   /** Optional path to a "deep-dive" page */
   deepDivePath?: string;
+  errorMessage?: string;
+  warningMessage?: string;
 }
 
 const MenuDropdown = ({ menuActions }: { menuActions: MenuAction[] }) => {
@@ -194,11 +202,28 @@ export const CustomInfoCard = ({
   skimContent,
   skimContentError = false,
   deepDivePath,
+  errorMessage,
+  warningMessage,
 }: CustomInfoCardProps) => {
   const [expanded, setExpanded] = useState(true);
   const handleExpandClick = () => {
     setExpanded(prev => !prev);
   };
+
+  let statusIcon = null;
+  if (errorMessage) {
+    statusIcon = (
+      <Tooltip title={errorMessage}>
+        <ErrorIcon color="error" sx={{ mr: 0.5, verticalAlign: 'middle' }} />
+      </Tooltip>
+    );
+  } else if (warningMessage) {
+    statusIcon = (
+      <Tooltip title={warningMessage}>
+        <WarningIcon color="warning" sx={{ mr: 0.5, verticalAlign: 'middle' }} />
+      </Tooltip>
+    );
+  }
 
   return (
     <StyledCard hasFooter={!!footerButtons} className={classes.cardWrapper}>
@@ -212,13 +237,22 @@ export const CustomInfoCard = ({
               sx={{
                 transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
                 transition: 'transform 150ms',
-                mr: 1,
+                mr: 0,
               }}
             >
               <ExpandMoreIcon />
             </IconButton>
+            {statusIcon}
             <Typography className={classes.titleText}>{title}</Typography>
-            {dataSources.length > 0 && <DataSourceList {...{ dataSources }} />}
+            {expanded ? (
+              dataSources.length > 0 && <DataSourceList dataSources={dataSources} />
+            ) : (
+              (skimContent || skimContentError) && (
+                <Box sx={{ flex: 1, ml: 2 }}>
+                  {skimContentError ? <SkimContentErrorState /> : skimContent}
+                </Box>
+              )
+            )}
           </Box>
         }
         action={
@@ -236,11 +270,6 @@ export const CustomInfoCard = ({
           </Box>
         }
       />
-      {!expanded && (skimContent || skimContentError) && (
-        <Box className={classes.cardSkimContent}>
-          {skimContentError ? <SkimContentErrorState /> : skimContent}
-        </Box>
-      )}
       <Divider />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         {subheader && (

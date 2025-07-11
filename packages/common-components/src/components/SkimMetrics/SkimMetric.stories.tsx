@@ -35,3 +35,35 @@ DarkMode.decorators = [
     </ThemeProvider>
   ),
 ];
+
+export const ErrorState = Template.bind({});
+ErrorState.args = {
+  label: 'Users',
+  isError: true,
+};
+
+export const NAState = Template.bind({});
+NAState.args = {
+  label: 'Users',
+};
+
+export const SuccessColor = Template.bind({});
+SuccessColor.args = {
+  label: 'Users',
+  value: '123',
+  color: 'success',
+};
+
+export const ErrorColor = Template.bind({});
+ErrorColor.args = {
+  label: 'Users',
+  value: '123',
+  color: 'error',
+};
+
+export const WarningColor = Template.bind({});
+WarningColor.args = {
+  label: 'Users',
+  value: '123',
+  color: 'warning',
+};
