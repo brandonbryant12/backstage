@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn add recharts)",
+      "Bash(mkdir:*)",
+      "Bash(yarn test:*)"
+    ],
+    "deny": []
+  }
+}

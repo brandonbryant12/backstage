@@ -53,20 +53,16 @@ import {
 } from '@backstage/catalog-model';
 import { MissingAnnotationsCard } from 'common-components';
 import { PreuseCard } from 'common-components';
-
-import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
+import { CodeCoverageCard } from 'backstage-plugin-helloworld';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
-import Accordion from 'common-components/src/components/Accordian/Accordian';
 
 const techdocsContent = (
   <EntityTechdocsContent>
-    <TechDocsAddons>
       <ReportIssue />
-    </TechDocsAddons>
   </EntityTechdocsContent>
 );
 
@@ -146,28 +142,6 @@ const overviewContent = (
         annotation={["ann1", "ann2"]}
       />
     </Grid>
-    <Grid item md={6} xs={12}>
-      <Accordion
-        items={[
-          {
-            id: '1',
-            header: 'What is Lorem Ipsum?',
-            body: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-          },
-          {
-            id: '2',
-            header: 'Why do we use it?',
-            body: 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.',
-          },
-          {
-            id: '3',
-            header: 'Where does it come from?',
-            body: 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC.',
-          },
-        ]}
-      />
-    </Grid>
-
 <Grid container spacing={3} alignItems="stretch">
   {/* ─────────────── FULL-WIDTH CARD ─────────────── */}
   <Grid item md={12} xs={12}>
@@ -490,53 +464,7 @@ const overviewContent = (
     </CustomInfoCard>
   </Grid>
   <Grid item md={12} xs={12}>
-    <CustomInfoCard
-      title="Performance Stats (Unhealthy Warning)"
-      subheader="Real-time metrics and insights"
-      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
-      warningMessage="Warning: Application health is degraded. Error rate is above threshold."
-      skimContent={
-        <SkimStats
-          metrics={[
-            { label: 'Uptime', value: '97.2%' },
-            { label: 'Errors', value: '3.5%', isError: true },
-            { label: 'Avg Latency', value: '120 ms' },
-          ]}
-        />
-      }
-      footerButtonsComponent={
-        <Box sx={{ display: 'flex'}}>
-          <Button variant="outlined" size="small">View Details</Button>
-          <Button variant="contained" size="small">Refresh</Button>
-        </Box>
-      }
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: 2 }}>
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
-            <Chip label="120 ms" color="primary" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={60} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Uptime */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
-            <Chip label="97.2%" color="primary" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={97.2} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Error Rate */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
-            <Chip label="3.5%" color="secondary" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={3.5} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-      </Box>
-    </CustomInfoCard>
+    <CodeCoverageCard/>
   </Grid>
 </Grid>
 
