@@ -60,6 +60,11 @@ import {
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
 
+const isNonProd = () => {
+  const hostname = window.location.hostname;
+  return hostname === 'localhost' || hostname.startsWith('dev.');
+};
+
 const techdocsContent = (
   <EntityTechdocsContent>
       <ReportIssue />
@@ -471,6 +476,14 @@ const overviewContent = (
   </Grid>
 );
 
+const debugContent = (
+  <EmptyState
+    title="Debug Mode"
+    description="This is a debug page available only in non-production environments."
+    missing="info"
+  />
+);
+
 const serviceEntityPage = (
   <EntityLayout>
     <EntityLayout.Route path="/" title="Overview">
@@ -514,6 +527,10 @@ const serviceEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
+    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -549,6 +566,10 @@ const websiteEntityPage = (
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
     </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
+    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -560,6 +581,10 @@ const defaultEntityPage = (
 
     <EntityLayout.Route path="/docs" title="Docs">
       {techdocsContent}
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -610,6 +635,10 @@ const apiPage = (
         </Grid>
       </Grid>
     </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
+    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -625,6 +654,10 @@ const userPage = (
           <EntityOwnershipCard variant="gridItem" />
         </Grid>
       </Grid>
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -647,6 +680,10 @@ const groupPage = (
           <EntityLinksCard />
         </Grid>
       </Grid>
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
     </EntityLayout.Route>
   </EntityLayout>
 );
@@ -696,6 +733,10 @@ const systemPage = (
         unidirectional={false}
       />
     </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
+    </EntityLayout.Route>
   </EntityLayout>
 );
 
@@ -714,6 +755,10 @@ const domainPage = (
           <EntityHasSystemsCard variant="gridItem" />
         </Grid>
       </Grid>
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/debug" title="Debug" if={isNonProd}>
+      {debugContent}
     </EntityLayout.Route>
   </EntityLayout>
 );
