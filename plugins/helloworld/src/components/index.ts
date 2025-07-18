@@ -7,3 +7,4 @@ Exports all components from the helloworld plugin
 export * from './apiCards';
 export * from './catalogCards';
 export * from './CodeCoverageCard';
+export * from './ResilienceCard';
