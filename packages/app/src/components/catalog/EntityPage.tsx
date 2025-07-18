@@ -53,7 +53,7 @@ import {
 } from '@backstage/catalog-model';
 import { MissingAnnotationsCard } from 'common-components';
 import { PreuseCard } from 'common-components';
-import { CodeCoverageCard } from 'backstage-plugin-helloworld';
+import { CodeCoverageCard, ResilienceCard } from 'backstage-plugin-helloworld';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import {
   EntityKubernetesContent,
@@ -128,6 +128,9 @@ const overviewContent = (
     </Grid>
     <Grid item md={6} xs={12}>
       <EntityCatalogGraphCard variant="gridItem" height={400} />
+    </Grid>
+    <Grid item md={12} xs={12}>
+      <ResilienceCard />
     </Grid>
     <Grid item md={4} xs={12}>
       <EntityLinksCard />
