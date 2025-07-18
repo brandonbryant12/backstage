@@ -41,41 +41,45 @@ const ResilienceExpandedContent = () => {
   
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}>
-        <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-          CHAOS EXPERIMENT
-        </Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          <Typography variant="body2">
-            Chaos Experiments Compliant: {chaosExperiment.compliant ? 'Yes' : 'No'}.
+      <Grid item xs={12}>
+        <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+            CHAOS EXPERIMENT
           </Typography>
-          <Typography variant="body2">
-            In Scope: {chaosExperiment.inScope ? 'Yes' : 'No'}
-          </Typography>
-          <Typography variant="body2">
-            Catchup Date: {chaosExperiment.catchupDate}
-          </Typography>
-          <Typography variant="body2">
-            Snapshot Facing Date: {chaosExperiment.snapshotFacingDate || 'NO'}
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            <Typography variant="body2">
+              Chaos Experiments Compliant: {chaosExperiment.compliant ? 'Yes' : 'No'}.
+            </Typography>
+            <Typography variant="body2">
+              In Scope: {chaosExperiment.inScope ? 'Yes' : 'No'}
+            </Typography>
+            <Typography variant="body2">
+              Catchup Date: {chaosExperiment.catchupDate}
+            </Typography>
+            <Typography variant="body2">
+              Snapshot Facing Date: {chaosExperiment.snapshotFacingDate || 'NO'}
+            </Typography>
+          </Box>
         </Box>
       </Grid>
-      <Grid item xs={6}>
-        <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
-          INCIDENT MANAGEMENT
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Box sx={{ bgcolor: 'error.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
-            Critical {incidents.critical}
-          </Box>
-          <Box sx={{ bgcolor: 'warning.dark', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
-            High {incidents.high}
-          </Box>
-          <Box sx={{ bgcolor: 'warning.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
-            Medium {incidents.medium}
-          </Box>
-          <Box sx={{ bgcolor: 'info.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
-            Low & Below {incidents.low}
+      <Grid item xs={12}>
+        <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 1 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+            INCIDENT MANAGEMENT
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Box sx={{ bgcolor: 'error.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
+              Critical {incidents.critical}
+            </Box>
+            <Box sx={{ bgcolor: 'warning.dark', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
+              High {incidents.high}
+            </Box>
+            <Box sx={{ bgcolor: 'warning.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
+              Medium {incidents.medium}
+            </Box>
+            <Box sx={{ bgcolor: 'info.main', color: 'common.white', px: 2, py: 1, borderRadius: 0, textAlign: 'center', fontSize: '0.875rem', fontWeight: 'bold' }}>
+              Low & Below {incidents.low}
+            </Box>
           </Box>
         </Box>
       </Grid>
