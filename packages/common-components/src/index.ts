@@ -16,3 +16,5 @@ export * from './components/Accordian/Accordian';
 export * from './components/SkimMetrics'
 export * from './components/EntityHeader/EntityHeader'
 export * from './components/DeepDivePage/DeepDivePage';
+export * from './components/AdaptiveGrid';
+export * from './components/VideoCarousel';
