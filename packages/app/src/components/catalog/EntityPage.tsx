@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Grid, Typography, Card, CardContent, LinearProgress, Chip } from '@material-ui/core';
+import { Box, Button, Grid, Typography, Card, LinearProgress, Chip } from '@material-ui/core';
 import { CustomInfoCard, SkimStats } from 'common-components';
 import {
   EntityApiDefinitionCard,
@@ -52,7 +52,6 @@ import {
   RELATION_PROVIDES_API,
 } from '@backstage/catalog-model';
 import { MissingAnnotationsCard } from 'common-components';
-import { PreuseCard } from 'common-components';
 import { CodeCoverageCard, ResilienceCard } from 'backstage-plugin-helloworld';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 import {
@@ -150,158 +149,163 @@ const overviewContent = (
         annotation={["ann1", "ann2"]}
       />
     </Grid>
-<Grid container spacing={3} alignItems="stretch">
-  {/* ─────────────── FULL-WIDTH CARD ─────────────── */}
-  <Grid item md={12} xs={12}>
-    <CustomInfoCard
-      title="Service Performance Stats"
-      subheader="Real-time metrics and insights"
-      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
-      skimContent={
-        <SkimStats
-          metrics={[
-            { label: 'Uptime', value: '99.9%' },
-            { label: 'Errors', value: '0.1%' },
-            { label: 'Avg Latency', value: '24 ms' },
-          ]}
-        />
-      }
-      footerButtonsComponent={
-        <Box sx={{ display: 'flex'}}>
-          <Button variant="outlined" size="small">View Details</Button>
-          <Button variant="contained" size="small">Refresh</Button>
-        </Box>
-      }
-    >
-      {/* ------------- same detailed content ------------- */}
-      {/* Response Time */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
-            <Chip label="24 ms" color="primary" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Uptime */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
-            <Chip label="99.9%" color="success" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Error Rate */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
-            <Chip label="0.1%" color="error" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Throughput */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Requests/min</Typography>
-            <Chip label="1 234" color="info" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Resource Usage */}
-        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
-            <Typography variant="h6" color="primary">34%</Typography>
-          </Card>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
-            <Typography variant="h6" color="warning.main">78%</Typography>
-          </Card>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
-            <Typography variant="h6" color="success.main">45%</Typography>
-          </Card>
-        </Box>
+<AdaptiveGrid>
+  <CustomInfoCard
+    key="perfStats"
+    title="Service Performance Stats"
+    subheader="Real-time metrics and insights"
+    dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+    skimContent={
+      <SkimStats
+        metrics={[
+          { label: 'Uptime', value: '99.9%' },
+          { label: 'Errors', value: '0.1%' },
+          { label: 'Avg Latency', value: '24 ms' },
+        ]}
+      />
+    }
+    footerButtonsComponent={
+      <Box sx={{ display: 'flex' }}>
+        <Button variant="outlined" size="small">
+          View Details
+        </Button>
+        <Button variant="contained" size="small">
+          Refresh
+        </Button>
       </Box>
-    </CustomInfoCard>
-  </Grid>
-  <Grid item md={12} xs={12}>
-    <CustomInfoCard
-      title="Performance Stats with Error"
-      subheader="Real-time metrics and insights"
-      dataSources={['Prometheus', 'Grafana', 'Jaeger']}
-      skimContent={
-        <SkimStats
-          metrics={[
-            { label: 'Uptime', isError: true },
-            { label: 'Errors', value: '0.1%' },
-            { label: 'Avg Latency', value: '24 ms' },
-          ]}
-        />
-      }
-      footerButtonsComponent={
-        <Box sx={{ display: 'flex'}}>
-          <Button variant="outlined" size="small">View Details</Button>
-          <Button variant="contained" size="small">Refresh</Button>
+    }
+  >
+    {/* ------------- same detailed content ------------- */}
+    {/* Response Time */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+          <Chip label="24 ms" color="primary" size="small" />
         </Box>
-      }
-    >
-      {/* ------------- same detailed content ------------- */}
-      {/* Response Time */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
-            <Chip label="24 ms" color="primary" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Uptime */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
-            <Chip label="99.9%" color="success" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Error Rate */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Error Rate</Typography>
-            <Chip label="0.1%" color="error" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Throughput */}
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="body2" color="textSecondary">Requests/min</Typography>
-            <Chip label="1 234" color="info" size="small" />
-          </Box>
-          <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
-        </Box>
-        {/* Resource Usage */}
-        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
-            <Typography variant="h6" color="primary">34%</Typography>
-          </Card>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
-            <Typography variant="h6" color="warning.main">78%</Typography>
-          </Card>
-          <Card sx={{ flex: 1, p: 1.5 }}>
-            <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
-            <Typography variant="h6" color="success.main">45%</Typography>
-          </Card>
-        </Box>
+        <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
       </Box>
-    </CustomInfoCard>
-  </Grid>
-  <Grid item md={12} xs={12}>
-    <CodeCoverageCard/>
-  </Grid>
-</Grid>
+      {/* Uptime */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+          <Chip label="99.9%" color="success" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Error Rate */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+          <Chip label="0.1%" color="error" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Throughput */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Requests/min</Typography>
+          <Chip label="1 234" color="info" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Resource Usage */}
+      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
+          <Typography variant="h6" color="primary">34%</Typography>
+        </Card>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
+          <Typography variant="h6" color="warning.main">78%</Typography>
+        </Card>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
+          <Typography variant="h6" color="success.main">45%</Typography>
+        </Card>
+      </Box>
+    </Box>
+  </CustomInfoCard>
+
+  <CustomInfoCard
+    key="perfStatsError"
+    title="Performance Stats with Error"
+    subheader="Real-time metrics and insights"
+    dataSources={['Prometheus', 'Grafana', 'Jaeger']}
+    skimContent={
+      <SkimStats
+        metrics={[
+          { label: 'Uptime', isError: true },
+          { label: 'Errors', value: '0.1%' },
+          { label: 'Avg Latency', value: '24 ms' },
+        ]}
+      />
+    }
+    footerButtonsComponent={
+      <Box sx={{ display: 'flex' }}>
+        <Button variant="outlined" size="small">
+          View Details
+        </Button>
+        <Button variant="contained" size="small">
+          Refresh
+        </Button>
+      </Box>
+    }
+  >
+    {/* ------------- same detailed content ------------- */}
+    {/* Response Time */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Average Response Time</Typography>
+          <Chip label="24 ms" color="primary" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Uptime */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Service Uptime</Typography>
+          <Chip label="99.9%" color="success" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={99.9} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Error Rate */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Error Rate</Typography>
+          <Chip label="0.1%" color="error" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={0.1} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Throughput */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="body2" color="textSecondary">Requests/min</Typography>
+          <Chip label="1 234" color="info" size="small" />
+        </Box>
+        <LinearProgress variant="determinate" value={85} sx={{ height: 8, borderRadius: 4 }} />
+      </Box>
+      {/* Resource Usage */}
+      <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>CPU Usage</Typography>
+          <Typography variant="h6" color="primary">34%</Typography>
+        </Card>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>Memory</Typography>
+          <Typography variant="h6" color="warning.main">78%</Typography>
+        </Card>
+        <Card sx={{ flex: 1, p: 1.5 }}>
+          <Typography variant="body2" color="textSecondary" gutterBottom>Storage</Typography>
+          <Typography variant="h6" color="success.main">45%</Typography>
+        </Card>
+      </Box>
+    </Box>
+  </CustomInfoCard>
+
+  <CodeCoverageCard key="coverageCard" />
+</AdaptiveGrid>
 
   </Grid>
 );

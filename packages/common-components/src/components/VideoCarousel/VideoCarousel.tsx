@@ -6,6 +6,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Video, VideoProps } from './Video';
+import ReactPlayer from 'react-player';
 
 export interface VideoItem extends Omit<VideoProps, 'width' | 'height'> {
   id: string;
@@ -231,6 +232,7 @@ export const VideoCarousel: React.FC<VideoCarouselProps> = ({
             onClick={() => handleScroll('left')}
             disabled={!canScrollLeft}
             size="small"
+            aria-label="Previous"
           >
             <ChevronLeftIcon />
           </IconButton>
@@ -252,11 +254,26 @@ export const VideoCarousel: React.FC<VideoCarouselProps> = ({
                   onClick={() => handleVideoSelect(video.id)}
                   sx={{ height: thumbnailHeight }}
                 >
-                  {video.thumbnailUri ? (
+                  {video.thumbnailUri || ReactPlayer.canPlay(video.uri) ? (
                     <img
-                      src={video.thumbnailUri}
+                      src={video.thumbnailUri || `https://img.youtube.com/vi/${video.uri.split('/').pop()}/0.jpg`}
                       alt={video.title || 'Video thumbnail'}
                       className={classes.thumbnailImage}
+                      onError={(e) => {
+                        // Fallback if thumbnail fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          const fallback = document.createElement('div');
+                          fallback.className = classes.thumbnailImage;
+                          fallback.style.display = 'flex';
+                          fallback.style.alignItems = 'center';
+                          fallback.style.justifyContent = 'center';
+                          fallback.innerHTML = '<svg class="MuiSvgIcon-root" style="font-size: 40px; opacity: 0.5;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>';
+                          parent.appendChild(fallback);
+                        }
+                      }}
                     />
                   ) : (
                     <Box
@@ -291,6 +308,7 @@ export const VideoCarousel: React.FC<VideoCarouselProps> = ({
             onClick={() => handleScroll('right')}
             disabled={!canScrollRight}
             size="small"
+            aria-label="Next"
           >
             <ChevronRightIcon />
           </IconButton>

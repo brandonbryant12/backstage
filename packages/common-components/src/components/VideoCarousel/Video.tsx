@@ -2,6 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import ReactPlayer from 'react-player';
 
 export interface VideoProps {
   uri: string;
@@ -10,8 +11,17 @@ export interface VideoProps {
   thumbnailUri?: string;
   onPlay?: () => void;
   onPause?: () => void;
+  onEnded?: () => void;
+  onError?: (error: any) => void;
+  onProgress?: (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => void;
   width?: string | number;
   height?: string | number;
+  controls?: boolean;
+  playing?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  volume?: number;
+  playbackRate?: number;
 }
 
 const PREFIX = 'Video';
@@ -48,7 +58,10 @@ const StyledBox = styled(Box)(({ theme }) => ({
     left: 0,
     width: '100%',
     height: '100%',
-    objectFit: 'contain',
+    '& > div': {
+      width: '100% !important',
+      height: '100% !important',
+    },
   },
 
   [`& .${classes.infoWrapper}`]: {
@@ -75,8 +88,17 @@ export const Video: React.FC<VideoProps> = ({
   thumbnailUri,
   onPlay,
   onPause,
+  onEnded,
+  onError,
+  onProgress,
   width,
   height,
+  controls = true,
+  playing = false,
+  loop = false,
+  muted = false,
+  volume = 0.8,
+  playbackRate = 1,
 }) => {
   return (
     <StyledBox className={classes.container}>
@@ -87,16 +109,24 @@ export const Video: React.FC<VideoProps> = ({
           ...(height && { paddingTop: 0, height }),
         }}
       >
-        <video
+        <ReactPlayer
           className={classes.video}
-          src={uri}
-          poster={thumbnailUri}
-          controls
+          url={uri}
+          light={thumbnailUri}
+          controls={controls}
+          playing={playing}
+          loop={loop}
+          muted={muted}
+          volume={volume}
+          playbackRate={playbackRate}
+          width="100%"
+          height="100%"
           onPlay={onPlay}
           onPause={onPause}
-        >
-          Your browser does not support the video tag.
-        </video>
+          onEnded={onEnded}
+          onError={onError}
+          onProgress={onProgress}
+        />
       </Box>
       
       {(title || description) && (

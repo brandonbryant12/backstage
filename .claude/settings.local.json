@@ -3,7 +3,12 @@
     "allow": [
       "Bash(yarn add recharts)",
       "Bash(mkdir:*)",
-      "Bash(yarn test:*)"
+      "Bash(yarn test:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(yarn add:*)"
     ],
     "deny": []
   }

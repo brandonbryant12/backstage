@@ -29,7 +29,8 @@
     "@backstage/test-utils": "^1.7.5",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^16.2.0",
-    "@types/react": "^16"
+    "@types/react": "^16",
+    "@types/react-resizable": "^3"
   },
   "files": [
     "dist"
@@ -48,6 +49,9 @@
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
-    "@mui/styles": "^6.0.0"
+    "@mui/styles": "^6.0.0",
+    "react-grid-layout": "^1.5.2",
+    "react-player": "^3.3.1",
+    "react-resizable": "^3.0.5"
   }
 }

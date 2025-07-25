@@ -22,6 +22,8 @@ import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link as RouterLink } from 'react-router-dom';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 
 import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -126,6 +128,12 @@ export interface CustomInfoCardProps {
   deepDivePath?: string;
   errorMessage?: string;
   warningMessage?: string;
+  /** Show or hide the width-toggle button (AdaptiveGrid sets this) */
+  showWidthToggle?: boolean;
+  /** Current width state (half / full) */
+  isFullWidth?: boolean;
+  /** Callback fired when user clicks width-toggle */
+  onToggleWidth?: () => void;
 }
 
 const MenuDropdown = ({ menuActions }: { menuActions: MenuAction[] }) => {
@@ -204,6 +212,9 @@ export const CustomInfoCard = ({
   deepDivePath,
   errorMessage,
   warningMessage,
+  showWidthToggle = false,
+  isFullWidth = false,
+  onToggleWidth,
 }: CustomInfoCardProps) => {
   const [expanded, setExpanded] = useState(true);
   const handleExpandClick = () => {
@@ -228,7 +239,7 @@ export const CustomInfoCard = ({
   return (
     <StyledCard hasFooter={!!footerButtons} className={classes.cardWrapper}>
       <CardHeader
-        className={classes.cardHeader}
+        className={`${classes.cardHeader} custom-info-card-drag-handle`}
         title={
           <Box className={classes.titleWrapper}>
             <IconButton
@@ -257,6 +268,19 @@ export const CustomInfoCard = ({
         }
         action={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {showWidthToggle && (
+              <IconButton
+                aria-label="toggle-width"
+                onClick={onToggleWidth}
+                size="small"
+              >
+                {isFullWidth ? (
+                  <UnfoldLessIcon fontSize="small" />
+                ) : (
+                  <UnfoldMoreIcon fontSize="small" />
+                )}
+              </IconButton>
+            )}
             {deepDivePath && (
               <IconButton
                 component={RouterLink}
