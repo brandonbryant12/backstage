@@ -46,7 +46,7 @@
     "app": "link:../app",
     "backstage-plugin-catalog-backend-module-example-fragment-provider": "^0.1.0",
     "better-sqlite3": "^11.0.0",
-    "node-gyp": "^10.0.0",
+    "node-gyp": "^11.0.0",
     "pg": "^8.11.3"
   },
   "devDependencies": {
