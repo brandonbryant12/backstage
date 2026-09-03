@@ -48,7 +48,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.0.0",
     "@types/supertest": "^6.0.0",
-    "msw": "^1.0.0",
+    "msw": "^2.0.0",
     "supertest": "^6.2.4"
   },
   "files": [
