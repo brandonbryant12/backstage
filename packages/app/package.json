@@ -40,7 +40,7 @@
     "@backstage/plugin-user-settings": "^0.8.19",
     "@backstage/theme": "^0.6.4",
     "@internal/plugin-tech-radar": "workspace:^",
-    "@material-ui/core": "^4.12.2",
+    "@mui/material": "^5.0.0",
     "@material-ui/icons": "^4.9.1",
     "@tanstack/react-query": "^5.81.5",
     "backstage-plugin-helloworld": "workspace:^",
