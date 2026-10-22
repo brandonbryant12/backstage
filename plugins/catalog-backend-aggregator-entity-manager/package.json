@@ -33,7 +33,7 @@
     "@backstage/plugin-permission-common": "^0.8.4",
     "@backstage/types": "^1.2.1",
     "@internal/entity-aggregation-common": "^0.1.0",
-    "express": "^4.21.2",
+    "express": "^5.0.0",
     "express-promise-router": "^4.1.1",
     "knex": "^3.0.0",
     "lodash": "^4.17.21",
